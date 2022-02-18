@@ -1,3 +1,16 @@
+# Career
+
+Since 1994, creation and development of systems, portals, personal pages, websites, and specialized systems for internet and websites for managing registrations and routines. Specialization in analysis and development of systems for customer service, CRM, SAC, Helpdesk & Telemarketing. Also acting with customer support and remote administration of database and corporate portals.
+
+# Profile
+
+Critical analysis, organization, discipline, teamwork, concern with responsibility and punctuality, tireless search for quality and creativity.
+
+## Page Profile Build
+
+✨ Build a beautiful and simple website in literally minutes. 
+  - Demo at https://beautifuljekyll.com
+
 [![](https://i.imgur.com/zNBkzj1.png)](https://beautifuljekyll.com/plans/)
 
 # Beautiful Jekyll
