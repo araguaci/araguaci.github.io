@@ -373,3 +373,5 @@ It is important to have the wireframes to understand the flow of the user's jour
 7. **CAREER** Apply for a full time job. You are ready.
 8. **SKILLS** Continue iterating.
 9. **CAREER** Prepare for interviews
+
+Source: [shrutikapoor08](https://github.com/shrutikapoor08/Learn-Web-Development-Checklist)
