@@ -6,6 +6,8 @@ Since 1994, creation and development of systems, portals, personal pages, websit
 
 Critical analysis, organization, discipline, teamwork, concern with responsibility and punctuality, tireless search for quality and creativity.
 
+[see it here...](https://araguaci.github.io/)
+
 ## Page Profile Build
 
 ✨ Build a beautiful and simple website in literally minutes. 
