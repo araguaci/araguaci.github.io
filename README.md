@@ -78,9 +78,9 @@ Getting started is *literally* as easy as 1-2-3 :smile:
 
 Scroll down to see the steps involved, but here is a 40-second video just as a reference as you work through the steps. If you don't already have a [GitHub account](https://github.com/join), you'll need to sign up.
 
-![Installation steps](assets/img/install-steps.gif)
+![Installation steps](https://github.com/daattali/beautiful-jekyll/blob/master/assets/img/install-steps.gif)
 
-### 1. Fork this project
+### 1. Fork [repo daattali/beautiful-jekyll project](https://github.com/daattali/beautiful-jekyll)
 
 Fork this project by clicking the __*Fork*__ button at the top right corner of this page. Forking means that you now copied this entire project and all the files into your account.
 
