@@ -3,6 +3,7 @@ _site
 .sass-cache
 .vagrant
 .history
+.vscode/settings.json
 
 # general
 .DS_Store
