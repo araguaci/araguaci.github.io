@@ -207,17 +207,16 @@ asterisk -rvv
 
 You should get the following output:
 
-Asterisk 17.8.1, Copyright (C) 1999 - 2018, Digium, Inc. and others.
+Asterisk 19.6.0, Copyright (C) 1999 - 2022, Sangoma Technologies Corporation and others.
 Created by Mark Spencer <markster@digium.com>
 Asterisk comes with ABSOLUTELY NO WARRANTY; type 'core show warranty' for details.
 This is free software, with components licensed under the GNU General Public
 License version 2 and other licenses; you are welcome to redistribute it under
 certain conditions. Type 'core show license' for details.
-=======================================================================
-==
+=========================================================================
 Running as user 'asterisk'
 Running under group 'asterisk'
-Connected to Asterisk 17.8.1 currently running on server (pid = 52652)
+Connected to Asterisk 19.6.0 currently running on SERVER (pid = 68160)
 server\*CLI>
 
 Exit out of the CLI type:
@@ -229,7 +228,7 @@ Exit
 Step 5 – Install FreePBX
 ------------------------
 
-FreePBX requires Apache webserver, MariaDB and PHP version 7.2 to be installed in your server. By default, Ubuntu 20.04 ships with PHP version 7.4, so you will need to install the PHP Ondrej repository to your server. You can add it with the following command:
+FreePBX requires Apache webserver, MariaDB and PHP version 7.4 to be installed in your server. By default, Ubuntu 20.04 ships with PHP version 7.4, so you will need to install the PHP Ondrej repository to your server. You can add it with the following command:
 
 ```
 apt-get install software-properties-common –y
@@ -242,7 +241,7 @@ add-apt-repository ppa:ondrej/php -y
 Next, install Apache, MariaDB and PHP with the following command:
 
 ```
-apt-get install apache2 mariadb-server libapache2-mod-php7.2 php7.2 php-pear php7.2-cgi php7.2-common php7.2-curl php7.2-mbstring php7.2-gd php7.2-mysql php7.2-bcmath php7.2-zip php7.2-xml php7.2-imap php7.2-json php7.2-snmp
+apt-get install apache2 mariadb-server libapache2-mod-php7.4 php7.4 php-pear php7.4-cgi php7.4-common php7.4-curl php7.4-mbstring php7.4-gd php7.4-mysql php7.4-bcmath php7.4-zip php7.4-xml php7.4-imap php7.4-json php7.4-snmp
 ```
 
 Once all the packages are installed, download the latest version of FreePBX using the following command:
@@ -287,8 +286,8 @@ sed -i 's/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
 Next, set upload\_max\_filesize to php.ini file with the following command:
 
 ```
-sed -i 's/\\(^upload\_max\_filesize = \\).\*/\\120M/' /etc/php/7.2/apache2/php.ini
-sed -i 's/\\(^upload\_max\_filesize = \\).\*/\\120M/' /etc/php/7.2/cli/php.ini
+sed -i 's/\\(^upload\_max\_filesize = \\).\*/\\120M/' /etc/php/7.4/apache2/php.ini
+sed -i 's/\\(^upload\_max\_filesize = \\).\*/\\120M/' /etc/php/7.4/cli/php.ini
 ```
 
 Next, enable the Apache rewrite module and restart the Apache service with the following command:
