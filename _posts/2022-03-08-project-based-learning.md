@@ -650,3 +650,4 @@ To get started, simply fork this repo. Please refer to [https://github.com/pract
 - [Enlight](https://enlight.nyc/)
 - [Hack Club Workshops](https://hackclub.com/workshops/)
 - [CodeCrafters](https://codecrafters.io/)
+- [Scaler Topics](https://www.scaler.com/topics/)
