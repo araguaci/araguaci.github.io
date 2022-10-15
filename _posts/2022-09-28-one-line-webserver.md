@@ -1,15 +1,12 @@
 ---
 layout: post
-title: CSS Portal
-subtitle: CSSPortal - Fun with CSS! ⚡
-cover-img: /assets/img/webdev.jpg
-thumbnail-img: /assets/img/artesdosullogo.png
-share-img: /assets/img/artesdosullogo.png
+title: One-Line Web Server 
+subtitle: Simple web server up command
+cover-img: /assets/img/big-data.jpg
+thumbnail-img: /assets/img/develop.png
+share-img: /assets/img/develop.png
 tags: [development, resources, awesome]
 ---     
-
-[One-Line Web Server 🖥️](https://notes.aliciasykes.com/32456/one-line-web-server)
-==================================================================================
 
 The following commands will each start a simple web server, serving up the files in the current directory.  
 Just open up the browser, and navigate to the system's IP + port (e.g. `http://localhost:8080`).
@@ -85,4 +82,6 @@ This is really useful for so many use cases, for example temporarily sharing loc
 You may need to log in, to do so, create an account on ngrok, go to dashboard --> autotoken and copy your token.  
 Then run `./ngrok authtoken [your-token]`
 
+
+[One-Line Web Server 🖥️](https://notes.aliciasykes.com/32456/one-line-web-server)
 

@@ -1,15 +1,13 @@
 ---
 layout: post
-title: CSS Portal
-subtitle: CSSPortal - Fun with CSS! ⚡
+title: Raspberry Pi Projects
+subtitle: Raspberry Pi is a series of multiplatform single plate mini-computers
 cover-img: /assets/img/webdev.jpg
-thumbnail-img: /assets/img/artesdosullogo.png
-share-img: /assets/img/artesdosullogo.png
+thumbnail-img: /assets/img/RaspberryPi.jpg
+share-img: /assets/img/RaspberryPi.jpg
 tags: [development, resources, awesome]
 ---     
 
-[One-Line Web Server 🖥️](https://notes.aliciasykes.com/32456/one-line-web-server)
-==================================================================================
 
 ![Banner Image - Raspberry Pi Projects](https://i.ibb.co/LP1wZtc/Top-Raspberry-Pi-Projects.png "Icons from various Raspberry Pi Projects")
 
@@ -21,7 +19,7 @@ Ever since the first version was released in 2012, the Raspberry Pi has been a s
 
 ### Raspberry Pi Projects
 
-Here is a curated list of projects that I have used, enjoyed and would recommend for anyone looking to put their Pi to use. For links to each projects GitHub repo, see: [https://github.com/stars/Lissy93/lists/raspberry-pi](https://github.com/stars/Lissy93/lists/raspberry-pi)
+For links to each projects GitHub repo, see: [https://github.com/stars/Lissy93/lists/raspberry-pi](https://github.com/stars/Lissy93/lists/raspberry-pi)
 
 There's nothing too complicated here, so this should also provide a good starting point for beginners. Everything here is fully open source and backed by strong communities with large user bases.  
   
@@ -109,4 +107,3 @@ The following projects are a bit more hands-on
 *   Step-by-step Pi NAS with OpenMediaVault: via [Instructables](https://www.instructables.com/PiNAS-the-Raspberry-Pi-NAS/) by @araymbox
 *   Distraction-Free Writing Machine: via [Instructables](https://www.instructables.com/FeatherQuill-34-Hours-of-Distraction-Free-Writing/) by @CameronCoward
 
-img.banner { width: 100%; max-width: 600px; margin: 0 auto; }
