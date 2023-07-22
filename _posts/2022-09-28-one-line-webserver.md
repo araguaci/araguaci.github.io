@@ -16,35 +16,30 @@ Just open up the browser, and navigate to the system's IP + port (e.g. `http://l
     python -m http.server 8000
     
 
-* * *
 
 ### Node.js
 
     npx http-server ./ --port 8080
     
 
-* * *
 
 ### PHP
 
     php -S 127.0.0.1:8080
     
 
-* * *
 
 ### Ruby
 
     ruby -run -e httpd ./ -p 8080
     
 
-* * *
 
 ### R
 
     Rscript -e 'servr::httd()' -p8080
     
 
-* * *
 
 ### Caddy
 
@@ -53,7 +48,6 @@ Just open up the browser, and navigate to the system's IP + port (e.g. `http://l
     caddy file-server
     
 
-* * *
 
 ### Rust (with [miniserve](https://github.com/svenstaro/miniserve))
 
@@ -61,14 +55,12 @@ Just open up the browser, and navigate to the system's IP + port (e.g. `http://l
     miniserve -p 8080 .
     
 
-* * *
 
-### BusyBox
+### BusyBox [The Swiss Army Knife of Embedded Linux](https://www.busybox.net)
 
     busybox httpd -f -p 8080
     
 
-* * *
 
 ## You can also share the server with someone remotely, Using Ngrok to expose server to the internet
 
