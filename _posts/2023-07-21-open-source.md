@@ -132,122 +132,125 @@ List of open-source alternatives to everyday SaaS products.
 
 |Company|Website|GitHub stars|
 |:-------|:------|:----------|
-[Graylog](https://github.com/Graylog2/graylog2-server) | [graylog.org](https://www.graylog.org/) | (https://github.com/Graylog2/graylog2-server)[<img src="https://img.shields.io/github/stars/Graylog2/graylog2-server?style=flat" width=100/>] |
+[Graylog](https://github.com/Graylog2/graylog2-server) | [graylog.org](https://www.graylog.org/) | [<img src="https://img.shields.io/github/stars/Graylog2/graylog2-server?style=flat" width=100/>](https://github.com/Graylog2/graylog2-server) |
 
 ### To-do app:
 
 |Company|Website|GitHub stars|
 |:-------|:------|:----------|
-[super-productivity](https://github.com/johannesjo/super-productivity) | [super-productivity.com](http://super-productivity.com/) | (https://github.com/johannesjo/super-productivity)[<img src="https://img.shields.io/github/stars/johannesjo/super-productivity?style=flat" width=100/>] |
+[super-productivity](https://github.com/johannesjo/super-productivity) | [super-productivity.com](http://super-productivity.com/) | [<img src="https://img.shields.io/github/stars/johannesjo/super-productivity?style=flat" width=100/>](https://github.com/johannesjo/super-productivity) |
 
 ### Community management:
 
 |Company|Website|GitHub stars|
 |:-------|:------|:----------|
-[Discourse](https://github.com/discourse/discourse) | [discourse.org](https://www.discourse.org/) | (https://github.com/discourse/discourse)[<img src="https://img.shields.io/github/stars/discourse/discourse?style=flat" width=100/>] |
-[Flarum](https://github.com/flarum/flarum) | [flarum.org](https://flarum.org/) | (https://github.com/flarum/flarum)[<img src="https://img.shields.io/github/stars/flarum/flarum?style=flat" width=100/>] |
-[crowd.dev](https://github.com/CrowdDotDev/crowd.dev) | [crowd.dev](https://www.crowd.dev/) | (https://github.com/CrowdDotDev/crowd.dev)[<img src="https://img.shields.io/github/stars/CrowdDotDev/crowd.dev?style=flat" width=100/>] |
+[Discourse](https://github.com/discourse/discourse) | [discourse.org](https://www.discourse.org/) | [<img src="https://img.shields.io/github/stars/discourse/discourse?style=flat" width=100/>](https://github.com/discourse/discourse) |
+[Flarum](https://github.com/flarum/flarum) | [flarum.org](https://flarum.org/) | [<img src="https://img.shields.io/github/stars/flarum/flarum?style=flat" width=100/>](https://github.com/flarum/flarum) |
+[crowd.dev](https://github.com/CrowdDotDev/crowd.dev) | [crowd.dev](https://www.crowd.dev/) | [<img src="https://img.shields.io/github/stars/CrowdDotDev/crowd.dev?style=flat" width=100/>](https://github.com/CrowdDotDev/crowd.dev) |
 
 ### Kanban board (Trello alternatives):
 
 |Company|Website|GitHub stars|
 |:-------|:------|:----------|
-[WeKan](https://github.com/wekan/wekan) | [wekan.github.io](https://wekan.github.io/) | (https://github.com/wekan/wekan)[<img src="https://img.shields.io/github/stars/wekan/wekan?style=flat" width=100/>] |
-[Focalboard](https://github.com/mattermost/focalboard) | [focalboard.com](https://www.focalboard.com/) | (https://github.com/mattermost/focalboard)[<img src="https://img.shields.io/github/stars/mattermost/focalboard?style=flat" width=100/>] |
-[Kanboard](https://github.com/kanboard/kanboard) | [kanboard.org](https://kanboard.org/) | (https://github.com/kanboard/kanboard)[<img src="https://img.shields.io/github/stars/kanboard/kanboard?style=flat" width=100/>] |
-[Planka](https://github.com/plankanban/planka) | [planka.app](https://planka.app/) | (https://github.com/plankanban/planka)[<img src="https://img.shields.io/github/stars/plankanban/planka?style=flat" width=100/>] |
+[WeKan](https://github.com/wekan/wekan) | [wekan.github.io](https://wekan.github.io/) | [<img src="https://img.shields.io/github/stars/wekan/wekan?style=flat" width=100/>](https://github.com/wekan/wekan) |
+[Focalboard](https://github.com/mattermost/focalboard) | [focalboard.com](https://www.focalboard.com/) | [<img src="https://img.shields.io/github/stars/mattermost/focalboard?style=flat" width=100/>](https://github.com/mattermost/focalboard) |
+[Kanboard](https://github.com/kanboard/kanboard) | [kanboard.org](https://kanboard.org/) | [<img src="https://img.shields.io/github/stars/kanboard/kanboard?style=flat" width=100/>](https://github.com/kanboard/kanboard) |
+[Planka](https://github.com/plankanban/planka) | [planka.app](https://planka.app/) | [<img src="https://img.shields.io/github/stars/plankanban/planka?style=flat" width=100/>](https://github.com/plankanban/planka) |
 
 ### Social network/ Micro-blogging (Twitter alternatives):
 
 |Company|Website|GitHub stars|
 |:-------|:------|:----------|
-[Mastodon](https://github.com/mastodon/mastodon) | [joinmastodon.org](https://joinmastodon.org/) | (https://github.com/mastodon/mastodon)[<img src="https://img.shields.io/github/stars/mastodon/mastodon?style=flat" width=100/>] |
-[HumHub](https://github.com/humhub/humhub) | [humhub.com](https://www.humhub.com/) | (https://github.com/humhub/humhub)[<img src="https://img.shields.io/github/stars/humhub/humhub?style=flat" width=100/>] |
-[Elgg](https://github.com/elgg/elgg) | [elgg.org](https://elgg.org/) | (https://github.com/elgg/elgg)[<img src="https://img.shields.io/github/stars/Elgg/Elgg?style=flat" width=100/>] |
+[Mastodon](https://github.com/mastodon/mastodon) | [joinmastodon.org](https://joinmastodon.org/) | [<img src="https://img.shields.io/github/stars/mastodon/mastodon?style=flat" width=100/>](https://github.com/mastodon/mastodon) |
+[HumHub](https://github.com/humhub/humhub) | [humhub.com](https://www.humhub.com/) | [<img src="https://img.shields.io/github/stars/humhub/humhub?style=flat" width=100/>](https://github.com/humhub/humhub) |
+[Elgg](https://github.com/elgg/elgg) | [elgg.org](https://elgg.org/) | [<img src="https://img.shields.io/github/stars/Elgg/Elgg?style=flat" width=100/>](https://github.com/elgg/elgg) |
 
 ### Ticket management (Zendesk, Freshdesk alternatives):
 
 |Company|Website|GitHub stars|
 |:-------|:------|:----------|
-[Zammad](https://github.com/zammad/zammad) | [zammad.com](https://zammad.com) | (https://github.com/zammad/zammad)[<img src="https://img.shields.io/github/stars/zammad/zammad?style=flat" width=100/>] |
-[Peppermint](https://github.com/Peppermint-Lab/peppermint) | [peppermint.sh](https://peppermint.sh/) | (https://github.com/Peppermint-Lab/peppermint)[<img src="https://img.shields.io/github/stars/Peppermint-Lab/peppermint?style=flat" width=100/>] |
+[Zammad](https://github.com/zammad/zammad) | [zammad.com](https://zammad.com) | [<img src="https://img.shields.io/github/stars/zammad/zammad?style=flat" width=100/>](https://github.com/zammad/zammad) |
+[Peppermint](https://github.com/Peppermint-Lab/peppermint) | [peppermint.sh](https://peppermint.sh/) | [<img src="https://img.shields.io/github/stars/Peppermint-Lab/peppermint?style=flat" width=100/>](https://github.com/Peppermint-Lab/peppermint) |
 
 ### Scheduling tool (Calendly alternatives):
 
 |Company|Website|GitHub stars|
 |:-------|:------|:----------|
-[Cal.com](https://github.com/calcom/cal.com) | [cal.com](https://cal.com/) | (https://github.com/calcom/cal.com)[<img src="https://img.shields.io/github/stars/calcom/cal.com?style=flat" width=100/>] |
+[Cal.com](https://github.com/calcom/cal.com) | [cal.com](https://cal.com/) | [<img src="https://img.shields.io/github/stars/calcom/cal.com?style=flat" width=100/>](https://github.com/calcom/cal.com) |
 
 ### Smart spreadsheet (Airtable alternatives):
 
 |Company|Website|GitHub stars|
 |:-------|:------|:----------|
-[NocoDB](https://github.com/nocodb/nocodb) | [nocodb.com](https://nocodb.com/) | (https://github.com/nocodb/nocodb)[<img src="https://img.shields.io/github/stars/nocodb/nocodb?style=flat" width=100/>] |
-[Luckysheet](https://github.com/dream-num/Luckysheet) | [dream-num.github.io/LuckysheetDocs](https://dream-num.github.io/LuckysheetDocs/) | (https://github.com/dream-num/Luckysheet)[<img src="https://img.shields.io/github/stars/dream-num/Luckysheet?style=flat" width=100/>] |
-[APITable](https://github.com/apitable/apitable) | [apitable.com](https://apitable.com/) | (https://github.com/apitable/apitable)[<img src="https://img.shields.io/github/stars/apitable/apitable?style=flat" width=100/>] |
-[Grist](https://github.com/gristlabs/grist-core) | [getgrist.com](https://www.getgrist.com/) | ("https://www.getgrist.com/")[<img src="https://img.shields.io/github/stars/gristlabs/grist-core?style=flat" width=100/>] |
+[NocoDB](https://github.com/nocodb/nocodb) | [nocodb.com](https://nocodb.com/) | [<img src="https://img.shields.io/github/stars/nocodb/nocodb?style=flat" width=100/>](https://github.com/nocodb/nocodb) |
+[Luckysheet](https://github.com/dream-num/Luckysheet) | [dream-num.github.io/LuckysheetDocs](https://dream-num.github.io/LuckysheetDocs/) | [<img src="https://img.shields.io/github/stars/dream-num/Luckysheet?style=flat" width=100/>](https://github.com/dream-num/Luckysheet) |
+[APITable](https://github.com/apitable/apitable) | [apitable.com](https://apitable.com/) | [<img src="https://img.shields.io/github/stars/apitable/apitable?style=flat" width=100/>](https://github.com/apitable/apitable) |
+[Grist](https://github.com/gristlabs/grist-core) | [getgrist.com](https://www.getgrist.com/) | [<img src="https://img.shields.io/github/stars/gristlabs/grist-core?style=flat" width=100/>]("https://www.getgrist.com/") |
 
 ### Team communication (Slack, Discord alternatives):
 
 |Company|Website|GitHub stars|
 |:-------|:------|:----------|
-[Rocket.chat](https://github.com/RocketChat/Rocket.Chat) | [rocket.chat](https://www.rocket.chat/) | (https://github.com/RocketChat/Rocket.Chat)[<img src="https://img.shields.io/github/stars/RocketChat/Rocket.Chat?style=flat" width=100/>] |
-[Mattermost](https://github.com/mattermost/mattermost-server) | [mattermost.com](https://mattermost.com/) | (https://github.com/mattermost/mattermost-server)[<img src="https://img.shields.io/github/stars/mattermost/mattermost-server?style=flat" width=100/>] |
-[Zulip](https://github.com/zulip/zulip) | [zulip.com](https://zulip.com/) | (https://github.com/zulip/zulip)[<img src="https://img.shields.io/github/stars/zulip/zulip?style=flat" width=100/>] |
-[Element](https://github.com/vector-im/element-web) | [element.io](https://element.io) | (https://github.com/vector-im/element-web)[<img src="https://img.shields.io/github/stars/vector-im/element-web?style=flat" width=100/>] |
-[Spacebar](https://github.com/spacebarchat/spacebarchat) | [spacebar.chat](https://spacebar.chat/) | (https://github.com/spacebarchat/spacebarchat)[<img src="https://img.shields.io/github/stars/spacebarchat/spacebarchat?style=flat" width=100/>] |
-[RelatedChat](https://github.com/relatedcode/Messenger) | [relatedcode.com](https://relatedcode.com/) | (https://github.com/relatedcode/Messenger)[<img src="https://img.shields.io/github/stars/relatedcode/Messenger?style=flat" width=100/>] |
+[Rocket.chat](https://github.com/RocketChat/Rocket.Chat) | [rocket.chat](https://www.rocket.chat/) | [<img src="https://img.shields.io/github/stars/RocketChat/Rocket.Chat?style=flat" width=100/>](https://github.com/RocketChat/Rocket.Chat) |
+[Mattermost](https://github.com/mattermost/mattermost-server) | [mattermost.com](https://mattermost.com/) | [<img src="https://img.shields.io/github/stars/mattermost/mattermost-server?style=flat" width=100/>](https://github.com/mattermost/mattermost-server) |
+[Zulip](https://github.com/zulip/zulip) | [zulip.com](https://zulip.com/) | [<img src="https://img.shields.io/github/stars/zulip/zulip?style=flat" width=100/>](https://github.com/zulip/zulip) |
+[Element](https://github.com/vector-im/element-web) | [element.io](https://element.io) | [<img src="https://img.shields.io/github/stars/vector-im/element-web?style=flat" width=100/>](https://github.com/vector-im/element-web) |
+[Spacebar](https://github.com/spacebarchat/spacebarchat) | [spacebar.chat](https://spacebar.chat/) | [<img src="https://img.shields.io/github/stars/spacebarchat/spacebarchat?style=flat" width=100/>](https://github.com/spacebarchat/spacebarchat) |
+[RelatedChat](https://github.com/relatedcode/Messenger) | [relatedcode.com](https://relatedcode.com/) | [<img src="https://img.shields.io/github/stars/relatedcode/Messenger?style=flat" width=100/>](https://github.com/relatedcode/Messenger) |
 
 ### Live chat (Intercom alternatives):
 
 |Company|Website|GitHub stars|
 |:-------|:------|:----------|
-[Chatwoot](https://github.com/chatwoot/chatwoot) | [chatwoot.com](https://www.chatwoot.com/) | (https://github.com/chatwoot/chatwoot)[<img src="https://img.shields.io/github/stars/chatwoot/chatwoot?style=flat" width=100/>] |
+[Chatwoot](https://github.com/chatwoot/chatwoot) | [chatwoot.com](https://www.chatwoot.com/) | [<img src="https://img.shields.io/github/stars/chatwoot/chatwoot?style=flat" width=100/>](https://github.com/chatwoot/chatwoot) |
 
 ### User authentication (Auth0 alternatives):
 
 |Company|Website|GitHub stars|
 |:-------|:------|:----------|
-[Keycloak](https://github.com/keycloak/keycloak) | [keycloak.org](https://www.keycloak.org/) | (https://github.com/keycloak/keycloak)[<img src="https://img.shields.io/github/stars/keycloak/keycloak?style=flat" width=100/>] |
-[SuperTokens](https://github.com/supertokens/supertokens-core) | [supertokens.com](https://supertokens.com/) | (https://github.com/supertokens/supertokens-core)[<img src="https://img.shields.io/github/stars/supertokens/supertokens-core?style=flat" width=100/>] |
-[Logto](https://github.com/logto-io/logto) | [logto.io](https://logto.io/) | (https://github.com/logto-io/logto)[<img src="https://img.shields.io/github/stars/logto-io/logto?style=flat" width=100/>] |
+[Keycloak](https://github.com/keycloak/keycloak) | [keycloak.org](https://www.keycloak.org/) | [<img src="https://img.shields.io/github/stars/keycloak/keycloak?style=flat" width=100/>](https://github.com/keycloak/keycloak) |
+[SuperTokens](https://github.com/supertokens/supertokens-core) | [supertokens.com](https://supertokens.com/) | [<img src="https://img.shields.io/github/stars/supertokens/supertokens-core?style=flat" width=100/>](https://github.com/supertokens/supertokens-core) |
+[Logto](https://github.com/logto-io/logto) | [logto.io](https://logto.io/) | [<img src="https://img.shields.io/github/stars/logto-io/logto?style=flat" width=100/>](https://github.com/logto-io/logto) |
 
 ### Digital search experience (Algolia alternatives):
 
 |Company|Website|GitHub stars|
 |:-------|:------|:----------|
-[Typesense](https://github.com/typesense/typesense) | [typesense.org](https://typesense.org/) | (https://github.com/typesense/typesense)[<img src="https://img.shields.io/github/stars/typesense/typesense?style=flat" width=100/>] |
+[Typesense](https://github.com/typesense/typesense) | [typesense.org](https://typesense.org/) | [<img src="https://img.shields.io/github/stars/typesense/typesense?style=flat" width=100/>](https://github.com/typesense/typesense) |
 
 ### Backend-as-a-Service (Firebase alternatives):
 
 |Company|Website|GitHub stars|
 |:-------|:------|:----------|
-[Supabase](https://github.com/supabase/supabase) | [supabase.com](https://supabase.com/) | (https://github.com/supabase/supabase)[<img src="https://img.shields.io/github/stars/supabase/supabase?style=flat" width=100/>] |
-[Appwrite](https://github.com/appwrite/appwrite) | [appwrite.io](https://appwrite.io/) | (https://github.com/appwrite/appwrite)[<img src="https://img.shields.io/github/stars/appwrite/appwrite?style=flat" width=100/>] |
-[Nhost](https://github.com/nhost/nhost) | [nhost.io](https://nhost.io/) | (https://github.com/nhost/nhost)[<img src="https://img.shields.io/github/stars/nhost/nhost?style=flat" width=100/>] |
+[Supabase](https://github.com/supabase/supabase) | [supabase.com](https://supabase.com/) | [<img src="https://img.shields.io/github/stars/supabase/supabase?style=flat" width=100/>](https://github.com/supabase/supabase) |
+[Appwrite](https://github.com/appwrite/appwrite) | [appwrite.io](https://appwrite.io/) | [<img src="https://img.shields.io/github/stars/appwrite/appwrite?style=flat" width=100/>](https://github.com/appwrite/appwrite) |
+[Nhost](https://github.com/nhost/nhost) | [nhost.io](https://nhost.io/) | [<img src="https://img.shields.io/github/stars/nhost/nhost?style=flat" width=100/>](https://github.com/nhost/nhost) |
 
 ### Customer data platform/ CDP (Segment alternatives):
 
 |Company|Website|GitHub stars|
 |:-------|:------|:----------|
-[Jitsu](https://github.com/jitsucom/jitsu) | [jitsu.com](https://jitsu.com/) | (https://github.com/jitsucom/jitsu)[<img src="https://img.shields.io/github/stars/jitsucom/jitsu?style=flat" width=100/>] |
+[Jitsu](https://github.com/jitsucom/jitsu) | [jitsu.com](https://jitsu.com/) | [<img src="https://img.shields.io/github/stars/jitsucom/jitsu?style=flat" width=100/>](https://github.com/jitsucom/jitsu) |
 
 ### Link shortener (Bitly alternatives):
+
 |Company|Website|GitHub stars|
 |:-------|:------|:----------|
-[Dub](https://github.com/steven-tey/dub) | [dub.sh](https://dub.sh/) | (https://github.com/steven-tey/dub)[<img src="https://img.shields.io/github/stars/steven-tey/dub?style=flat" width=100/>] |
+[Dub](https://github.com/steven-tey/dub) | [dub.sh](https://dub.sh/) | [<img src="https://img.shields.io/github/stars/steven-tey/dub?style=flat" width=100/>](https://github.com/steven-tey/dub) |
 
 ### Online store builder (Shopify alternatives):
+
 |Company|Website|GitHub stars|
 |:-------|:------|:----------|
-[Medusa](https://github.com/medusajs/medusa) | [medusajs.com](https://medusajs.com/) | (https://github.com/medusajs/medusa)[<img src="https://img.shields.io/github/stars/medusajs/medusa?style=flat" width=100/>] |
-[Vue Storefront](https://github.com/vuestorefront/vue-storefront) | [vuestorefront.io](https://vuestorefront.io/) | (https://github.com/vuestorefront/vue-storefront)[<img src="https://img.shields.io/github/stars/vuestorefront/vue-storefront?style=flat" width=100/>] |
-[Sylius](https://github.com/sylius/sylius) | [sylius.com](https://sylius.com/) | (https://github.com/sylius/sylius)[<img src="https://img.shields.io/github/stars/Sylius/Sylius?style=flat" width=100/>] |
-[Presta](https://github.com/PrestaShop/PrestaShop) | [prestashop-project.org](https://www.prestashop-project.org/) | (https://github.com/PrestaShop/PrestaShop)[<img src="https://img.shields.io/github/stars/PrestaShop/PrestaShop?style=flat" width=100/>] |
-[Bagisto](https://github.com/bagisto/bagisto) | [bagisto.com](https://bagisto.com/) | (https://github.com/bagisto/bagisto)[<img src="https://img.shields.io/github/stars/bagisto/bagisto?style=flat" width=100/>] |
-[Litekart](https://github.com/itswadesh/svelte-commerce) | [litekart.in](https://litekart.in/) | (https://github.com/itswadesh/svelte-commerce)[<img src="https://img.shields.io/github/stars/itswadesh/svelte-commerce?style=flat" width=100/>] |
+[Medusa](https://github.com/medusajs/medusa) | [medusajs.com](https://medusajs.com/) | [<img src="https://img.shields.io/github/stars/medusajs/medusa?style=flat" width=100/>](https://github.com/medusajs/medusa) |
+[Vue Storefront](https://github.com/vuestorefront/vue-storefront) | [vuestorefront.io](https://vuestorefront.io/) | [<img src="https://img.shields.io/github/stars/vuestorefront/vue-storefront?style=flat" width=100/>](https://github.com/vuestorefront/vue-storefront) |
+[Sylius](https://github.com/sylius/sylius) | [sylius.com](https://sylius.com/) | [<img src="https://img.shields.io/github/stars/Sylius/Sylius?style=flat" width=100/>](https://github.com/sylius/sylius) |
+[Presta](https://github.com/PrestaShop/PrestaShop) | [prestashop-project.org](https://www.prestashop-project.org/) | [<img src="https://img.shields.io/github/stars/PrestaShop/PrestaShop?style=flat" width=100/>](https://github.com/PrestaShop/PrestaShop) |
+[Bagisto](https://github.com/bagisto/bagisto) | [bagisto.com](https://bagisto.com/) | [<img src="https://img.shields.io/github/stars/bagisto/bagisto?style=flat" width=100/>](https://github.com/bagisto/bagisto) |
+[Litekart](https://github.com/itswadesh/svelte-commerce) | [litekart.in](https://litekart.in/) | [<img src="https://img.shields.io/github/stars/itswadesh/svelte-commerce?style=flat" width=100/>](https://github.com/itswadesh/svelte-commerce) |
 
 ### Password manager (1Password alternatives):
+
 |Company|Website|GitHub stars|
 |:-------|:------|:----------|
 [Bitwarden](https://github.com/bitwarden/clients) | [bitwarden.com](https://bitwarden.com/) | (https://github.com/bitwarden/clients)[<img src="https://img.shields.io/github/stars/bitwarden/clients?style=flat" width=100/>] |
@@ -255,21 +258,25 @@ List of open-source alternatives to everyday SaaS products.
 [Padloc](https://github.com/padloc/padloc) | [padloc.app](https://padloc.app/) | (https://github.com/padloc/padloc)[<img src="https://img.shields.io/github/stars/padloc/padloc?style=flat" width=100/>] |
 
 ### Email delivery (Mailgun, SendGrid alternatives):
+
 |Company|Website|GitHub stars|
 |:-------|:------|:----------|
 [Postal](https://github.com/postalserver/postal) | [docs.postalserver.io](https://docs.postalserver.io/) | (https://github.com/postalserver/postal)[<img src="https://img.shields.io/github/stars/postalserver/postal?style=flat" width=100/>] |
 
 ### Usage-based billing (Stripe, Chargebee alternatives):
+
 |Company|Website|GitHub stars|
 |:-------|:------|:----------|
 [Lago](https://github.com/getlago/lago) | [getlago.com](https://www.getlago.com/) | (https://github.com/getlago/lago)[<img src="https://img.shields.io/github/stars/getlago/lago?style=flat" width=100/>] |
 
 ### File uploader:
+
 |Company|Website|GitHub stars|
 |:-------|:------|:----------|
 [Uppy](https://github.com/transloadit/uppy) | [uppy.io](https://uppy.io/) | (https://github.com/transloadit/uppy)[<img src="https://img.shields.io/github/stars/transloadit/uppy?style=flat" width=100/>] |
 
 ### Notification infrastructure:
+
 |Company|Website|GitHub stars|
 |:-------|:------|:----------|
 [Novu](https://github.com/novuhq/novu) | [novu.co](https://novu.co/) | (https://github.com/novuhq/novu)[<img src="https://img.shields.io/github/stars/novuhq/novu?style=flat" width=100/>] |
@@ -278,17 +285,20 @@ List of open-source alternatives to everyday SaaS products.
 [Apprise](https://github.com/caronc/apprise) | [hub.docker.com/r/caronc/apprise](https://hub.docker.com/r/caronc/apprise) | (https://github.com/caronc/apprise)[<img src="https://img.shields.io/github/stars/caronc/apprise?style=flat" width=100/>] |
 
 ### API development (Postman alternatives):
+
 |Company|Website|GitHub stars|
 |:-------|:------|:----------|
 [hoppscotch](https://github.com/hoppscotch/hoppscotch) | [hoppscotch.io](https://hoppscotch.io/) | (https://github.com/hoppscotch/hoppscotch)[<img src="https://img.shields.io/github/stars/hoppscotch/hoppscotch?style=flat" width=100/>] |
 [Insomnia](https://github.com/Kong/insomnia) | [insomnia.rest](https://insomnia.rest/) | (https://github.com/Kong/insomnia)[<img src="https://img.shields.io/github/stars/Kong/insomnia?style=flat" width=100/>] |
 
 ### Programmatic videos:
+
 |Company|Website|GitHub stars|
 |:-------|:------|:----------|
 [Remotion](https://github.com/remotion-dev/remotion) | [remotion.dev](https://www.remotion.dev/) | (https://github.com/remotion-dev/remotion)[<img src="https://img.shields.io/github/stars/remotion-dev/remotion?style=flat" width=100/>] |
 
 ### Data warehouse (Snowflake alternatives):
+
 |Company|Website|GitHub stars|
 |:-------|:------|:----------|
 [Databend](https://github.com/datafuselabs/databend) | [databend.rs](https://databend.rs/) | (https://github.com/datafuselabs/databend)[<img src="https://img.shields.io/github/stars/datafuselabs/databend?style=flat" width=100/>] |
