@@ -1,6 +1,13 @@
-# Open source alternatives
-List of open-source alternatives to everyday SaaS products.
-
+---
+layout: post
+title: Open source alternatives
+subtitle: ⚡ List of open-source alternatives to everyday SaaS products
+cover-img: /assets/img/avatar-screenshot-med-26.jpg
+thumbnail-img: /assets/img/config.png
+share-img: /assets/img/config.png
+tags: [free, websites, resources, productivity]
+---
+ 
 ### Artificial intelligence chatbot/ LLM (ChatGPT alternatives):
 
 | Company         | Website             | GitHub stars |

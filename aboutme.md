@@ -59,3 +59,4 @@ Critical analysis, organization, discipline, teamwork, concern with responsibili
 <p align="center">
   <a href="https://www.buymeacoffee.com/araguaci"> <img align="center" src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" height="50" width="210" alt="araguaci" /></a>
 </p>
+

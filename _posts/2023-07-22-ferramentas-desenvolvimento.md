@@ -1,5 +1,12 @@
-# 🛠️ Ferramentas para desenvolvimento
-> Ferramentas geralmente serão sites com algum conteúdo pronto ou customizavel que você possa aplicar no projeto, fazendo assim que você economize tempo no seu desenvolvimento.
+---
+layout: post
+title: 🛠️ Ferramentas para desenvolvimento
+subtitle: ⚡ Ferramentas geralmente serão sites com algum conteúdo pronto ou customizavel que você possa aplicar no projeto, fazendo assim que você economize tempo no seu desenvolvimento.
+cover-img: /assets/img/big-data.jpg
+thumbnail-img: /assets/img/develop.png
+share-img: /assets/img/develop.png
+tags: [websites, resources, productivity]
+--- 
 
 - [Minimamente](https://www.minimamente.com/project/magic/) - Efeitos para você colocar no seu CSS <br>
 - [Hamburgers](https://jonsuh.com/hamburgers/) - Gerador de Menu Hamburgers <br> 
