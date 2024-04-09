@@ -1,6 +1,6 @@
 ---
 layout: post
-title: free-for.dev
+title: FreeFor.DEV
 subtitle: ⚡ Developers and Open Source authors now have a massive amount of services offering free tiers
 cover-img: /assets/img/big-data.jpg
 thumbnail-img: /assets/img/freefordev.png
