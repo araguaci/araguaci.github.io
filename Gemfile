@@ -6,9 +6,24 @@ gemspec
 
 gem 'tzinfo-data'
 
-gem "tzinfo", "~> 2.0"
+gem "tzinfo" 
 
-gem "webrick", "~> 1.7"
+gem "webrick" 
 
-gem "timezone", "~> 1.3"
+gem "timezone" 
 
+gem "tzinfo-data" 
+
+gem "jekyll" 
+
+gem "jekyll-sitemap" 
+
+gem "kramdown-parser-gfm" 
+
+gem "kramdown" 
+
+gem "jekyll-watch" 
+
+gem "rouge" 
+
+gem "listen" 
