@@ -1,9 +1,10 @@
 ---
 title: Everything about Mindmaps
-description: "A Mind Map is a diagram for representing tasks, words, concepts, or items linked to and arranged around a central concept using a non-linear graphical layout."
+subtitle: "A Mind Map is a diagram for representing tasks, words, concepts, or items linked to and arranged around a central concept using a non-linear graphical layout."
 date: 2024-06-23T00:14:15.287Z
-image: 
-    path: "https://substackcdn.com/image/fetch/w_1456,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F0d027c8c-8452-4e8e-8a6b-30497403605c_2400x1260.png"
+thumbnail-img: /assets/img/color_icons8_flat_mind_map.svg
+share-img: /assets/img/color_icons8_flat_mind_map.svg
+cover-img: "https://substackcdn.com/image/fetch/w_1456,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F0d027c8c-8452-4e8e-8a6b-30497403605c_2400x1260.png"
 tags: [Mindmaps]
 categories: []
 type: default
