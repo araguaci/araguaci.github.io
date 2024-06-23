@@ -14,7 +14,7 @@ gem "timezone"
 
 gem "tzinfo-data" 
 
-gem "jekyll" 
+gem "jekyll"
 
 gem "jekyll-sitemap" 
 
@@ -27,3 +27,5 @@ gem "jekyll-watch"
 gem "rouge" 
 
 gem "listen" 
+
+# gem "jekyll-theme-chirpy"

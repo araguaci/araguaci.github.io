@@ -241,6 +241,7 @@ plugins:
   - jekyll-paginate
   - jekyll-sitemap
 
+# theme: jekyll-theme-chirpy
 remote_theme: daattali/beautiful-jekyll@5.0.0
 
 
