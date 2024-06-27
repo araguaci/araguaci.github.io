@@ -1,6 +1,6 @@
 ---
 title: 📦 Moving WSL Distribution to Another Drive
-description: "🚀 This guide explains the process of moving a Linux distribution installed on Windows Subsystem for Linux (WSL) to another drive. In this example, we will be moving an Ubuntu 22.04 distribution, and the steps are outlined below."
+subtitle: "🚀 This guide explains the process of moving a Linux distribution installed on Windows Subsystem for Linux (WSL) to another drive. In this example, we will be moving an Ubuntu 22.04 distribution, and the steps are outlined below."
 date: 2024-06-27T00:14:15.287Z
 tags: [WSL,Linux]
 categories: []
