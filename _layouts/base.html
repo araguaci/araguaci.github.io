@@ -2,6 +2,7 @@
 common-css:
   - "/assets/css/bootstrap-social.css"
   - "/assets/css/beautifuljekyll.css"
+  - "/assets/css/main.css"
 common-ext-css:
   - href: "https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
     sri: "sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
@@ -17,7 +18,8 @@ common-ext-js:
     sri: "sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
 common-js:
   - "/assets/js/beautifuljekyll.js"
-  - "/assets/js/mermaid.min.js"  
+  - "/assets/js/mermaid.min.js"
+  - "/assets/js/main.js"  
 ---
 
 <!DOCTYPE html>
@@ -31,9 +33,12 @@ common-js:
 
   {% include nav.html %}
 
+  <div id="top"></div>
   {{ content }}
 
   {% include footer.html %}
+
+  {% include scrolltop.html %}
 
   {% include footer-scripts.html %}
 

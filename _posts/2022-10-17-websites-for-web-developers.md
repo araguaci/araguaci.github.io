@@ -5,7 +5,7 @@ subtitle: 99.8% don’t know all of them ⚡
 cover-img: /assets/img/avatar-screenshot-med-26.jpg
 thumbnail-img: /assets/img/chart.png
 share-img: /assets/img/chart.png
-tags: [websites, resources, productivity]
+tags: [developer, resources, productivity]
 ---
 
 Keeping websites handy can be the ultimate productivity hack, Here are some of the best websites I use to make my life easier.

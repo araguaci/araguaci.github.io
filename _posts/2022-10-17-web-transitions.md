@@ -5,7 +5,7 @@ subtitle: The web is made up of technologies that got their start over 25 years 
 cover-img: /assets/img/avatar-screenshot-med-26.jpg
 thumbnail-img: /assets/img/chart.png
 share-img: /assets/img/chart.png
-tags: [websites, resources, productivity]
+tags: [developer, resources, productivity]
 ---
 
 The web is made up of technologies that got their start over 25 years ago. HTTP, HTML, CSS, and JS were all first standardized in the mid-nineties (when I was 8 years old). Since then, the web evolved into a ubiquitous application platform. As the web has evolved, so too has the architecture for the development of these applications. There are many core architectures for building applications for the web these days. The most popular architecture employed by web developers today is the Single Page App (SPA), but **we are transitioning** to a new and improved architecture for building web applications.

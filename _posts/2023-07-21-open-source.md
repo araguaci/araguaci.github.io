@@ -5,7 +5,7 @@ subtitle: ⚡ List of open-source alternatives to everyday SaaS products
 cover-img: /assets/img/avatar-screenshot-med-26.jpg
 thumbnail-img: /assets/img/config.png
 share-img: /assets/img/config.png
-tags: [free, websites, resources, productivity]
+tags: [free, developer, resources, productivity]
 ---
  
 ### Artificial intelligence chatbot/ LLM (ChatGPT alternatives):

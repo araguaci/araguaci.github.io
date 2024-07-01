@@ -5,7 +5,7 @@ subtitle: ⚡ Ferramentas geralmente serão sites com algum conteúdo pronto ou 
 cover-img: /assets/img/big-data.jpg
 thumbnail-img: /assets/img/develop.png
 share-img: /assets/img/develop.png
-tags: [websites, resources, productivity]
+tags: [developer, resources, productivity]
 --- 
 
 - [Minimamente](https://www.minimamente.com/project/magic/) - Efeitos para você colocar no seu CSS <br>

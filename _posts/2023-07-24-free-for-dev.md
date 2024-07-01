@@ -5,7 +5,7 @@ subtitle: ⚡ Developers and Open Source authors now have a massive amount of se
 cover-img: /assets/img/big-data.jpg
 thumbnail-img: /assets/img/freefordev.png
 share-img: /assets/img/freefordev.png
-tags: [free, websites, resources, productivity]
+tags: [free, developer, resources, productivity]
 ---
 
 Developers and Open Source authors now have a massive amount of services offering free tiers, but it can be hard to find them all to make informed decisions.

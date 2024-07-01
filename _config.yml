@@ -24,9 +24,9 @@ author: Araguaci
 # --- List of links in the navigation bar --- #
 
 navbar-links:
+  tags: "tags"
   about me: "aboutme"
   personality: "personality"
-  website: "https://araguaci.github.io/tags/#website"
   projects:
     - Floripa Surf Club: "http://www.floripasurfclub.com.br/"
     - CENTRAL DE AVENTURAS: "http://centraldeaventuras.com.br/"
@@ -57,7 +57,7 @@ social-network-links:
   email: "araguaci@gmail.com"
   facebook: artesdosulweb
   github: araguaci
-  twitter: araguaci
+  twitter: artesdosul
   patreon: artesdosul
   youtube: c/AraguaciCarlosdeAndrade
   instagram: araguaci.andrade
