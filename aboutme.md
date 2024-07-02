@@ -4,6 +4,27 @@ title: About me
 subtitle: ✠ KODOISH, KODOISH, KODOISH ADONAI TSEBAYOTH ✠
 ---
 
+- [Português](#português)
+  - [📝 **Introdução:**](#-introdução)
+  - [🔰 **Perfil:**](#-perfil)
+  - [👨‍🎓 **Carreira:**](#-carreira)
+  - [🎓 **Educação:**](#-educação)
+  - [🔍 **Palavras Chaves:**](#-palavras-chaves)
+- [English](#english)
+  - [📝 **Introduction:**](#-introduction)
+  - [🔰 **Profile:**](#-profile)
+  - [👨‍🎓 **Career:**](#-career)
+  - [🔰 **Profile:**](#-profile-1)
+  - [🎓 **Graduation:**](#-graduation)
+  - [🔍 **Keywords:**](#-keywords)
+- [For everyone on earth](#for-everyone-on-earth)
+- [Links](#links)
+  - [Hobby Designer, Producer, Creator, Patreon and Hosting by Free Volunteering](#hobby-designer-producer-creator-patreon-and-hosting-by-free-volunteering)
+  - [F.E.C.E.E.S.S. ☆ A.C.E.S. SC](#feceess--aces-sc)
+  - [🌐 **Online Presence:**](#-online-presence)
+  - [📧 **Contact:**](#-contact)
+
+
 > **Você deve ser a mudança que deseja ver no mundo.**  
 > **~~ Mahatma Gandhi**
 
@@ -16,6 +37,10 @@ Ola, sou Araguaci, bacharel em informática e especializado em desenvolvimento d
 Este espaço é para publicação de ideias, opiniões e pensamentos. Este crescente a censura no mundo e muitos serviços estão sujeitos a uma avaliação e moderação de conteúdo. Desta forma este espaço é para uso pessoal e registro livre de moderação.
 
 ### 🔰 **Perfil:**
+
+Análise crítica, organização, disciplina, trabalho em equipe, preocupação com responsabilidade e pontualidade, busca incansável pela qualidade e criatividade.
+
+### 👨‍🎓 **Carreira:**
 
 Desde 1994, trabalhando na criação e desenvolvimento de sistemas, portais, páginas pessoais, websites e sistemas para internet e gerenciamento de processos e rotinas digitais. Especializado no desenvolvimento, análise e gestão de sistemas para atendimento ao cliente, Call Center, CRM, SAC, Helpdesk e Telemarketing. Atuando também com suporte ao cliente e administração remota de banco de dados e portais corporativos.
 
@@ -102,6 +127,7 @@ Critical analysis, organization, discipline, teamwork, concern with responsibili
 ✠ May God keep you in the palm of his hand.
 </td></tr></table>
 
+## Links
 
 ### Hobby Designer, Producer, Creator, Patreon and Hosting by Free Volunteering
 
@@ -130,8 +156,6 @@ Critical analysis, organization, discipline, teamwork, concern with responsibili
 
 --- 
 
-## Links
-
 [![Website](https://img.shields.io/endpoint?color=RGBA%2839%2C%20119%2C%20119%2C%201%29&label=artesdosul&url=https%3A%2F%2Fwww.artesdosul.com%2Fapi.php%3Fcallback%3Dweb)](https://www.artesdosul.com)
 [![X Org](https://img.shields.io/badge/X_Org-%40artesdosul-1d9bf0.svg)](https://x.com/artesdosul)
 [![X User](https://img.shields.io/badge/X_User-%40araguaci-1d9bf0.svg)](https://x.com/araguaci)
@@ -140,12 +164,12 @@ Critical analysis, organization, discipline, teamwork, concern with responsibili
 [![Patron](https://badgen.net/badge/icon/patreon?icon=patreon&color=orange)](https://patreon.com/artesdosul) 
 [![Buy me a coffee](https://badgen.net/badge/icon/buymeacoffee?icon=buymeacoffee&color=yellow)](https://buymeacoffee.com/araguaci)  
 
-## 🌐 **Online Presence:**
+### 🌐 **Online Presence:**
 
 * [Website](https://www.artesdosul.com)
 * [GitHub](https://github.com/araguaci)
 * [Instagram](https://www.instagram.com/araguaci.andrade/)
 
-## 📧 **Contact:**
+### 📧 **Contact:**
 
 * Email: [araguaci@gmail.com](mailto:araguaci@gmail.com)

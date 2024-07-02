@@ -14,6 +14,22 @@ share-img: /assets/img/osgeo.svg
 
 📌 Here's a list of sites you've never heard of.
 
+- [www.refseek.com](https://www.refseek.com/) - Search for academic resources. More than a billion sources: encyclopedias, monographs, magazines.
+
+- [www.worldcat.org](https://search.worldcat.org/pt) - search for content from 20 thousand libraries around the world. Find out where the closest rare book you need is.
+
+- [link.springer.com](https://link.springer.com) – access to more than 10 million scientific documents: books, articles, research protocols.
+
+- [www.bioline.org.br](https://www.bioline.org.br/) is a library of scientific journals on biosciences published in developing countries.
+
+- [repec.org](http://repec.org) - volunteers from 102 countries collected almost 4 million publications on economics and related sciences.
+
+- [www.science.gov](https://www.science.gov/) is an American state search engine for more than 2,200 scientific websites. More than 200 million articles are indexed.
+
+- [www.base-search.net](https://www.base-search.net/) is one of the most powerful searches in academic studies texts. More than 100 million scientific documents, 70% of them free.
+
+---
+
 # Academic
 
 - [StuDocu - Free summaries, lecture notes & exam prep](https://www.studocu.com/en-us)
@@ -36,7 +52,7 @@ share-img: /assets/img/osgeo.svg
 
 - [AcademicIndex](http://www.academicindex.net/)
 
-- [Free Online Legal Research | Lexis® Web](http://lexisweb.com/)
+- [Free Online Legal Research - Lexis® Web](http://lexisweb.com/)
 
 - [Zetoc: Homepage](http://zetoc.jisc.ac.uk/)
 
@@ -44,7 +60,7 @@ share-img: /assets/img/osgeo.svg
 
 - [Temporary Email - Ma Jianjun University Free Education Email](https://mail.mjj.edu.ge/)
 
-- [Crafton Hills College | CCC MyPath](https://www.cccmypath.org/uPortal/f/u7859l1s1000/normal/render.uP#session_state=fe5d7586-21c2-44e9-9e1b-19509decc737&code=24e56c0f-b3f4-4ef0-9b09-510b3f5e911d.fe5d7586-21c2-44e9-9e1b-19509decc737.1a9e2586-6f11-4403-8d0b-8f07b75d1ab8)
+- [Crafton Hills College - CCC MyPath](https://www.cccmypath.org/uPortal/f/u7859l1s1000/normal/render.uP#session_state=fe5d7586-21c2-44e9-9e1b-19509decc737&code=24e56c0f-b3f4-4ef0-9b09-510b3f5e911d.fe5d7586-21c2-44e9-9e1b-19509decc737.1a9e2586-6f11-4403-8d0b-8f07b75d1ab8)
 
 - [Google Colaboratory](https://colab.research.google.com/github/shirooo39/MiXLab/blob/master/MiXLab.ipynb)
 
@@ -70,18 +86,3 @@ share-img: /assets/img/osgeo.svg
 
 - [Scilit.net](https://www.scilit.net/)
 
----
-
-- [www.refseek.com](https://www.refseek.com/) - Search for academic resources. More than a billion sources: encyclopedias, monographs, magazines.
-
-- [www.worldcat.org](https://search.worldcat.org/pt) - search for content from 20 thousand libraries around the world. Find out where the closest rare book you need is.
-
-- [link.springer.com](https://link.springer.com) – access to more than 10 million scientific documents: books, articles, research protocols.
-
-- [www.bioline.org.br](https://www.bioline.org.br/) is a library of scientific journals on biosciences published in developing countries.
-
-- [repec.org](http://repec.org) - volunteers from 102 countries collected almost 4 million publications on economics and related sciences.
-
-- [www.science.gov](https://www.science.gov/) is an American state search engine for more than 2,200 scientific websites. More than 200 million articles are indexed.
-
-- [www.base-search.net](https://www.base-search.net/) is one of the most powerful searches in academic studies texts. More than 100 million scientific documents, 70% of them free.
