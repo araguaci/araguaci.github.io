@@ -28,7 +28,7 @@ navbar-links:
   about me: "aboutme"
   personality: "personality"
   projects:
-    - Floripa Surf Club: "http://www.floripasurfclub.com.br/"
+    - Floripa Surf Club: "http://www.floripasurfclub.com/"
     - CENTRAL DE AVENTURAS: "http://centraldeaventuras.com.br/"
     - Projeto SUP SOCIAL: "https://supsocial.vercel.app/"
     - FLORIPA SUP CLUB - Stand Up Paddle SURFCLUB: "http://www.floripasupclub.com.br/"    
@@ -56,7 +56,7 @@ round-avatar: true
 social-network-links:
   email: "araguaci@gmail.com"
   facebook: artesdosulweb
-  github: araguaci
+  github: artesdosul
   twitter: artesdosul
   patreon: artesdosul
   youtube: c/AraguaciCarlosdeAndrade
@@ -103,6 +103,13 @@ feed_show_excerpt: true
 # Whether or not to show a list of tags below each post preview in the feed page
 feed_show_tags: true
 
+# Extensions
+## Plugins: https://hexo.io/plugins/
+feed:
+  type: atom
+  path: atom.xml
+  limit: 20
+  
 # The keywords to associate with your website, for SEO purposes
 keywords: "artesdosul,araguaci,surf,surfschool,surftrip,floripa,patriamadabrasil"
 
@@ -241,7 +248,7 @@ plugins:
   - jekyll-paginate
   - jekyll-sitemap
 
-# theme: jekyll-theme-chirpy
+#remote_theme: jekyll-theme-chirpy
 remote_theme: daattali/beautiful-jekyll@5.0.0
 
 

@@ -12,8 +12,6 @@ gem "webrick"
 
 gem "timezone" 
 
-gem "tzinfo-data" 
-
 gem "jekyll"
 
 gem "jekyll-sitemap" 
@@ -27,5 +25,9 @@ gem "jekyll-watch"
 gem "rouge" 
 
 gem "listen" 
+
+gem 'bigdecimal'
+
+gem 'logger'
 
 # gem "jekyll-theme-chirpy"
