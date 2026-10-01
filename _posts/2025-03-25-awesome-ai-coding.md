@@ -1,3 +1,11 @@
+---
+title: Awesome AI Coding Resources
+subtitle: A comprehensive collection of AI coding tools, tutorials, and resources to get started with AI assisted coding.
+date: 2025-03-25
+tags: [AI, tools, awesome-list]
+categories: [Development, AI]
+---
+
 # Awesome AI Coding Resources [![Awesome](https://awesome.re/badge.svg)](https://awesome.re) 
 
 > A comprehensive collection of AI coding tools, tutorials, and resources to get started with AI assisted coding.

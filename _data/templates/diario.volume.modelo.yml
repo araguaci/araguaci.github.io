@@ -1,0 +1,16 @@
+# Modelo de volume. Copie para _data/daily.dev-NN.yml (NN = próximo número).
+# Não salve este arquivo com o prefixo daily.dev-: o importador lê _data/daily.dev-*.yml.
+# Roteiro: docs/roteiro-automacao-diario-dev.md
+# Entrada em branco: _data/templates/diario.entrada.modelo.yml
+
+metadata:
+  year: 2026
+  author: "Araguaci Carlos de Andrade"
+  ecosystem: "Artes do Sul & Araguaci Dev Hub"
+  volume: 0
+  total_entries: 0
+  generated_at: "2026-10-01"
+  status: "rascunho"
+  source_note: "De onde vieram os fatos: repositório, intervalo de commits, changelog. Um tema por entrada."
+
+entries: []

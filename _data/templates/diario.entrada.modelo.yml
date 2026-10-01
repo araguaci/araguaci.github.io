@@ -1,0 +1,24 @@
+# Bloco de uma entrada. Cole sob `entries:` do volume, com o hífen na frente.
+# Campos obrigatórios: id, date, title, category, tags, slug, summary,
+# problem_statement, key_learnings, impact_value, related_projects.
+# code_snippet pode ficar vazio.
+# Valide com: python diario_dev.py validar _data/daily.dev-NN.yml
+
+- id: "DEV-2026-000"
+  date: "2026-10-01"
+  title: "Frase curta do que foi aprendido"
+  category: "devops"
+  tags: [docker, php]
+  slug: "frase-curta-em-kebab-case"
+  summary: "Duas frases. O que estava em jogo e o que passou a valer."
+  problem_statement: >
+    O que quebrou ou o que não fechava. Fatos observados, sem métrica inventada.
+  key_learnings:
+    - "Lição 1, com o mecanismo (porta, comando, arquivo, versão)."
+    - "Lição 2, o que não era a causa."
+    - "Lição 3, a regra que evita repetir o incidente."
+  code_snippet: |
+    # Trecho curto que ilustra a lição. Sem senha, token, IP de produção ou chave.
+    echo ok
+  impact_value: "O que mudou na prática, em uma frase."
+  related_projects: ["nome-do-repositorio"]

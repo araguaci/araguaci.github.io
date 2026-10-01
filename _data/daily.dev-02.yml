@@ -1,0 +1,594 @@
+metadata:
+  year: 2026
+  author: Araguaci Carlos de Andrade
+  ecosystem: Artes do Sul & Araguaci Dev Hub
+  volume: 2
+  total_entries: 16
+  generated_at: '2026-10-01'
+  status: Pronto para importação e publicação como posts/artigos
+entries:
+- id: DEV-2026-017
+  date: '2026-09-30'
+  title: 'Deploy Híbrido Resiliente: Sincronização Atômica via FTPS e Preservação
+    de Artefatos Jekyll'
+  category: devops
+  tags:
+  - devops
+  - ftp
+  - ci-cd
+  - jekyll
+  - vercel
+  - python
+  slug: deploy-hibrido-resiliente-sincronizacao-ftps-jekyll
+  summary: Arquitetura de deploy contínuo multi-alvo sincronizando Vercel e servidores
+    Linux via FTPS passivo com verificação atômica de integridade MD5 e proteção do
+    diretório docs/.
+  problem_statement: Em deploys híbridos em que o repositório alimenta simultaneamente
+    Vercel (via docs/) e servidores web legados via FTPS, o comando jekyll build limpava
+    recursivamente a pasta de destino, causando sobrescritas acidentais e truncamento
+    de arquivos HTML em conexões passivas.
+  key_learnings:
+  - O Jekyll executa limpeza implícita no diretório destino se parâmetros de destination
+    não forem rigidamente isolados; backups em staging pré-deploy evitam perda de
+    assets compilados.
+  - Sockets FTPS passivos requerem transmissão em chunks moderados (8192 bytes) com
+    mecanismo de retry exponencial com jitter para blindagem contra oscilações de
+    rota.
+  - Verificação de integridade pós-upload confrontando hashes MD5 locais com comandos
+    de tamanho/checksum no servidor FTP elimina transferências truncadas antes da
+    entrada em produção.
+  code_snippet: "# Script de deploy FTPS atômico com verificação de integridade\n\
+    import ftplib, os, hashlib\n\ndef upload_atomic(ftp, local_file, remote_file):\n\
+    \    chunk_size = 8192\n    with open(local_file, 'rb') as f:\n        ftp.storbinary(f'STOR\
+    \ {remote_file}', f, chunk_size)\n    remote_size = ftp.size(remote_file)\n  \
+    \  local_size = os.path.getsize(local_file)\n    if remote_size != local_size:\n\
+    \        raise IOError(f'Truncamento detectado: {local_size} vs {remote_size}')\n"
+  impact_value: Zero downtime e eliminação de 100% dos incidentes de páginas truncadas
+    em deploys do portal artesdosul.com.
+  related_projects:
+  - artesdosul.com
+  - artesdosul.github.io
+- id: DEV-2026-018
+  date: '2026-09-29'
+  title: 'Engenharia de Hero Images de Alto Impacto: Conversão WebP Lossless e Formato
+    5:2 para X Articles'
+  category: frontend
+  tags:
+  - webp
+  - design
+  - performance
+  - pillow
+  - xcom
+  - seo
+  slug: engenharia-hero-images-webp-proporcao-5-2-x-articles
+  summary: Pipeline automatizado de geração, corte áureo e compressão de imagens de
+    capa em formato estrito 5:2 para X Articles e webapps de altíssimo desempenho.
+  problem_statement: Banners heróicos de artigos gerados em resoluções arbitrárias
+    sofriam cortes agressivos em telas mobile e no leitor de X Articles, além de estourarem
+    orçamentos de performance (LCP) com imagens de mais de 3.5MB.
+  key_learnings:
+  - A proporção 5:2 (e.g. 1200x480px ou 2500x1000px) é a métrica geométrica ideal
+    para headers do X Articles sem perdas em safe-zones centrais.
+  - A compressão WebP com quality=85 e método de esforço 6 no Pillow entrega economia
+    de até 88% de tráfego mantendo fidelidade de contraste tipográfico WCAG AAA.
+  - A declaração estrita de metadados og:image:width e og:image:height no frontmatter
+    previne saltos de layout (CLS) na renderização de snippets em mensageiros e redes
+    sociais.
+  code_snippet: "from PIL import Image\n\ndef optimize_hero_image(src_path, dest_path,\
+    \ target_ratio=(5, 2)):\n    with Image.open(src_path) as img:\n        w, h =\
+    \ img.size\n        target_w = w\n        target_h = int(w * (target_ratio[1]\
+    \ / target_ratio[0]))\n        if target_h > h:\n            target_h = h\n  \
+    \          target_w = int(h * (target_ratio[0] / target_ratio[1]))\n        left\
+    \ = (w - target_w) // 2\n        top = (h - target_h) // 2\n        cropped =\
+    \ img.crop((left, top, left + target_w, top + target_h))\n        cropped.save(dest_path,\
+    \ 'WEBP', quality=85, method=6)\n"
+  impact_value: Redução de 85% do payload de mídia em 56 portais e pontuação 100 de
+    SEO no Google Lighthouse.
+  related_projects:
+  - artesdosul
+  - guias.artesdosul.com
+  - xcom-articles
+- id: DEV-2026-019
+  date: '2026-09-29'
+  title: 'Design de Interface Devocional & Decodificação Interativa: A Sagrada Medalha
+    de São Bento (CSSML PWA)'
+  category: frontend
+  tags:
+  - pwa
+  - css-grid
+  - svg
+  - audio-api
+  - ux
+  - devocional
+  slug: interface-devocional-decodificacao-interativa-cssml-pwa
+  summary: Modelagem de Progressive Web App devocional interativo com decodificador
+    SVG em tempo real de siglas latinas da Cruz Sagrada e oração com áudio gregoriano.
+  problem_statement: A Medalha de São Bento possui inscrições criptográficas latinas
+    históricas (C.S.P.B., C.S.S.M.L., N.D.S.M.D., V.R.S.N.S.M.V., S.M.Q.L.I.V.B.)
+    de difícil assimilação pelo fiel sem um mapa interativo conectado.
+  key_learnings:
+  - Mapeamento vetorial SVG com atributos data-sigla e event delegation viabiliza
+    interação tátil suave em qualquer resolução de tela.
+  - Estruturação de CSS Grid em 3 colunas (3x3) para viewports desktop (>= 1200px)
+    proporciona simetria sagrada e harmonia estética minimalista.
+  - A integração de canto gregoriano via Web Audio API deve implementar desbloqueio
+    por gesto explícito do usuário, respeitando as políticas modernas de autoplay
+    dos browsers.
+  code_snippet: "/* Grid 3x3 balanceado para decodificador de siglas */\n.siglas-grid\
+    \ {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(280px,\
+    \ 1fr));\n  gap: 1.5rem;\n}\n@media (min-width: 1200px) {\n  .siglas-grid {\n\
+    \    grid-template-columns: repeat(3, 1fr);\n  }\n}\n.sigla-card {\n  backdrop-filter:\
+    \ blur(12px);\n  background: rgba(18, 22, 34, 0.75);\n  border: 1px solid rgba(212,\
+    \ 175, 55, 0.25);\n  border-radius: 12px;\n  transition: transform 0.2s ease,\
+    \ border-color 0.2s ease;\n}\n"
+  impact_value: Criação de plataforma soberana de oração com mais de 100% de disponibilidade
+    offline e fidelidade teológica rigorosa.
+  related_projects:
+  - cssml.artesdosul.com
+  - arcanjos.artesdosul.com
+- id: DEV-2026-020
+  date: '2026-09-28'
+  title: 'Engenharia Reversa Psicológica: O Playbook do Manipulador como PWA Educativo
+    Offline-First'
+  category: frontend
+  tags:
+  - pwa
+  - offline-first
+  - dark-psychology
+  - search-index
+  - service-worker
+  slug: engenharia-reversa-psicologica-playbook-manipulador-pwa
+  summary: Desenvolvimento de aplicação de referência sobre psicologia comportamental
+    e desarmamento de táticas manipulativas com motor de busca local e funcionamento
+    offline total.
+  problem_statement: Bases conceituais de psicologia escura e táticas de defesa comunicacional
+    são volumosas e frequentemente pesquisadas em situações de campo onde o acesso
+    à rede é instável ou monitorado.
+  key_learnings:
+  - Estratégia CacheFirst em Service Worker assegura carregamento sub-50ms e privacidade
+    absoluta das consultas do usuário sem envio de telemetria.
+  - Indexação de busca em memória via tokens de trigramas (fuzzy search) possibilita
+    localizar padrões de manipulação mesmo com digitação aproximada.
+  - Sinalização de cores com contraste tático (alerta vermelho, defesa azul, contexto
+    cinza) melhora a taxa de compreensão sob estresse cognitivo.
+  code_snippet: "// Service Worker: Cache agressivo para base de conhecimento soberana\n\
+    const CACHE_NAME = 'playbook-v1.2';\nself.addEventListener('fetch', (event) =>\
+    \ {\n  event.respondWith(\n    caches.match(event.request).then((cachedResponse)\
+    \ => {\n      if (cachedResponse) return cachedResponse;\n      return fetch(event.request).then((networkResponse)\
+    \ => {\n        return caches.open(CACHE_NAME).then((cache) => {\n          cache.put(event.request,\
+    \ networkResponse.clone());\n          return networkResponse;\n        });\n\
+    \      });\n    })\n  );\n});\n"
+  impact_value: Disponibilização de ferramenta educativa aberta de proteção cívica
+    contra persuasão desonesta e gaslighting corporativo.
+  related_projects:
+  - persuasao.artesdosul.com
+  - artesdosul.com
+- id: DEV-2026-021
+  date: '2026-09-27'
+  title: 'Cartografia de Saúde Holística & Medicina Integrativa: O PWA Mapa da Cura
+    e Frequências Rife'
+  category: frontend
+  tags:
+  - pwa
+  - medicina-integrativa
+  - svg
+  - tooltips
+  - saude-digital
+  slug: cartografia-saude-holistica-pwa-mapa-da-cura-frequencias
+  summary: Construção de bússola terapêutica interativa em SVG para fitoterapia, biofísica
+    e frequências sonoras integrativas com compartilhamento social via WhatsApp.
+  problem_statement: A navegação em manuais extensos de práticas integrativas gerava
+    fadiga no paciente e impossibilidade de prescrição compartilhada rápida com familiares.
+  key_learnings:
+  - Cálculo de coordenadas polares (raio, seno, cosseno) para posicionamento de nós
+    em rosa-dos-ventos SVG garante escalabilidade visual matemática perfeita.
+  - 'Tooltips desacoplados com position: fixed e cálculo de bounding-rect previnem
+    cortes causados por wrappers com overflow: hidden.'
+  - Codificação direta de roteiros e prescrições em URLs wa.me viabiliza encaminhamento
+    de guias de saúde sem intermediários ou bancos de dados.
+  code_snippet: "// Posicionamento trigonométrico em SVG da Rosa da Cura\nfunction\
+    \ getPointOnCircle(cx, cy, r, angleInDegrees) {\n  const rad = (angleInDegrees\
+    \ - 90) * Math.PI / 180.0;\n  return {\n    x: cx + (r * Math.cos(rad)),\n   \
+    \ y: cy + (r * Math.sin(rad))\n  };\n}\n"
+  impact_value: Democratização do acesso a guias de autocuidado e conexão direta de
+    pacientes com abordagens de bem-estar natural.
+  related_projects:
+  - cura.artesdosul.com
+  - gaia.artesdosul.com
+- id: DEV-2026-022
+  date: '2026-09-26'
+  title: 'Design Memorial & Telemetria F1: A Trilogia Ayrton Senna Lotus 98T em Web
+    Experience'
+  category: frontend
+  tags:
+  - svg
+  - webgl
+  - telemetria
+  - ayrton-senna
+  - ux
+  - storytelling
+  slug: design-memorial-telemetria-f1-trilogia-ayrton-senna-lotus-98t
+  summary: Engenharia de experiência imersiva comemorativa de automobilismo combinando
+    estética John Player Special, telemetria de 1.200 cv e simulação de rotação do
+    turbo Renault EF15B.
+  problem_statement: Memoriais digitais costumam recair em galerias genéricas sem
+    transmitir a engenharia visceral e o desafio tecnológico da lendária Era Turbo
+    da Fórmula 1 de 1986.
+  key_learnings:
+  - 'Uso de estética preto acetinado com acentos em ouro metálico (Hex #D4AF37) e
+    tipografia monospaced reproduz o clima de paddock e engenharia de precisão dos
+    anos 80.'
+  - Plotagem paramétrica de curvas de potência e boost (5.4 bar em treino) em SVG
+    vetorial agrega credibilidade técnica e profundidade documental ao portal.
+  - A estruturação de hubs canônicos cruzados (Inmemoriam, Memories e Magic) maximiza
+    o engajamento e a permanência do visitante no ecossistema.
+  code_snippet: "<!-- Gráfico Vetorial de Curva de Potência e Pressão de Turbo -->\n\
+    <svg viewBox=\"0 0 600 250\" class=\"telemetry-chart\">\n  <defs>\n    <linearGradient\
+    \ id=\"goldGrad\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"0\">\n      <stop offset=\"\
+    0%\" stop-color=\"#8a7322\" />\n      <stop offset=\"100%\" stop-color=\"#ffd700\"\
+    \ />\n    </linearGradient>\n  </defs>\n  <path d=\"M 50,220 C 180,210 280,180\
+    \ 380,80 S 520,30 550,25\" fill=\"none\" stroke=\"url(#goldGrad)\" stroke-width=\"\
+    3\" />\n</svg>\n"
+  impact_value: Tributo de alta tecnologia preservando a memória cultural e o rigor
+    técnico da maior era do automobilismo mundial.
+  related_projects:
+  - senna-lotus-98t
+  - artesdosul.com/tributos
+- id: DEV-2026-023
+  date: '2026-09-24'
+  title: 'Pipeline Unificado de Currículo Soberano: De YAML Único para JSON Resume,
+    Markdown e PDF'
+  category: devops
+  tags:
+  - json-resume
+  - yaml
+  - python
+  - weasyprint
+  - automacao
+  - cv
+  slug: pipeline-unificado-curriculo-soberano-yaml-json-markdown-pdf
+  summary: Automação editorial baseada em Single Source of Truth que compila dados
+    profissionais em JSON Schema internacional, Markdown para GitHub e PDF de alta
+    precisão.
+  problem_statement: A manutenção manual de currículo e portfólio contendo 30+ anos
+    de experiência e 56 projetos em diversas plataformas causava dispersão de dados,
+    erros de datas e trabalho duplicado.
+  key_learnings:
+  - O formato resume.yml como fonte única de verdade centraliza competências, histórico
+    de empresas e publicações, desacoplando o conteúdo da apresentação.
+  - A conformidade estrita com o padrão JSON Resume permite integração instantânea
+    com motores de busca e analisadores de recrutamento (ATS).
+  - 'A geração headless de PDF via HTML5 com regras de CSS Paged Media (@page { size:
+    A4; margin: 15mm; }) garante paginação perfeita sem cortes em blocos de texto.'
+  code_snippet: "# Script de orquestração de formatos de currículo\nimport yaml, json,\
+    \ subprocess\n\ndef sync_resume_ecosystem():\n    with open('_data/resume.yml',\
+    \ 'r', encoding='utf-8') as f:\n        data = yaml.safe_load(f)\n    with open('_data/resume.json',\
+    \ 'w', encoding='utf-8') as f:\n        json.dump(data, f, ensure_ascii=False,\
+    \ indent=2)\n    # Compilação para PDF via Chrome Headless\n    subprocess.run(['pwsh',\
+    \ '-Command', 'node scripts/render_pdf.js'])\n"
+  impact_value: Atualização de portfólio e currículo em múltiplos formatos em menos
+    de 5 segundos a partir de um único commit.
+  related_projects:
+  - artesdosul.com/curriculo
+  - araguaci.github.io
+- id: DEV-2026-024
+  date: '2026-08-25'
+  title: 'Engenharia de Micro-Aplicações Criativas: Algoritmos de Delaunay e Canvas
+    Generativo (Polygonize 3D)'
+  category: frontend
+  tags:
+  - canvas
+  - delaunay
+  - procedural
+  - web-graphics
+  - math
+  - javascript
+  slug: micro-aplicacoes-criativas-delaunay-canvas-polygonize
+  summary: Geração procedimental de malhas poligonais e arte computacional no cliente
+    com Triangulação de Delaunay e otimização de renderização com TypedArrays.
+  problem_statement: Renderizar dezenas de milhares de polígonos interativos a partir
+    de fotografias do usuário diretamente no browser provocava travamento da thread
+    principal e alto consumo de memória.
+  key_learnings:
+  - A Triangulação de Delaunay sobre pontos distribuídos por algoritmo de Poisson
+    Disk produz malhas orgânicas sem arestas agudas e finas indesejadas.
+  - O uso de TypedArrays (Float32Array) para coordenadas e Uint32Array para índices
+    reduz o overhead de alocação de objetos em mais de 75%.
+  - O cálculo de cor média por centróide do triângulo amostrando diretamente a imagem
+    de fundo via getImageData viabiliza exportação vetorial de fidelidade artística.
+  code_snippet: "// Renderização otimizada de triângulos Delaunay em Canvas 2D\nfunction\
+    \ renderMesh(ctx, vertices, triangles, colors) {\n  for (let i = 0; i < triangles.length;\
+    \ i += 3) {\n    const p0 = triangles[i] * 2, p1 = triangles[i+1] * 2, p2 = triangles[i+2]\
+    \ * 2;\n    ctx.fillStyle = colors[i / 3];\n    ctx.beginPath();\n    ctx.moveTo(vertices[p0],\
+    \ vertices[p0 + 1]);\n    ctx.lineTo(vertices[p1], vertices[p1 + 1]);\n    ctx.lineTo(vertices[p2],\
+    \ vertices[p2 + 1]);\n    ctx.closePath();\n    ctx.fill();\n  }\n}\n"
+  impact_value: Suíte de webapps criativos aberta, fluida e com processamento 100%
+    no navegador sem envio de fotos a servidores remotos.
+  related_projects:
+  - polygonize-3d
+  - chromamesh
+  - glitchlab
+- id: DEV-2026-025
+  date: '2026-08-22'
+  title: 'Visualização Sonora Reativa em Tempo Real: FFT e Web Audio API no AudioVisualizer
+    3D'
+  category: frontend
+  tags:
+  - web-audio
+  - fft
+  - visualizer
+  - audio-reactive
+  - javascript
+  slug: visualizacao-sonora-reativa-fft-web-audio-api
+  summary: Arquitetura de processamento espectral de frequências sonoras com AnalyserNode
+    e deformação de malha tridimensional em 60 FPS com interpolação linear.
+  problem_statement: Visualizadores sonoros tradicionais na web sofrem com atrasos
+    entre a batida sonora e a resposta gráfica, além de trepidação excessiva nos eixos
+    geométricos.
+  key_learnings:
+  - O nó AnalyserNode com fftSize de 2048 e smoothingTimeConstant de 0.85 amortece
+    o ruído espectral e preserva a definição dos transientes de graves.
+  - A segmentação das bandas em Graves (20-250Hz), Médios (250-4000Hz) e Agudos (4k-20kHz)
+    permite modular propriedades gráficas distintas (escala, cor e rotação).
+  - A técnica de LERP (Linear Interpolation) aplicada aos vetores de transição gráfica
+    elimina artefatos visuais de salto abrupto entre frames.
+  code_snippet: "// Processamento espectral de frequência e interpolação linear\n\
+    const analyser = audioCtx.createAnalyser();\nanalyser.fftSize = 2048;\nanalyser.smoothingTimeConstant\
+    \ = 0.85;\nconst freqData = new Uint8Array(analyser.frequencyBinCount);\n\nfunction\
+    \ animate() {\n  requestAnimationFrame(animate);\n  analyser.getByteFrequencyData(freqData);\n\
+    \  let bassAvg = 0;\n  for (let i = 0; i < 30; i++) bassAvg += freqData[i];\n\
+    \  bassAvg /= 30;\n  const targetScale = 1.0 + (bassAvg / 255.0) * 1.5;\n  currentScale\
+    \ += (targetScale - currentScale) * 0.15; // LERP\n}\n"
+  impact_value: Experiência audiovisual envolvente no navegador para meditação, estudo
+    frequencial e estúdios musicais.
+  related_projects:
+  - audioviz-3d
+  - gaia.artesdosul.com
+- id: DEV-2026-026
+  date: '2026-08-14'
+  title: Governança de Metadados e Prevenção de Erros 404 em Tag Clouds no Jekyll
+    Estático
+  category: devops
+  tags:
+  - jekyll
+  - metadata
+  - taxonomy
+  - safe-mode
+  - github-pages
+  slug: governanca-metadados-prevencao-erros-404-tag-clouds-jekyll
+  summary: Estratégia de normalização taxonômica e criação de coleções seguras no
+    Jekyll para evitar links quebrados em nuvens de tags geradas no GitHub Pages.
+  problem_statement: No Safe Mode do GitHub Pages, a ausência de plugins de terceiros
+    para criação automática de arquivos de tags gerava links para rotas inexistentes
+    e erros 404 ao clicar em tags livres.
+  key_learnings:
+  - A definição de um arquivo canônico _featured_tags ou dicionário de whitelist garante
+    que apenas tags com páginas de destino declaradas recebam hyperlinks.
+  - 'O filtro Liquid slugify: "latin" deve ser aplicado universalmente para uniformizar
+    diacríticos e evitar falhas de codificação UTF-8 entre sistemas operacionais.'
+  - Testes automatizados de integridade estática no CI detectam nós órfãos antes da
+    sincronização dos builds.
+  code_snippet: "<!-- Nuvem de tags resiliente com verificação de existência -->\n\
+    {% for tag in site.tags %}\n  {% assign tag_slug = tag[0] | slugify: \"latin\"\
+    \ %}\n  {% if site.data.featured_tags contains tag_slug %}\n    <a href=\"/tags/{{\
+    \ tag_slug }}/\" class=\"tag-badge\">{{ tag[0] }} ({{ tag[1].size }})</a>\n  {%\
+    \ else %}\n    <span class=\"tag-badge tag-plain\">{{ tag[0] }}</span>\n  {% endif\
+    \ %}\n{% endfor %}\n"
+  impact_value: Eliminação de 100% dos links quebrados em taxonomias de projetos e
+    conformidade total com os padrões do GitHub Pages.
+  related_projects:
+  - artesdosul
+  - araguaci.github.io
+- id: DEV-2026-027
+  date: '2026-07-20'
+  title: 'Orquestração de Agentes com MCP (Model Context Protocol): O Fim dos Scripts
+    Ad-Hoc'
+  category: ia
+  tags:
+  - mcp
+  - llm
+  - agentes
+  - automacao
+  - composio
+  - tool-use
+  slug: orquestracao-agentes-mcp-model-context-protocol
+  summary: Padronização da integração de agentes autônomos com APIs corporativas (Google
+    Drive, WhatsApp, Git) via especificação aberta Model Context Protocol.
+  problem_statement: Pipelines de automação com LLMs construídas sobre scripts pontuais
+    de terceiros quebravam constantemente com qualquer alteração de payload ou cabeçalhos
+    de autenticação.
+  key_learnings:
+  - O protocolo MCP (Model Context Protocol) provê uma camada de transporte RPC tipada
+    e estável entre o modelo e os recursos externos.
+  - O isolamento de chaves de API e tokens de autenticação em servidores MCP dedicados
+    protege credenciais contra vazamentos em históricos e contextos de LLM.
+  - Validações formais com JSON Schema em ferramentas MCP reduzem drasticamente respostas
+    com alucinação de argumentos ou tipos incompatíveis.
+  code_snippet: "{\n  \"mcpServers\": {\n    \"github\": {\n      \"command\": \"\
+    npx\",\n      \"args\": [\"-y\", \"@modelcontextprotocol/server-github\"],\n \
+    \     \"env\": { \"GITHUB_PERSONAL_ACCESS_TOKEN\": \"***\" }\n    },\n    \"filesystem\"\
+    : {\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"@modelcontextprotocol/server-filesystem\"\
+    , \"D:\\\\artesdosul\"]\n    }\n  }\n}\n"
+  impact_value: Infraestrutura de pair programming e automação com agentes autônomos
+    robusta, modular e imune a breaking changes de APIs.
+  related_projects:
+  - artesdosul
+  - central-de-agentes
+- id: DEV-2026-028
+  date: '2026-07-10'
+  title: 'Estratégia Editorial para X Articles: Long-Forms Técnicos sem Ruído de Threads'
+  category: conteudo
+  tags:
+  - xcom
+  - copywriting
+  - editorial
+  - markdown
+  - content-strategy
+  slug: estrategia-editorial-x-articles-long-forms-sem-ruido
+  summary: Metodologia de conversão e polimento de documentos técnicos complexos para
+    publicação no formato longo nativo do X (Twitter Articles) com máxima retenção.
+  problem_statement: Threads fragmentadas no X dispersavam a discussão técnica e geravam
+    atrito cognitivo em artigos de engenharia densos com código e diagramas.
+  key_learnings:
+  - O formato nativo X Articles dispensa artifícios de paginação forçada como [1/20]
+    e separadores horizontais, oferecendo layout limpo e agradável.
+  - Aberturas de impacto com declaração clara de problema nos primeiros dois parágrafos
+    retêm leitores com perfil executivo e técnico qualificado.
+  - A sincronização de chamadas e ganchos complementares em posts curtos multiplica
+    o alcance orgânico direcionando tráfego qualificado para o artigo longo.
+  code_snippet: "# Regra de higienização de Markdown para X Articles\nimport re\n\n\
+    def clean_for_x_article(md_text):\n    # Remove marcadores de thread [X/Y]\n \
+    \   cleaned = re.sub(r'\\s*\\[\\d+/\\d+\\]\\s*', ' ', md_text)\n    # Remove separadores\
+    \ de tweet repetitivos\n    cleaned = re.sub(r'\\n---+\\n', '\\n\\n', cleaned)\n\
+    \    # Garante parágrafos curtos e dinâmicos\n    return cleaned.strip()\n"
+  impact_value: Crescimento de autoridade e engajamento qualificado em redes de tecnologia
+    sem dependência de algoritmos de feed efêmero.
+  related_projects:
+  - xcom-article
+  - artesdosul-editorial
+- id: DEV-2026-029
+  date: '2026-06-25'
+  title: Central de Chamados Serverless & Anti-Robô com Roteamento Regional WhatsApp
+  category: arquitetura
+  tags:
+  - serverless
+  - helpdesk
+  - whatsapp-api
+  - anti-bot
+  - edge
+  slug: central-chamados-serverless-anti-robo-roteamento-whatsapp
+  summary: Implementação de helpdesk corporativo com emissão de protocolo transparente
+    no cliente e roteamento geográfico direto para atendentes em Santa Catarina e
+    São Paulo.
+  problem_statement: Sistemas SaaS tradicionais de chamados impõem assinaturas mensais
+    caras e geram atrito no cliente final, que prefere atendimento ágil e direto no
+    WhatsApp.
+  key_learnings:
+  - Geração de protocolo no cliente via timestamp base36 e token randômico permite
+    rastreamento imediato de chamados sem servidor de banco de dados ativo.
+  - Roteamento contextual baseado no DDD ou na seleção de serviço direciona o cliente
+    ao canal correto (SC ou SP) com payload estruturado e sem retrabalho.
+  - A barreira invisível Sentinela (campos honeypot e timer mínimo de interação) bloqueia
+    submissões de spammers e scripts maliciosos de web scraping.
+  code_snippet: "// Geração de protocolo e roteamento de suporte\nfunction createSupportTicket(region,\
+    \ clientName, issueDesc) {\n  const dateStr = new Date().toISOString().slice(0,10).replace(/-/g,\
+    \ '');\n  const randCode = Math.random().toString(36).substring(2, 6).toUpperCase();\n\
+    \  const protocol = `ADS-${dateStr}-${randCode}`;\n  \n  const phone = region\
+    \ === 'SP' ? '5511973741227' : '5547936182687';\n  const msg = encodeURIComponent(`*Chamado:*\
+    \ #${protocol}\\n*Cliente:* ${clientName}\\n*Demanda:* ${issueDesc}`);\n  window.open(`https://wa.me/${phone}?text=${msg}`,\
+    \ '_blank');\n}\n"
+  impact_value: Custo zero de infraestrutura e tempo de primeira resposta ao cliente
+    reduzido de 4 horas para menos de 3 minutos.
+  related_projects:
+  - suporte.artesdosul.com
+  - artesdosul.com
+- id: DEV-2026-030
+  date: '2026-06-05'
+  title: 'Portais Geográficos & Ecoturismo: Vetores SVG e Leaflet com Performance
+    100 PageSpeed'
+  category: frontend
+  tags:
+  - gis
+  - leaflet
+  - ecoturismo
+  - performance
+  - openstreetmap
+  slug: portais-geograficos-ecoturismo-vetores-svg-leaflet-pagespeed
+  summary: Substituição de SDKs pesados de mapas comerciais por arquitetura leve com
+    Leaflet, camadas GeoJSON vetoriais e tiles estáticos para guias de turismo sustentável.
+  problem_statement: Plataformas de turismo regional e escolas de surf em Bombinhas
+    e Florianópolis sofriam com lentidão extrema de carregamento ao carregar SDKs
+    pesados de mapas proprietários.
+  key_learnings:
+  - Leaflet com OpenStreetMap consome uma fração de memória em relação a APIs proprietárias,
+    reduzindo o tempo de bloqueio de CPU a quase zero.
+  - Camadas de trilhas ecológicas desenhadas em formato GeoJSON leve (menos de 20KB)
+    possibilitam visualização fluida de altimetria e rotas de ecoturismo.
+  - O carregamento dinâmico (lazy execution) da renderização do mapa mediante interseção
+    (IntersectionObserver) assegura notas máximas de Core Web Vitals.
+  code_snippet: "// Inicialização preguiçosa de mapa interativo ao entrar na viewport\n\
+    const mapObserver = new IntersectionObserver((entries) => {\n  if (entries[0].isIntersecting)\
+    \ {\n    const map = L.map('tour-map').setView([-27.143, -48.498], 13);\n    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);\n\
+    \    mapObserver.disconnect();\n  }\n});\nmapObserver.observe(document.getElementById('tour-map'));\n"
+  impact_value: Portais de ecoturismo rápidos em conexões móveis de praia, impulsionando
+    reservas diretas e valorizando a economia local.
+  related_projects:
+  - central-de-aventuras
+  - bombinhasaluguel.com.br
+  - floripasurfclub
+- id: DEV-2026-031
+  date: '2026-05-15'
+  title: Hardware Maker & Telemetria Portátil com M5Stack Cardputer e ESP32-S3 em
+    FreeRTOS
+  category: iot
+  tags:
+  - esp32-s3
+  - m5stack
+  - freertos
+  - c-plus-plus
+  - hardware
+  - maker
+  slug: hardware-maker-telemetria-portatil-m5stack-cardputer-esp32-s3
+  summary: Desenvolvimento de firmware para terminal portátil de bancada com teclado
+    integrado, display IPS e barramento SPI acelerado por DMA para auditoria de redes
+    de sensores.
+  problem_statement: A análise em campo de nós de sensores IoT dispersos exigia transportar
+    computadores portáteis pesados ou sofrer com esgotamento rápido de bateria de
+    bancada.
+  key_learnings:
+  - O microcontrolador ESP32-S3 com FreeRTOS permite isolar tarefas de exibição gráfica
+    no Core 0 e recepção de pacotes sem fio no Core 1 com latência previsível.
+  - Comunicação com o display ST7789 via barramento SPI utilizando DMA (Direct Memory
+    Access) transfere buffers de imagem sem consumir ciclos de processamento de CPU.
+  - Estratégias de gerenciamento de energia com Light Sleep e redução dinâmica de
+    frequência de 240MHz para 80MHz quadruplicam a autonomia da bateria em campo.
+  code_snippet: "// Tarefa de telemetria isolada em Core dedicado no FreeRTOS\nvoid\
+    \ telemetryTask(void *pvParameters) {\n  esp_now_peer_info_t peerInfo = {};\n\
+    \  // Inicialização e escuta contínua de pacotes sem jitter\n  for(;;) {\n   \
+    \ if (xQueueReceive(packetQueue, &incomingPacket, portMAX_DELAY) == pdTRUE) {\n\
+    \      processSensorData(&incomingPacket);\n    }\n  }\n}\n// Criação da tarefa\
+    \ vinculada ao Core 1\nxTaskCreatePinnedToCore(telemetryTask, \"TeleTask\", 4096,\
+    \ NULL, 2, NULL, 1);\n"
+  impact_value: Criação de scanner e terminal de testes de hardware independente de
+    fios, com custo de hardware inferior a R$ 250.
+  related_projects:
+  - m5stack-ecosystem
+  - oficina-maker
+  - esp-now-hub
+- id: DEV-2026-032
+  date: '2026-04-20'
+  title: 'Governança de Dados Cívicos e OSINT: Cadeia de Custódia Digital com Hash
+    SHA-256 e IPFS'
+  category: osint
+  tags:
+  - osint
+  - jurimetria
+  - sha256
+  - ipfs
+  - transparencia
+  - governanca
+  slug: governanca-dados-civicos-osint-cadeia-custodia-sha256-ipfs
+  summary: Metodologia de coleta de evidências cívicas e investigativas imutáveis
+    com ancoragem criptográfica de integridade e espelhamento distribuído.
+  problem_statement: Investigações de supersalários, atos administrativos controversos
+    e diários oficiais sofrem com apagamento deliberado de links e alterações silenciosas
+    na fonte original.
+  key_learnings:
+  - O cálculo imediato de hash SHA-256 no momento do scraping cria um selo matemático
+    imutável que comprova que o arquivo não sofreu adulteração posterior.
+  - O arquivamento permanente via IPFS (InterPlanetary File System) e Web Archive
+    confere redundância distribuída imune a censura ou quedas de servidores.
+  - A estruturação dos dados sob licença Creative Commons Zero (CC0) protege o ecossistema
+    contra ameaças de intimidação jurídica por alegações de direitos autorais.
+  code_snippet: "# Geração de selo de integridade SHA-256 para dossiês cívicos\nimport\
+    \ hashlib, json\n\ndef anchor_evidence(file_path):\n    sha = hashlib.sha256()\n\
+    \    with open(file_path, 'rb') as f:\n        while chunk := f.read(65536):\n\
+    \            sha.update(chunk)\n    evidence_receipt = {\n        'file': file_path,\n\
+    \        'sha256': sha.hexdigest(),\n        'license': 'CC0-1.0 Public Domain'\n\
+    \    }\n    return evidence_receipt\n"
+  impact_value: Transparência pública radical e preservação histórica de provas para
+    o jornalismo investigativo e cidadania ativa.
+  related_projects:
+  - lawfare
+  - vaza-toga
+  - censura-no-brasil

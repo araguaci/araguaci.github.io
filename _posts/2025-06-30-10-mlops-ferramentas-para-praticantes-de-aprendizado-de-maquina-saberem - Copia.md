@@ -1,7 +1,7 @@
 ---
 title: 10 MLOps Ferramentas para Praticantes de Aprendizado de Máquina Saberem
 subtitle: "O aprendizado de máquina não se trata apenas de construir modelos. Trate-se também de implantá-los, gerenciá-los e mantê-los. É aqui que entram as operações de aprendizado de máquina (MLOps)."
-date: 2025-06-30T16:48:43.396Z
+date: 2025-06-30
 preview: ""
 tags: [MLOps, Machine Learning, Tools, AI, DevOps]
 categories: [Tecnologia, Desenvolvimento]

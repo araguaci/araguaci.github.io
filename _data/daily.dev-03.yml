@@ -1,0 +1,444 @@
+# ==============================================================================
+# DIÁRIO DE DESENVOLVIMENTO & REGISTRO DE APRENDIZADOS TÉCNICOS (2026)
+# Repositório de Origem: D:\app_aragua\araguaci.github.io\_data\daily.dev-03.yml
+# Volume 3 — Lorentz / Omnichannel (commits de 2026 ainda fora dos volumes 1 e 2)
+# Autor: Araguaci Carlos de Andrade (Artes do Sul)
+# Fontes: histórico git de omnichannel, lorentz-vps-stack, supervisor,
+#         omnichannel-system, lorentz-webphone, issabel4-docker, _lab,
+#         gerador-licenca, lorentz-n8n e supervisor-docs (jan–set/2026).
+# ==============================================================================
+
+metadata:
+  year: 2026
+  author: "Araguaci Carlos de Andrade"
+  ecosystem: "Artes do Sul & Araguaci Dev Hub"
+  volume: 3
+  total_entries: 16
+  generated_at: "2026-10-01"
+  status: "Pronto para importação e publicação como posts/artigos"
+  source_note: "Aprendizados extraídos dos commits de 2026 do monorepo Lorentz/Omnichannel. Um artigo por tema, não um artigo por commit."
+
+entries:
+  - id: "DEV-2026-033"
+    date: "2026-09-28"
+    title: "Dois contact centers no mesmo host: a porta 8090 já era do CTI"
+    category: "arquitetura"
+    tags: [docker, laravel, sql-server, mysql, portas, omnichannel]
+    slug: "contact-center-legado-e-laravel-colisao-porta-8090"
+    summary: "O Supervisor PHP com SQL Server segue em produção enquanto o Omnichannel Laravel sobe ao lado, com MySQL próprio e uma porta que não disputa a API do LorentzCTI."
+    problem_statement: >
+      O compose de desenvolvimento do Laravel publicava a porta 8090. Essa porta já era a Monitor API
+      do LorentzCTI. Subir os dois arquivos ao mesmo tempo derrubava o monitoramento ou o helpdesk novo.
+    key_learnings:
+      - "O stack chama só docker-compose.vps.yml, na porta 8095. O compose de desenvolvimento do Laravel fica de fora dessa montagem."
+      - "SQL Server do legado e MySQL do Laravel não se misturam. O encontro dos dois sistemas é o portal e o MonitorOPS."
+      - "Na VPS a 8095 escuta em 127.0.0.1, atrás do Caddy. No laboratório o bind é aberto para o host Windows enxergar o WSL."
+    code_snippet: |
+      # Lab / homologação (bind acessível no host)
+      ./scripts/deploy-omnichannel.sh --lab
+
+      # VPS (8095 só em localhost; o domínio entra pelo Caddy)
+      ./scripts/deploy-omnichannel.sh --vps
+
+      # Pular o Laravel e deixar o legado sozinho
+      ./scripts/deploy-lab-local.sh --skip-omnichannel
+    impact_value: "Legado e helpdesk novo sobem no mesmo ambiente sem tomar a porta do monitoramento CTI."
+    related_projects: ["omnichannel", "lorentz-vps-stack", "omnichannel-system"]
+
+  - id: "DEV-2026-034"
+    date: "2026-09-19"
+    title: "Preferências de interface por usuário e trilha de navegação com prazo"
+    category: "frontend"
+    tags: [laravel, lgpd, ui, scheduler, mysql]
+    slug: "preferencias-ui-por-usuario-log-navegacao-opt-in"
+    summary: "Navbar, tamanho de ícone, layout dos módulos e favoritos passaram a viver no usuário. A trilha de navegação só grava quando o opt-in está ligado e é podada aos 90 dias."
+    problem_statement: >
+      A aparência era global e não servia operadores diferentes. Guardar cada clique por padrão
+      também inchava a base e conflitava com o mínimo necessário da LGPD.
+    key_learnings:
+      - "A coluna users.ui_preferences guarda o shell de cada pessoa. A ordem de categorias da instalação fica em outra tabela."
+      - "O middleware de navegação só escreve com opt-in. O comando navigation-logs:prune --days=90 limita a retenção."
+      - "Na VPS o agendador precisa de um serviço próprio (php artisan schedule:work). Sem esse container a poda não roda."
+    code_snippet: |
+      # Retenção da trilha de navegação (opt-in)
+      php artisan navigation-logs:prune --days=90
+
+      # Compose da VPS: serviço que mantém o scheduler vivo
+      # omnichannel_scheduler: php artisan schedule:work
+    impact_value: "Cada operador guarda o próprio shell e a trilha de uso deixa de crescer sem prazo."
+    related_projects: ["omnichannel-system"]
+
+  - id: "DEV-2026-035"
+    date: "2026-09-18"
+    title: "Helpdesk com três modos de WhatsApp e o service worker que invalidava a resposta"
+    category: "arquitetura"
+    tags: [laravel, whatsapp, service-worker, vite, smtp]
+    slug: "helpdesk-whatsapp-gateway-e-service-worker-response"
+    summary: "Portal de suporte com token de acompanhamento e um único gateway WhatsApp (log, WAHA ou Meta), depois de corrigir cache do service worker, assets do Vite e o e-mail de senha em inglês."
+    problem_statement: >
+      O service worker em cache agressivo quebrava o preload com 'Failed to convert value to Response'.
+      O nginx servia um manifest do Vite de outro build. Módulos respondiam HTTP 500 porque o schema
+      ainda não tinha colunas que o código já lia. O reset de senha saía em inglês.
+    key_learnings:
+      - "Um gateway com modos log, waha e meta evita três integrações paralelas enquanto o canal ainda está em prova."
+      - "Cache-first em aplicação Laravel com assets versionados pelo Vite dessincroniza o preload. Estático pode cachear; o manifest, não."
+      - "Reparar migrations que ficaram para trás faz parte do deploy. O seeder assume colunas que um banco antigo não tem."
+      - "E-mail de redefinição pede notificação própria e lang pt_BR. O template padrão do framework não traduz sozinho."
+    code_snippet: |
+      # Modos do gateway (segredo fica no .env, não na tela de Settings)
+      # WHATSAPP_GATEWAY=log|waha|meta
+
+      # Conferir schema antes de culpar a rota
+      php scripts/repair-migrations.php
+      php scripts/smoke-modules.php
+    impact_value: "Chamado público com protocolo e WhatsApp de primeiro nível no mesmo app, com assets que batem com o build."
+    related_projects: ["omnichannel-system", "lorentz-vps-stack"]
+
+  - id: "DEV-2026-036"
+    date: "2026-08-11"
+    title: "DTMF de celular na URA e o dispositivo de áudio que o PJSIP não abria"
+    category: "telefonia"
+    tags: [dtmf, ura, pjsip, asterisk, panasonic]
+    slug: "dtmf-celular-ura-e-audio-wmme-pjsip"
+    summary: "Dígito de celular some quando a URA espera tom na faixa de voz e o tronco entrega RFC 2833. No laboratório, o softphone falha se o PJSIP foi compilado sem o host de áudio do Windows."
+    problem_statement: >
+      Em campo, menus e transferências da URA não recebiam o dígito vindo de celular.
+      No lab, o PJSIP 2.12.1 não abria o dispositivo de som. Os dois sintomas pareciam
+      a mesma falha e não eram.
+    key_learnings:
+      - "Antes de alterar o menu da URA, confirmar se o dígito chega como RFC 2833, SIP INFO ou tom in-band."
+      - "A captura no trecho do PABX mostra o evento de telefonia que o log da URA não registra."
+      - "No Windows, o pjproject de teste local precisa do host de áudio WMME. Sem isso o softphone sobe e não há áudio."
+    code_snippet: |
+      # Separar as duas falhas
+      # 1) Sinalização: o INVITE/RTP traz telephone-event (RFC 2833)?
+      # 2) Laboratório: o build do PJSIP incluiu o host WMME?
+
+      # Conferir no Asterisk se o dígito chegou ao canal
+      asterisk -rx "core show channel <canal>"
+    impact_value: "O diagnóstico de campo separa falha de sinalização DTMF de falha de compilação do softphone de teste."
+    related_projects: ["omnichannel", "ura", "_lab"]
+
+  - id: "DEV-2026-037"
+    date: "2026-08-04"
+    title: "Mojibake no Windows: UTF-8 lido como CP850 e gravado de novo"
+    category: "devops"
+    tags: [utf-8, windows, encoding, git]
+    slug: "mojibake-utf8-lido-como-cp850-windows"
+    summary: "Documentos do laboratório apareceram com caixas no lugar de acentos porque um editor abriu UTF-8 na página OEM do console e salvou por cima."
+    problem_statement: >
+      'ó' virou a sequência ├│ e o travessão virou ÔÇö. O clone git estava correto.
+      A cópia local é que foi regravada com a code page errada.
+    key_learnings:
+      - "O desenho ├│ ou ÔÇö é UTF-8 interpretado como CP850 e salvo de novo. Não é corrupção do remote."
+      - "git checkout do arquivo original recupera o texto quando o commit ainda está limpo."
+      - "Zip, RAR e editores presos na página OEM do Windows são a origem típica. O pull não é."
+    code_snippet: |
+      def looks_like_cp850_mojibake(text):
+          markers = ("├", "ÔÇ", "Ã§", "Ã£")
+          return any(mark in text for mark in markers)
+
+      # Recuperar: ler os bytes do arquivo como CP850 e gravar UTF-8 sem BOM.
+      # Se o commit git estiver íntegro, git checkout -- arquivo.md é o caminho curto.
+    impact_value: "Notas de campo em português deixam de ser regravadas com acento destruído."
+    related_projects: ["omnichannel", "_lab"]
+
+  - id: "DEV-2026-038"
+    date: "2026-07-31"
+    title: "Licença e painéis de administração só para a allowlist do edge"
+    category: "seguranca"
+    tags: [caddy, allowlist, licenca, docker, php]
+    slug: "allowlist-edge-licenca-e-id-de-host-linux"
+    summary: "O gerador de licença deixou de ficar público no proxy. No container Linux, a licença também deixou de chamar o comando VOL, que não existe fora do Windows."
+    problem_statement: >
+      A interface /licenca e o proxy injetavam a API sem filtro de IP. Ao mesmo tempo,
+      att_licenca.php executava VOL para ler o serial do volume. No container o shell
+      respondia 'VOL: not found' e a licença não fechava.
+    key_learnings:
+      - "O corte fica no Caddy, por IP de origem, e não só escondendo o link do portal."
+      - "O log de acessos negados mostra quem tentou entrar e de qual superfície (licença, monitor ou Portainer)."
+      - "Em VPS de cliente o profile de licença nem sobe."
+      - "No Linux o identificador estável vem de LORENTZ_STACK_HOST_ID, de um arquivo montado ou de /etc/machine-id. VOL e getmac continuam só no Windows."
+    code_snippet: |
+      function lorentz_stack_host_id_raw(): string
+      {
+          $env = getenv('LORENTZ_STACK_HOST_ID');
+          if ($env !== false && trim($env) !== '') {
+              return preg_replace('/[^a-zA-Z0-9\-]/', '', trim($env));
+          }
+          foreach (['/var/lorentz/stack-host-id', '/etc/machine-id'] as $path) {
+              if (is_readable($path)) {
+                  return trim((string) file_get_contents($path));
+              }
+          }
+          return '';
+      }
+    impact_value: "A emissão de licença fica restrita à rede de administração e o mesmo binário de licença passa a funcionar no container."
+    related_projects: ["lorentz-vps-stack", "supervisor"]
+
+  - id: "DEV-2026-039"
+    date: "2026-07-30"
+    title: "O que o laboratório Docker não mostra na ida para a VPS"
+    category: "devops"
+    tags: [vps, tls, symlink, php, sql-server, caddy]
+    slug: "lab-docker-nao-cobre-cutover-vps"
+    summary: "Compose verde no WSL não garante certificado, caminho de volume, driver SQL nem URL pública. O corte de ambiente quebrou em TLS, symlink e driver legado."
+    problem_statement: >
+      O laboratório aceita HTTP e certificado autoassinado. Em produção o navegador cobra
+      HTTPS válido, o PBX já ocupa a porta 443, um atalho em /root mudava o caminho relativo
+      do volume e o PHP 8.2 não tinha a extensão mssql antiga.
+    key_learnings:
+      - "URL pública antiga duplicada no .env vence no source do shell e aponta o stack para o host anterior."
+      - "Um symlink de atalho altera ../supervisor. O volume monta uma pasta vazia e o site sobe sem código."
+      - "No PHP 8.2 o driver é mssqlnative, com TrustServerCertificate quando o SQL ainda usa certificado interno. A extensão mssql legada não existe nesse runtime."
+      - "ADOdb e a pasta adodb5 não são o mesmo caminho. Flags de debug do Supervisor ficam desligadas no host de produção."
+    code_snippet: |
+      # Conferir para onde o relativo aponta antes do compose
+      readlink -f /root/lorentz
+      ls -la /root/omnichannel/supervisor/index.php
+
+      # .env: uma única URL pública. Duplicata antiga ganha no `source`.
+      # Driver no container: mssqlnative + TrustServerCertificate=true
+    impact_value: "O checklist de corte passa a olhar certificado, caminho real do volume e driver SQL, além do compose."
+    related_projects: ["lorentz-vps-stack", "supervisor"]
+
+  - id: "DEV-2026-040"
+    date: "2026-07-21"
+    title: "Trocar o repositório do PBX na VPS sem perder o firstboot local"
+    category: "devops"
+    tags: [git, issabel, docker, asterisk]
+    slug: "migrar-repositorio-pbx-descartar-firstboot-local"
+    summary: "A VPS ainda apontava para o fork antigo do Issabel. O pull só fechou depois de descartar o firstboot alterado no servidor e alinhar o remote canônico."
+    problem_statement: >
+      Scripts de primeiro boot editados direto na VPS divergiam do Git e bloqueavam a atualização.
+      No Asterisk 18 o schema de call center esperado pelo bootstrap também podia não existir,
+      e o script abortava o boot inteiro.
+    key_learnings:
+      - "Cópia local de script de boot no servidor não é fonte da verdade. O descarte consciente vem antes do pull."
+      - "ISSABEL_REPO, a imagem e a tag de firstboot mudam juntos. Trocar só o remote deixa o container no fluxo antigo."
+      - "A árvore anterior fica em backup no host antes de um re-clone."
+      - "Se a tabela de call center não existe no Asterisk 18, o bootstrap pula esse passo em vez de falhar."
+    code_snippet: |
+      # Na VPS, o firstboot local bloqueia o pull
+      git -C "$ISSABEL_DIR" status --short
+      # backup da árvore, depois alinhar origin e descartar o script divergente
+      git checkout -- issabel-firstboot
+      git pull
+
+      # Asterisk 18: schema de call center ausente não pode abortar o boot
+    impact_value: "A troca de fork do PBX na VPS deixa de parar no primeiro arquivo editado à mão."
+    related_projects: ["issabel4-docker", "lorentz-vps-stack"]
+
+  - id: "DEV-2026-041"
+    date: "2026-07-15"
+    title: "403 no Operador Web e o erro 130 do React por export que faltava"
+    category: "frontend"
+    tags: [apache, react, webrtc, webphone, php]
+    slug: "operador-web-403-apache-e-react-error-130"
+    summary: "O softphone WebRTC entrou no Supervisor no lugar do cliente analógico. O Apache devolvia 403 na pasta e o bundle React quebrava ao importar a tela de login."
+    problem_statement: >
+      Sem DirectoryIndex, Options -Indexes responde 403 em vez de abrir index.php.
+      A tela de login era importada do barrel de componentes, mas esse arquivo não a
+      reexportava. O React 130 avisa que o tipo do elemento é inválido: o import veio undefined.
+    key_learnings:
+      - "Options -Indexes sem DirectoryIndex index.php esconde a aplicação atrás de um 403."
+      - "O cliente legado foi renomeado para cli_analogico para as duas URLs não disputarem a mesma pasta."
+      - "O barrel precisa reexportar o componente que outras telas importam desse arquivo."
+      - "O placeholder da porta do webphone no att_config tem que ser trocado no render. Se sobrar o token, o embed aponta para um host literal."
+    code_snippet: |
+      # supervisor/cliente/.htaccess
+      DirectoryIndex index.php
+      Options -Indexes +FollowSymLinks
+
+      # Barrel: quem importa da pasta precisa receber o componente
+      export { LorentzLoginScreen } from './LorentzLoginScreen';
+    impact_value: "O operador abre o webphone dentro do Supervisor, com a pasta servindo index.php e o login montando de fato."
+    related_projects: ["supervisor", "lorentz-webphone", "lorentz-vps-stack"]
+
+  - id: "DEV-2026-042"
+    date: "2026-07-14"
+    title: "AMI do Asterisk visto do container: negar tudo e permitir a rede Docker"
+    category: "telefonia"
+    tags: [asterisk, ami, ufw, docker, cti]
+    slug: "ami-asterisk-acl-rede-docker-ufw"
+    summary: "O LorentzCTI na bridge não alcançava o AMI do Issabel em rede do host. A sessão só apareceu com permit da faixa Docker e a mesma faixa liberada no firewall, sem publicar a porta na internet."
+    problem_statement: >
+      O PBX escuta a porta 5038 no host. O CTI sai de um endereço 172.16.0.0/12.
+      A ACL padrão do manager só aceitava localhost, e o UFW ainda descartava o pacote
+      mesmo depois de ajustar o Asterisk.
+    key_learnings:
+      - "Issabel em rede do host e CTI em bridge não compartilham localhost."
+      - "manager_custom.conf começa com deny de tudo e só então permite 127.0.0.1 e a rede Docker."
+      - "UFW ativo e ACL do Asterisk são duas portas. As duas precisam concordar."
+      - "A 5038 não entra na lista pública do firewall."
+    code_snippet: |
+      ; /etc/asterisk/manager_custom.conf
+      ; segredo do manager fica no .env, não neste exemplo
+      deny=0.0.0.0/0.0.0.0
+      permit=127.0.0.1/255.255.255.255
+      permit=172.16.0.0/255.240.0.0
+
+      # Firewall do host, mesma faixa, sem abrir para a internet
+      ufw allow from 172.16.0.0/12 to any port 5038 proto tcp
+    impact_value: "O CTI volta a enxergar eventos do Asterisk e a porta de gerência continua fora da internet."
+    related_projects: ["lorentz-vps-stack", "issabel4-docker"]
+
+  - id: "DEV-2026-043"
+    date: "2026-07-12"
+    title: "Abas da Base Histórica sem Bootstrap e o INI ao lado do executável"
+    category: "backend"
+    tags: [php, jquery, dotnet, sql-server]
+    slug: "base-historica-abas-jquery-ini-ao-lado-do-exe"
+    summary: "A tela de arquivamento abria em branco porque as abas dependiam de JavaScript do Bootstrap que a página não carregava. O worker .NET lia o INI em Arquivos de Programas em vez da pasta do executável."
+    problem_statement: >
+      A troca de aba chamava o plugin do Bootstrap. Nessa tela o bundle não estava presente,
+      então o conteúdo não aparecia. No serviço, a configuração de laboratório ao lado do .exe
+      era ignorada e o processo seguia um INI de instalação antigo.
+    key_learnings:
+      - "Troca de aba em jQuery puro não depende do Bootstrap da página legada."
+      - "A busca do INI começa no diretório do executável e só depois olha Arquivos de Programas."
+      - "A chave da API no PHP e no worker é a mesma constante renderizada pelo stack. Valor divergente parece serviço fora do ar."
+    code_snippet: |
+      // Abas sem Bootstrap JS
+      document.querySelectorAll('[data-tab]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var id = btn.getAttribute('data-tab');
+          document.querySelectorAll('.tab-pane').forEach(function (pane) {
+            pane.hidden = pane.id !== id;
+          });
+        });
+      });
+
+      // Ordem do INI no worker: pasta do exe, depois Program Files
+    impact_value: "A manutenção de arquivamento volta a mostrar as abas e o worker de laboratório lê o INI que está junto do binário."
+    related_projects: ["supervisor", "omnichannel", "lorentz-vps-stack"]
+
+  - id: "DEV-2026-044"
+    date: "2026-07-11"
+    title: "Arquivar o mês de chamadas com T-SQL, sem arquivo de backup"
+    category: "backend"
+    tags: [sql-server, dotnet, cti, arquivamento]
+    slug: "arquivar-chamadas-tsql-mesma-instancia-sql"
+    summary: "Montar Base Histórica deixou de ser BACKUP e RESTORE em arquivo. O worker copia tabela a tabela entre bases da mesma instância e grava o que fez."
+    problem_statement: >
+      O utilitário antigo gerava arquivo de backup e restaurava em outra base. No Docker
+      isso exige volume, permissão de arquivo e um passo manual. Uma falha no meio do mês
+      não dizia qual tabela já tinha saído da base quente.
+    key_learnings:
+      - "O contrato é INSERT na base histórica, conferir a contagem e só então DELETE na base quente."
+      - "Não há desfazer automático se a tabela seguinte falhar. O histórico auditável marca até onde o lote chegou."
+      - "O agendamento mora em tabela de configuração. A tela PHP só chama a API. O motor é o worker .NET 9."
+    code_snippet: |
+      -- Mesma instância SQL Server, duas bases
+      INSERT INTO LorentzHistorico.dbo.CTI_CHAMADA
+      SELECT * FROM LorentzCTI.dbo.CTI_CHAMADA
+      WHERE DataInicio >= @ini AND DataInicio < @fim;
+
+      -- Só apaga na quente depois de a contagem bater
+      -- O lote fica em CTI_BASEHISTORICA_HISTORICO
+    impact_value: "O arquivamento mensal roda como serviço, com rastro do que já foi movido."
+    related_projects: ["omnichannel", "lorentz-vps-stack", "supervisor"]
+
+  - id: "DEV-2026-045"
+    date: "2026-07-10"
+    title: "O cliente Docker da distro fala uma API que o daemon já não usa"
+    category: "devops"
+    tags: [docker, api, portas, pwa, php]
+    slug: "docker-cli-api-antiga-e-portas-ocupadas-pelo-pbx"
+    summary: "O painel não listava containers porque o pacote docker.io negociava a API 1.41 com um daemon 1.52. No mesmo host, as portas 80 e 443 já pertenciam ao PBX."
+    problem_statement: >
+      O monitor em Python usava o CLI empacotado pela distro. O daemon recusava a versão
+      antiga da API e a tela parecia sem Docker. O portal, se subisse em 80 ou 443, colidia
+      com o Issabel. Um service worker cache-first no config.json ainda impedia o painel de
+      atualizar a lista de aplicativos.
+    key_learnings:
+      - "docker-ce-cli acompanha a API do daemon. O pacote docker.io da distro pode ficar uma geração atrás."
+      - "O portal fica na 8099. 80, 443 e 8088 permanecem com o PBX."
+      - "No PWA, estático pode ser cache-first. config.json é network-first, senão a lista de apps não muda."
+      - "O debug SQL do Supervisor liga por sessão. Ligado para todas as sessões enche o disco em produção."
+    code_snippet: |
+      # Cliente e daemon precisam da mesma geração de API
+      docker version
+      # Client API antiga (1.41) contra daemon 1.52: trocar docker.io por docker-ce-cli
+
+      # Portal fora das portas do PBX
+      PORTAL_HTTP_PORT=8099
+    impact_value: "O painel volta a falar com o Docker e o portal deixa de disputar as portas do PBX."
+    related_projects: ["lorentz-vps-stack"]
+
+  - id: "DEV-2026-046"
+    date: "2026-07-06"
+    title: "SIP pede a rede do host, e o tema do Issabel lia a coluna errada"
+    category: "telefonia"
+    tags: [sip, docker, issabel, mysql, rtp]
+    slug: "sip-rede-do-host-e-colunas-mysql-do-tema"
+    summary: "Registro e áudio não fecham bem atrás do NAT da bridge. Em produção o PBX usa a rede do host. O tema escuro quebrava porque a consulta de variáveis globais do MySQL pedia colunas com outro nome."
+    problem_statement: >
+      Softphone externo registrava e a mídia não voltava, típico de RTP atrás do NAT do Docker.
+      No painel do Issabel, a instalação do tema falhava ao ler globals: o PHP esperava
+      aliases que o SHOW VARIABLES não devolve.
+    key_learnings:
+      - "SIP e RTP do PBX em produção usam a rede do host. A bridge serve para o que não precisa de mídia direta."
+      - "SHOW GLOBAL VARIABLES devolve Variable e Value. O código do tema tem que ler esses nomes, não um alias inventado."
+      - "O webphone fica num profile opcional enquanto o código-fonte ainda não foi clonado."
+      - "Instalar tema por REPLACE INTO, com arquivos em /var/www/html, evita pipe e base64 frágeis numa sessão SSH."
+    code_snippet: |
+      # PBX com SIP/RTP na rede do host
+      services:
+        issabel:
+          network_mode: host
+
+      # MySQL: os nomes reais da saída
+      SHOW GLOBAL VARIABLES;
+      # colunas: Variable, Value
+    impact_value: "O ramal externo volta a ter áudio e o tema do painel instala sem quebrar na leitura do MySQL."
+    related_projects: ["issabel4-docker", "lorentz-vps-stack", "lorentz-webphone"]
+
+  - id: "DEV-2026-047"
+    date: "2026-06-23"
+    title: "Atualizar o cliente Windows sem pedir administrador"
+    category: "windows"
+    tags: [inno-setup, dotnet, atualizacao, seguranca]
+    slug: "auto-update-cliente-windows-sem-administrador"
+    summary: "O instalador gravava em Arquivos de Programas e o atualizador falhava para o operador sem elevação. A pasta do aplicativo passou a permitir modificação pelos usuários, e o INI da empresa saiu do Git."
+    problem_statement: >
+      Cada build novo pedia UAC porque o updater não conseguia trocar o exe em Program Files.
+      O script de publicação ainda esbarrava no lock do compartilhamento de rede, e um INI
+      com dados da empresa tinha caído na árvore versionada.
+    key_learnings:
+      - "Permissão Modify para Users na pasta {app} deixa o updater trocar exe e dll sem elevação."
+      - "O publish recusa gravar de novo a mesma versão. Isso evita manifesto apontando para binário trocado em silêncio."
+      - "A pasta deploy, com o INI da empresa, fica no gitignore."
+      - "Lock no share de rede pede nova tentativa no script, não um segundo clique manual."
+    code_snippet: |
+      ; Inno Setup: a pasta do app pode ser atualizada pelo operador
+      [Dirs]
+      Name: "{app}"; Permissions: users-modify
+
+      ; Não versionar
+      ; deploy/
+    impact_value: "A estação recebe a build nova sem UAC e a configuração da empresa deixa o repositório."
+    related_projects: ["omnichannel", "LorentzCliente"]
+
+  - id: "DEV-2026-048"
+    date: "2026-04-24"
+    title: "Firstboot em Python 2.7: acento sem cabeçalho de encoding derruba o EL7"
+    category: "devops"
+    tags: [python, issabel, centos, utf-8, docker]
+    slug: "firstboot-python27-encoding-utf8-el7"
+    summary: "O CentOS 7 do Issabel ainda roda Python 2.7 no primeiro boot. Um snippet com caractere fora de ASCII, sem declaring encoding, interrompe a provisão antes do PBX subir."
+    problem_statement: >
+      Comentários e mensagens em português dentro do firstboot eram UTF-8. O interpretador
+      2.7 do EL7 recusa o arquivo sem o cookie de encoding e o container reinicia no meio
+      da configuração, com AMI e Apache ainda fora.
+    key_learnings:
+      - "No Python 2.7, arquivo com acento precisa da linha coding utf-8 logo no topo."
+      - "O mesmo texto é inofensivo no Python 3 do restante do stack. O firstboot é o ponto que ainda é 2.7."
+      - "Mensagem de boot em ASCII evita a classe inteira de falha quando o cookie é esquecido."
+      - "Login de agente de call center e a porta HTTPS de produção foram estabilizados no mesmo ciclo: o boot tem que terminar para o restante ser testável."
+    code_snippet: |
+      # -*- coding: utf-8 -*-
+      # EL7 / Python 2.7: sem esta linha, acento no snippet aborta o firstboot.
+      print("Issabel firstboot ok")
+    impact_value: "O primeiro boot do PBX deixa de morrer num comentário em português."
+    related_projects: ["issabel4-docker", "lorentz-vps-stack"]

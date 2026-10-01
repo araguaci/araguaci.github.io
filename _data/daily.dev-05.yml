@@ -1,0 +1,98 @@
+# Volume 5 — repos aninhados em produção (NESTED-REPOS) ainda fora dos volumes 1–4.
+# Fonte: _agents (evo 92) e ecosistema-selva.vercel.app (evo 85). Código e commits de 2026.
+# JusMonitor, série demográfica, SIO e Lorentz já estavam no índice e não se repetem.
+
+metadata:
+  year: 2026
+  author: "Araguaci Carlos de Andrade"
+  ecosystem: "Artes do Sul & Araguaci Dev Hub"
+  volume: 5
+  total_entries: 4
+  generated_at: "2026-10-01"
+  status: "pronto"
+  source_note: "Repos em .gitignore NESTED-REPOS com status em_producao e evolucao alta em projetos.json. Só incidentes com mecanismo no código e que o índice ainda não cobria."
+
+entries:
+  - id: "DEV-2026-057"
+    date: "2026-08-17"
+    title: "Com a documentação pública desligada, a raiz da API aponta para o console"
+    category: "backend"
+    tags: [fastapi, openapi, oauth, agentes]
+    slug: "docs-publicos-desligados-raiz-aponta-console"
+    summary: "O Swagger aberto na internet depende de AGENTS_DOCS. Com o valor 0, /docs e /openapi.json somem e o campo docs da raiz passa a ser /console/docs."
+    problem_statement: >
+      O FastAPI publicava /docs sozinho. Desligar o Swagger no construtor não bastava:
+      a raiz continuava anunciando /docs, e o esquema ficava anônimo.
+    key_learnings:
+      - "main.py cria o FastAPI com docs_url, redoc_url e openapi_url nulos. As rotas /docs, /redoc e /openapi.json são manuais."
+      - "_docs_public lê AGENTS_DOCS. Diferente de 0, /openapi.json responde 404. GET / então devolve docs igual a /console/docs."
+      - "/console/openapi.json exige sessão Google ou X-API-Key. Anônimo em /console/docs recebe redirect 302 para /login."
+    code_snippet: |
+      docs_url = None
+      # AGENTS_DOCS=0 → /openapi.json 404
+      # GET / → {"docs": "/console/docs", "docs_public": false}
+    impact_value: "O catálogo HTTP deixou de entregar o Swagger anônimo quando a documentação pública está desligada."
+    related_projects: ["_agents"]
+
+  - id: "DEV-2026-058"
+    date: "2026-08-17"
+    title: "O histórico do agente guarda metadados sempre e o prompt só com opt-in"
+    category: "seguranca"
+    tags: [sqlite, fastapi, lgpd, agentes]
+    slug: "historico-agente-prompt-so-com-opt-in"
+    summary: "Cada execução grava quem rodou, qual agente e o status. O texto do prompt e da saída só entra no SQLite se o pedido pedir e a retenção for maior que zero."
+    problem_statement: >
+      O console precisava de histórico sem arquivar prompt por padrão.
+      Upload em base64 também não podia ir parar na mesma tabela.
+    key_learnings:
+      - "history.record grava a linha sempre. prompt e output só são preenchidos se store for verdadeiro e retention_days for maior que zero."
+      - "_wants_store_body aceita o header x-agents-store-body ou a query store_body com 1, true, yes ou on."
+      - "AGENTS_HISTORY_BODY_DAYS vale 30 se não vier número. O valor fica entre 0 e 365. expire_bodies zera prompt e output vencidos."
+      - "sanitize_params descarta as chaves file_bytes, arquivo_b64 e arquivo. O log de acesso não grava query nem body."
+    code_snippet: |
+      # Sem o header, prompt e output ficam NULL.
+      # X-Agents-Store-Body: 1  → grava, até AGENTS_HISTORY_BODY_DAYS
+    impact_value: "Rodar um agente passou a deixar rastro operacional sem guardar o texto do pedido por padrão."
+    related_projects: ["_agents"]
+
+  - id: "DEV-2026-059"
+    date: "2026-08-16"
+    title: "O limite de execução do agente é por processo e lê o primeiro IP encaminhado"
+    category: "backend"
+    tags: [fastapi, rate-limit, agentes]
+    slug: "rate-limit-agente-por-processo-e-forwarded-for"
+    summary: "POST /agent tem um teto por minuto. O contador vive na memória daquele processo e a chave é o primeiro endereço de X-Forwarded-For."
+    problem_statement: >
+      Várias chamadas seguidas no mesmo agente não tinham teto.
+      Um limite só no processo também não acompanha outro worker, e o IP visto pelo app não é o da conexão quando há proxy.
+    key_learnings:
+      - "RateLimitMiddleware só olha POST cujo path é /agent ou começa com /agent/. Acima do teto responde 429 com Retry-After 60."
+      - "AGENTS_RATE_LIMIT default 60 por janela de 60 segundos. Valor 0 desliga. O deque está em memória: um processo, um contador."
+      - "client_ip usa o primeiro trecho de X-Forwarded-For. Sem esse header, usa request.client.host."
+    code_snippet: |
+      # POST /agent/{id}
+      # AGENTS_RATE_LIMIT=60  → 429 depois do teto
+      # AGENTS_RATE_LIMIT=0   → sem limite
+    impact_value: "A execução do agente passou a ter teto por IP naquele processo, com desligamento explícito no ambiente."
+    related_projects: ["_agents"]
+
+  - id: "DEV-2026-060"
+    date: "2026-09-12"
+    title: "Hub novo no Ecossistema Selva só aparece quando o nome do cache muda"
+    category: "frontend"
+    tags: [service-worker, pwa, cache]
+    slug: "selva-hub-novo-exige-nome-de-cache"
+    summary: "O service worker entrega a lista de hubs do cache antes da rede. Incluir um hub no JSON não chega ao visitante enquanto CACHE_NAME for o mesmo."
+    problem_statement: >
+      O hub Arquivo Vivo entrou em ecosystem.json e no app, e a página antiga continuava no cache.
+      O install guarda a lista inteira, e o fetch devolve essa cópia.
+    key_learnings:
+      - "sw.js precacheia /data/ecosystem.json, /app.js e /index.html sob CACHE_NAME."
+      - "O fetch responde caches.match primeiro. Sem rede por cima, o JSON novo não substitui o antigo."
+      - "No activate, caches com outro nome são apagados. A troca registrada em 12/09 foi selva-hub-v3."
+    code_snippet: |
+      const CACHE_NAME = 'selva-hub-v3';
+      // install: cache.addAll inclui /data/ecosystem.json
+      // fetch: cache primeiro; activate apaga os nomes antigos
+    impact_value: "Publicar um hub novo passou a exigir outro CACHE_NAME, senão o visitante permanece na lista em cache."
+    related_projects: ["ecosistema-selva.vercel.app"]

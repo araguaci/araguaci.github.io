@@ -1,0 +1,20 @@
+# Forma do índice gerado por: python diario_dev.py indice
+# A ferramenta lê este índice antes de criar entrada nova.
+# Saída real (gerada, não editar à mão): _data/export/diario.indice.yml
+
+metadata:
+  generated_at: "2026-10-01"
+  source: "volumes"
+  total_entries: 0
+  last_id: ""
+  next_id: "DEV-2026-001"
+  next_volume: "_data/daily.dev-01.yml"
+
+entries:
+  - id: "DEV-2026-000"
+    date: "2026-10-01"
+    slug: "frase-curta-em-kebab-case"
+    title: "Frase curta do que foi aprendido"
+    category: "devops"
+    volume: "daily.dev-00.yml"
+    post: "_posts/2026-10-01-frase-curta-em-kebab-case.md"

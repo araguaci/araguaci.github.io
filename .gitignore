@@ -1,5 +1,6 @@
 # project
 _site
+_data/export/
 .sass-cache
 .vagrant
 .history

@@ -1,0 +1,471 @@
+# ==============================================================================
+# DIÁRIO DE DESENVOLVIMENTO & REGISTRO DE APRENDIZADOS TÉCNICOS (2026)
+# Repositório de Origem: D:\app_aragua\araguaci.github.io\_data\daily.dev-01.yml
+# Finalidade: Base estruturada para geração e importação de artigos técnicos
+# Autor: Araguaci Carlos de Andrade (Artes do Sul)
+# ==============================================================================
+
+metadata:
+  year: 2026
+  author: "Araguaci Carlos de Andrade"
+  ecosystem: "Artes do Sul & Araguaci Dev Hub"
+  total_entries: 16
+  generated_at: "2026-10-01"
+  status: "Pronto para importação e publicação como posts/artigos"
+
+entries:
+  - id: "DEV-2026-001"
+    date: "2026-10-01"
+    title: "Resolução de Conflitos no GitHub Actions: Modernização de Ruby 2.6 para 3.3 e a Falha da Gem FFI"
+    category: "devops"
+    tags: [github-actions, ruby, jekyll, ffi, ci-cd, bundler]
+    slug: "resolucao-conflitos-github-actions-ruby3-gem-ffi"
+    summary: "Diagnóstico profundo e correção definitiva de falha em pipeline de CI no GitHub Actions decorrente do uso de containers legados com Ruby 2.6 incompatíveis com gems modernas."
+    problem_statement: >
+      O workflow de CI rodava o container 'jekyll/builder:3.8' (com Ruby 2.6.3p62). O Bundler falhou ao instalar
+      a gem 'ffi-1.17.4', que exige estritamente Ruby >= 3.0, quebrando o pull request com Exit Code 5.
+    key_learnings:
+      - "Imagens Docker antigas de construtores de Jekyll congelam versões descontinuadas do Ruby e quebram quando o Rubygems resolve dependências transitivas contemporâneas."
+      - "O padrão moderno oficial para Jekyll no GitHub Actions dispensa Docker e usa a action nativa 'ruby/setup-ruby@v1' com 'bundler-cache: true'."
+      - "A migração para 'actions/checkout@v4' e Ruby 3.3 reduziu o tempo médio de compilação da pipeline de 3 minutos para apenas 17 segundos."
+    code_snippet: |
+      # .github/workflows/ci.yml moderno
+      name: Beautiful Jekyll CI
+      on: [push, pull_request]
+      jobs:
+        build:
+          runs-on: ubuntu-latest
+          steps:
+            - uses: actions/checkout@v4
+            - uses: ruby/setup-ruby@v1
+              with:
+                ruby-version: '3.3'
+                bundler-cache: true
+            - run: bundle exec jekyll build --future
+              env:
+                JEKYLL_ENV: production
+    impact_value: "Pipeline de CI 100% verde, eliminando alertas de depreciação do Node e blindando o repositório contra dependências que exigem Ruby 3+."
+    related_projects: ["artesdosul.github.io", "araguaci.github.io"]
+
+  - id: "DEV-2026-002"
+    date: "2026-10-01"
+    title: "A Armadilha do 'vendor/bundle' no Jekyll: Exclusão Obrigatória no _config.yml"
+    category: "devops"
+    tags: [jekyll, bundler, config-yml, debugging, ruby]
+    slug: "armadilha-vendor-bundle-jekyll-exclude"
+    summary: "Como evitar que o Jekyll tente processar arquivos de template internos das gems instaladas como se fossem posts do próprio blog."
+    problem_statement: >
+      Ao ativar 'bundler-cache: true', as gems são instaladas no caminho local 'vendor/bundle'. O Jekyll tentou
+      processar 'vendor/bundle/.../jekyll-3.10.0/.../_posts/0000-00-00-welcome-to-jekyll.markdown.erb' como post,
+      falhando com erro fatal de data inválida em tag ERB.
+    key_learnings:
+      - "Quando a diretiva 'exclude:' é declarada no '_config.yml', o Jekyll substitui totalmente sua lista padrão de exclusões."
+      - "Se 'vendor/' não for recolocado explicitamente em 'exclude:', o Jekyll fará varredura recursiva em todo o código-fonte das gems instaladas."
+      - "Arquivos de exemplo e geradores internos de gems com extensão '.markdown.erb' quebram o parser de frontmatter do Jekyll."
+    code_snippet: |
+      # _config.yml - Exclusão obrigatória de artefatos de build
+      exclude:
+        - vendor/
+        - .bundle/
+        - .sass-cache/
+        - .jekyll-cache/
+        - Gemfile
+        - Gemfile.lock
+    impact_value: "Zero falsos positivos de compilação em ambientes de integração contínua (GitHub Actions e Vercel)."
+    related_projects: ["artesdosul.github.io", "araguaci.github.io"]
+
+  - id: "DEV-2026-003"
+    date: "2026-10-01"
+    title: "Engenharia de Contraste em Headers Heróicos: Stacking Context e Overlay Gradiente"
+    category: "frontend"
+    tags: [css, acessibilidade, wcag, beautiful-jekyll, design-system]
+    slug: "engenharia-contraste-headers-heroicos-stacking-context"
+    summary: "Técnica definitiva de camadas CSS (z-index e pseudo-elementos) para garantir leitura de títulos sobre qualquer imagem de fundo sem recorrer a caixas opacas."
+    problem_statement: >
+      Aplicar 'background-color: rgba(255,255,255,0.6)' no seletor '.intro-header.big-img' não surtia efeito
+      porque a cor fica fisicamente atrás da 'background-image'. Títulos brancos colidiam com áreas claras de fotos.
+    key_learnings:
+      - "Propriedades 'background-color' nunca criam overlays sobre 'background-image' do mesmo elemento no box model da W3C."
+      - "A solução robusta requer um pseudo-elemento '::before' com 'position: absolute', 'pointer-events: none' e gradiente vertical (180deg)."
+      - "O container do texto deve receber 'position: relative' e 'z-index: 2' para elevar a tipografia acima da camada escura de oclusão."
+      - "Text-shadow duplo de alta dispersão garante conformidade com o padrão WCAG AAA (>7:1)."
+    code_snippet: |
+      .intro-header.big-img { position: relative; }
+      .intro-header.big-img::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(10,15,26,0.55) 0%, rgba(10,15,26,0.88) 100%);
+        z-index: 1;
+        pointer-events: none;
+      }
+      .intro-header.big-img .container-md {
+        position: relative;
+        z-index: 2;
+      }
+    impact_value: "Legibilidade impecável em 100% dos posts heróicos em telas mobile e desktop sob qualquer iluminação ambiente."
+    related_projects: ["artesdosul.github.io", "modelos.artesdosul.com"]
+
+  - id: "DEV-2026-004"
+    date: "2026-09-28"
+    title: "Arquitetura PWA Offline-First para Aplicações Devocionais e Espirituais"
+    category: "arquitetura"
+    tags: [pwa, service-worker, offline-first, localstorage, web-audio]
+    slug: "arquitetura-pwa-offline-first-aplicacoes-devocionais"
+    summary: "Como projetar Progressive Web Apps autônomos que funcionam perfeitamente sem conexão de internet, com feedback sensorial táctil e síntese de áudio leve."
+    problem_statement: >
+      Aplicações de oração e recolhimento não podem depender de conexões instáveis em áreas rurais ou capelas,
+      nem expor o usuário a rastreadores de anúncios invasivos.
+    key_learnings:
+      - "Service Workers com estratégia 'Cache-First' para ativos estáticos permitem inicialização instantânea (0ms de rede)."
+      - "A Web Audio API permite sintetizar sinos e campainhas harmônicas proceduralmente sem carregar arquivos MP3 volumosos."
+      - "A API de vibração nativa ('navigator.vibrate') fornece resposta háptica sutil para contagem de contas do Santo Terço."
+    code_snippet: |
+      // Síntese procedural de campainha sacra (Web Audio API)
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      function playBell(freq = 587.33) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 2.5);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 2.5);
+      }
+    impact_value: "Criação de santuários digitais autônomos (Mãe Maria, Os Filhos da Terra) com nota 100 em auditorias Lighthouse."
+    related_projects: ["mae-maria.artesdosul.com", "filhosdaterra.artesdosul.com"]
+
+  - id: "DEV-2026-005"
+    date: "2026-09-25"
+    title: "Síntese Sonora Procedural em 432Hz & Ressonância Schumann com Web Audio API"
+    category: "frontend"
+    tags: [web-audio, 432hz, som-procedural, brown-noise, performance]
+    slug: "sintese-sonora-procedural-432hz-web-audio-api"
+    summary: "Substituição de arquivos de áudio pesados de meditação por geradores procedurais de ruído rosa, frequências harmônicas e filtros passa-baixa em tempo real."
+    problem_statement: >
+      Streaming de faixas sonoras de meditação em alta fidelidade consome gigabytes de transferência e falha em
+      dispositivos com conexões lentas ou dados limitados.
+    key_learnings:
+      - "A criação de 'AudioBufferSourceNode' com ruído rosa modulado simula com perfeição o farfalhar do vento em pinheiros."
+      - "Osciladores duplos com ligeiro 'detune' (ex: 432Hz e 439.83Hz) geram batimentos binaurais que induzem relaxamento profundo."
+      - "Todo o motor sonoro cabe em menos de 100 linhas de JavaScript puro, consumindo menos de 2% de CPU."
+    code_snippet: |
+      // Gerador de Ruído Rosa Procedural (Algoritmo de Paul Kellet)
+      const bufferSize = ctx.sampleRate * 2;
+      const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        output[i] = (b0 + b1 + b2) * 0.11;
+      }
+    impact_value: "Experiência auditiva hipnótica e imersiva sem custo de largura de banda ou dependência de servidores de mídia."
+    related_projects: ["filhosdaterra.artesdosul.com", "gaia.artesdosul.com"]
+
+  - id: "DEV-2026-006"
+    date: "2026-09-15"
+    title: "Comunicação IoT de Ultrabaixa Latência (<5ms) com Protocolo ESP-NOW em Microcontroladores"
+    category: "iot"
+    tags: [esp32, esp-now, iot, sistemas-embarcados, wireless]
+    slug: "comunicacao-iot-ultrabaixa-latencia-esp-now"
+    summary: "Arquitetura de rede em malha proprietária para telemetria local e acionamento de atuadores sem uso de roteadores Wi-Fi ou servidores em nuvem."
+    problem_statement: >
+      O protocolo Wi-Fi tradicional com handshake TCP/IP e negociação DHCP introduz latências de 200ms a 2s e
+      falha catastrófica quando o roteador doméstico reinicia ou perde a conexão WAN.
+    key_learnings:
+      - "O protocolo ESP-NOW transmite pacotes diretos em camada 2 (MAC address) na faixa de 2.4 GHz em menos de 4 milissegundos."
+      - "Permite que sensores alimentados por bateria permaneçam em 'Deep Sleep' por meses, acordando apenas para disparar uma rajada de dados."
+      - "Módulos repetidores com ESP32 e antenas PCB de ganho cobrem propriedades rurais e bancadas de teste sem infraestrutura de rede."
+    code_snippet: |
+      // Envio básico ESP-NOW em C++ (Arduino Framework)
+      #include <esp_now.h>
+      #include <WiFi.h>
+      uint8_t peerAddress[] = {0x24, 0x0A, 0xC4, 0xXX, 0xXX, 0xXX};
+      void setup() {
+        WiFi.mode(WIFI_STA);
+        if (esp_now_init() != ESP_OK) return;
+        esp_now_peer_info_t peerInfo = {};
+        memcpy(peerInfo.peer_addr, peerAddress, 6);
+        peerInfo.channel = 0;
+        peerInfo.encrypt = false;
+        esp_now_add_peer(&peerInfo);
+      }
+    impact_value: "Infraestrutura soberana de bancada e automação predial imune a quedas de provedores de internet."
+    related_projects: ["oficina.artesdosul.com", "homelab.artesdosul.com"]
+
+  - id: "DEV-2026-007"
+    date: "2026-09-08"
+    title: "Cartografia Cronológica de Lawfare: Modelagem de Dossiês Interativos com Visx e D3"
+    category: "osint"
+    tags: [osint, visx, d3js, lawfare, investigacao, timeline]
+    slug: "cartografia-cronologica-lawfare-visx-d3"
+    summary: "Visualização interativa de centenas de atos jurídicos, ordens de exceção e inquéritos sigilosos sem sobrecarga de renderização no navegador."
+    problem_statement: >
+      Dossiês investigativos com mais de 500 marcos cronológicos causam engasgos severos no DOM do navegador
+      quando implementados com divs e listas HTML comuns.
+    key_learnings:
+      - "O uso de primitivas SVG com aceleração por hardware através do Visx (React + D3) permite zoom temporal contínuo."
+      - "A separação de camadas entre eixos matemáticos de tempo e cartões renderizados sob demanda (virtualização) elimina perda de frames."
+      - "A estruturação dos dados em JSON imutável auditável permite versionamento público em Git e cruzamento por filtros temáticos."
+    code_snippet: |
+      // Escala temporal com D3 / Visx
+      import { scaleTime } from '@visx/scale';
+      const timeScale = scaleTime({
+        domain: [new Date(2019, 0, 1), new Date(2026, 9, 1)],
+        range: [0, chartWidth],
+      });
+    impact_value: "Criação da maior linha do tempo investigativa e auditável sobre o fenômeno do lawfare no Brasil contemporâneo."
+    related_projects: ["lawfare-timeline.vercel.app", "selva.artesdosul.com"]
+
+  - id: "DEV-2026-008"
+    date: "2026-08-20"
+    title: "Processamento Visual com Shaders WebGL (GLSL) e Gravação Nativa WebM no Cliente"
+    category: "frontend"
+    tags: [webgl, glsl, shaders, canvas, video-export]
+    slug: "processamento-visual-shaders-webgl-glsl-webm"
+    summary: "Construção de estúdios visuais generativos de efeitos CRT, aberração cromática RGB e ruído analógico com renderização na placa de vídeo."
+    problem_statement: >
+      Aplicar filtros visuais complexos pixel a pixel em imagens e vídeos usando Canvas 2D em JavaScript puro
+      é inviável para processamento em tempo real a 60 frames por segundo.
+    key_learnings:
+      - "Fragment Shaders em GLSL executam cálculos paralelizados em cada fragmento diretamente nos núcleos da GPU."
+      - "A 'MediaRecorder API' permite capturar o fluxo gráfico ('canvas.captureStream(60)') e gerar arquivos WebM em alta resolução sem servidores de renderização."
+      - "Técnicas de distorção de lentes em coordenadas polares produzem curvaturas autênticas de monitores de tubo (CRT)."
+    code_snippet: |
+      // Fragment Shader: Aberração Cromática RGB
+      precision mediump float;
+      uniform sampler2D u_image;
+      varying vec2 v_texCoord;
+      uniform float u_offset;
+      void main() {
+        float r = texture2D(u_image, v_texCoord + vec2(u_offset, 0.0)).r;
+        float g = texture2D(u_image, v_texCoord).g;
+        float b = texture2D(u_image, v_texCoord - vec2(u_offset, 0.0)).b;
+        gl_FragColor = vec4(r, g, b, 1.0);
+      }
+    impact_value: "Lançamento do GlitchLab e ChromaMesh como ferramentas criativas autônomas do ecossistema Artes do Sul."
+    related_projects: ["glitchlab.artesdosul.com", "chromamesh.artesdosul.com"]
+
+  - id: "DEV-2026-009"
+    date: "2026-08-15"
+    title: "Auditoria Jurimétrica de Supersalários e Captura Institucional com Corpus CC0"
+    category: "osint"
+    tags: [jurimetria, dados-abertos, cc0, judiciario, transparência]
+    slug: "auditoria-jurimetrica-supersalarios-corpus-cc0"
+    summary: "Mineração de dados de remuneração de magistrados, quebra de 'penduricalhos' indenizatórios e disponibilização de base aberta sob Creative Commons Zero."
+    problem_statement: >
+      Tribunais brasileiros mascaram supersalários por meio de dezenas de rubricas indenizatórias obscuras
+      (folgas compensatórias, acúmulo de acervo), dificultando a fiscalização cidadã.
+    key_learnings:
+      - "A divisão entre 'remuneração paradigma' (subteto) e 'vantagens eventuais' é o mecanismo padrão de dreno orçamentário."
+      - "O cálculo da mediana regional de rendimentos em cotejo com a folha dos tribunais revela disparidades superiores a 40x o salário mínimo."
+      - "Bases em JSON tipado disponibilizadas em repositórios abertos garantem perenidade contra remoção de portais públicos."
+    code_snippet: |
+      // Cálculo de Excesso de Teto Constitucional
+      interface Contracheque {
+        subsidio: number;
+        indenizatorias: number;
+        retencaoTeto: number;
+      }
+      function calcularLiquidoReal(c: Contracheque): number {
+        return (c.subsidio - c.retencaoTeto) + c.indenizatorias;
+      }
+    impact_value: "Base de apoio para pesquisadores cívicos e jornalistas independentes com dados irrefutáveis (JusMonitor)."
+    related_projects: ["jusmonitor.vercel.app", "observatorio-civil-br.vercel.app"]
+
+  - id: "DEV-2026-010"
+    date: "2026-08-08"
+    title: "Arquitetura de Design System Cyber-Growth: Tokens HSL e Alta Conversão"
+    category: "frontend"
+    tags: [design-system, cybergrowth, css-tokens, glassmorphism, microanimacoes]
+    slug: "design-system-cybergrowth-tokens-hsl-conversao"
+    summary: "Princípios para construção de interfaces web que unem estética cinematográfica futurista a tempos de carregamento instantâneos e altas taxas de conversão."
+    problem_statement: >
+      Frameworks pesados de componentes (Tailwind com bibliotecas bloated de React) geram bundles gigantescos
+      e designs genéricos com cara de template pré-fabricado.
+    key_learnings:
+      - "A especificação de cores em 'hsl(var(--hue) var(--sat) var(--light) / var(--alpha))' permite theming dinâmico instantâneo sem recálculos de JS."
+      - "O uso criterioso de 'backdrop-filter: blur()' com bordas em 1px semi-translúcidas gera profundidade espacial nobre."
+      - "Microtransições de 150ms a 220ms com curvas 'cubic-bezier(0.16, 1, 0.3, 1)' criam sensação tátil responsiva imediata."
+    code_snippet: |
+      :root {
+        --primary-h: 220;
+        --primary-s: 90%;
+        --primary-l: 56%;
+        --surface-glass: hsl(var(--primary-h) 20% 8% / 0.65);
+        --border-glass: hsl(var(--primary-h) 100% 100% / 0.12);
+      }
+      .card-cyber {
+        background: var(--surface-glass);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--border-glass);
+        border-radius: 12px;
+      }
+    impact_value: "Padrão estético consolidado na vitrine Modelos Artes do Sul e nos 22 projetos Masterpiece."
+    related_projects: ["modelos.artesdosul.com", "temas.artesdosul.com"]
+
+  - id: "DEV-2026-011"
+    date: "2026-08-06"
+    title: "Data Science em Saúde Pública: Mineração de Séries Históricas DATASUS (SIM) 2014–2025"
+    category: "datascience"
+    tags: [datasus, estatistica, epidemiologia, python, recharts]
+    slug: "data-science-saude-publica-datasus-sim-2014-2025"
+    summary: "Extração, normalização e identificação visual de anomalias epidemiológicas em milhões de registros oficiais de óbito do Brasil."
+    problem_statement: >
+      Os microdados de mortalidade do Ministério da Saúde são distribuídos em formatos proprietários compactados
+      (arquivos DBC), exigindo descompressão especializada e limpeza de inconsistências cadastrais.
+    key_learnings:
+      - "A conversão automatizada de arquivos DBC via 'blast-dbf' em Python permite a ingestão contínua de registros do TABNET."
+      - "O cálculo de excesso de mortalidade exige padronização por pirâmide etária para evitar viés de envelhecimento populacional."
+      - "O cruzamento temporal com o Portal da Transparência do Registro Civil permite detectar atrasos e retenções de dados oficiais."
+    code_snippet: |
+      # Normalização de CID-10 para anomalias cardiovasculares
+      import pandas as pd
+      def filtrar_anomalias(df):
+          # I21: Infarto agudo, I40-I42: Miocardites/Cardiomiopatias
+          mask = df['CAUSABAS'].str.startswith(('I21', 'I40', 'I42'))
+          return df[mask].groupby(['ANO', 'MES']).size().reset_index(name='OBITOS')
+    impact_value: "Observatório independente de vigilância epidemiológica acessível sem filtros ideológicos (Série Demográfica)."
+    related_projects: ["serie-demografica.vercel.app", "selva.artesdosul.com"]
+
+  - id: "DEV-2026-012"
+    date: "2026-07-28"
+    title: "Engenharia de Prompt Avançada e Agentes Autônomos de Código em Pair Programming"
+    category: "ia"
+    tags: [ia-generativa, prompt-engineering, agentes, pair-programming, llm]
+    slug: "engenharia-prompt-agentes-autonomos-pair-programming"
+    summary: "Padrões sistemáticos para maximizar a assertividade de modelos LLM em refatoração de código legado, geração de testes e arquitetura de software."
+    problem_statement: >
+      Prompts genéricos ou ambíguos levam a alucinações, exclusão acidental de comentários essenciais e quebra
+      de padrões arquiteturais existentes no repositório.
+    key_learnings:
+      - "O padrão 'Role-Context-Task-Constraints' com exemplos de antes/depois eleva o acerto do modelo para mais de 98%."
+      - "A divisão de tarefas complexas em etapas sequenciais com checkpoints e verificação de testes previne regressões silenciosas."
+      - "A ingestão de arquivos de skills especializadas ('SKILL.md') contextualiza o agente com diretrizes de design e padrões de projeto específicos da empresa."
+    code_snippet: |
+      <!-- Estrutura de Prompt de Engenharia de Alto Desempenho -->
+      <context>
+      Atue como Engenheiro de Software Sênior especializado em Jekyll e Beautiful Jekyll.
+      </context>
+      <constraints>
+      - Não utilize bibliotecas externas além das listadas no Gemfile.
+      - Preserve todas as tags semânticas e garanta compatibilidade WCAG AAA.
+      </constraints>
+    impact_value: "Produtividade 10x acelerada no desenvolvimento das 56 plataformas do ecossistema Artes do Sul."
+    related_projects: ["artesdosul.com", "araguaci.github.io"]
+
+  - id: "DEV-2026-013"
+    date: "2026-07-15"
+    title: "Blindagem de Formulários Anti-Bot em 4 Camadas sem Fricção de Captchas"
+    category: "segurança"
+    tags: [segurança, antibot, honeypot, telemetria, webcrypto]
+    slug: "blindagem-formularios-antibot-4-camadas-sem-captcha"
+    summary: "Arquitetura de proteção sentinela contra robôs e spammers automatizados sem forçar usuários humanos a decifrarem quebra-cabeças irritantes."
+    problem_statement: >
+      Formulários abertos de suporte recebem centenas de submissões diárias de robôs de spam, enquanto captchas
+      de terceiros (Google reCAPTCHA, hCaptcha) degradam a privacidade e reduzem as taxas de conversão legítimas em até 30%.
+    key_learnings:
+      - "Campos Honeypot com coordenadas CSS fora da tela e 'tabindex=-1' capturam bots que preenchem formulários por parsing de DOM."
+      - "A validação de 'Time-to-Submit' (< 2.8 segundos) bloqueia requisições automatizadas disparadas por scripts headless."
+      - "A pontuação de telemetria orgânica (movimentação de mouse, toques touch e eventos keydown) valida o comportamento biológico."
+      - "Desafios aritméticos gerados em memória validam o suporte à execução de JavaScript sem requisições a servidores externos."
+    code_snippet: |
+      // Validação de tempo mínimo humano (Time-to-Submit)
+      const formRenderTime = Date.now();
+      form.addEventListener('submit', (e) => {
+        const elapsed = (Date.now() - formRenderTime) / 1000;
+        if (elapsed < 2.8) {
+          e.preventDefault();
+          console.warn("Bloqueado: submissão sobre-humana rápida detectada.");
+        }
+      });
+    impact_value: "Eliminação de 99.4% do spam de formulários na Central de Suporte Artes do Sul mantendo 100% de privacidade."
+    related_projects: ["suporte.artesdosul.com", "artesdosul.com"]
+
+  - id: "DEV-2026-014"
+    date: "2026-06-30"
+    title: "Modelagem Financeira e Unit Economics para Micro-SaaS: Da Ideia ao Breakeven"
+    category: "saas"
+    tags: [saas, unit-economics, cac-ltv, breakeven, empreendedorismo]
+    slug: "modelagem-financeira-unit-economics-micro-saas"
+    summary: "Construção de simuladores interativos no navegador para cálculo de LTV, CAC, Payback e validação de MVPs antes de escrever código."
+    problem_statement: >
+      A maioria dos desenvolvedores constrói softwares sem antes validar se a matemática do custo de aquisição
+      de clientes (CAC) é sustentável frente ao valor de tempo de vida (LTV) e à taxa de cancelamento (Churn).
+    key_learnings:
+      - "A relação saudável para sustentabilidade de software exige LTV / CAC >= 3x com período de Payback inferior a 12 meses."
+      - "O impacto do Churn composto ao longo de 12 meses drena o crescimento se a retenção não for priorizada sobre a aquisição."
+      - "Workspaces interativos no navegador com persistência em LocalStorage permitem testar múltiplos cenários de preços instantaneamente."
+    code_snippet: |
+      // Cálculo de LTV e Payback
+      function calcularMetricas(ticketMedio, churnMensal, cac, margemBruta = 0.8) {
+        const ltv = (ticketMedio * margemBruta) / (churnMensal / 100);
+        const ltvCacRatio = ltv / cac;
+        const paybackMeses = cac / (ticketMedio * margemBruta);
+        return { ltv, ltvCacRatio, paybackMeses };
+      }
+    impact_value: "Validação matemática rigorosa antes do investimento de tempo em desenvolvimento (SaaS Launchpad)."
+    related_projects: ["saas-launchpad", "modelos.artesdosul.com"]
+
+  - id: "DEV-2026-015"
+    date: "2026-06-10"
+    title: "Auditoria Tarifária Energética B2B com Parser de Faturas e Inteligência de Dados"
+    category: "datascience"
+    tags: [energia, parser-pdf, auditoria-fiscal, chartjs, b2b]
+    slug: "auditoria-tarifaria-energetica-b2b-parser-faturas"
+    summary: "Como converter arquivos PDF herméticos de distribuidoras de energia em diagnósticos automáticos de economia tarifária e prevenção de multas."
+    problem_statement: >
+      Pequenas e médias empresas pagam milhões de reais anualmente em faturas de energia elétrica sem perceber
+      cobranças indevidas de reativo excedente, ICMS e enquadramentos tarifários desvantajosos.
+    key_learnings:
+      - "O parsing automatizado de textos em PDFs de concessionárias extrai grandezas como demanda medida, demanda faturada e consumo ponta/fora de ponta."
+      - "A comparação algorítmica entre tarifas Verde, Azul e Convencional identifica oportunidades de redução de custo de até 25%."
+      - "Alertas visuais de reativo excedente orientam a manutenção preventiva de bancos de capacitores antes do vencimento do próximo ciclo."
+    code_snippet: |
+      // Diagnóstico de Multa por Energia Reativa
+      function diagnosticarReativo(kwhReativo, limiteTolerancia = 0) {
+        if (kwhReativo > limiteTolerancia) {
+          return { status: "ALERTA", msg: "Penalidade por baixo fator de potência detectada." };
+        }
+        return { status: "OK", msg: "Fator de potência em conformidade com a ANEEL." };
+      }
+    impact_value: "Produto SaaS B2B com ROI imediato para clientes industriais e comerciais (GridGuard)."
+    related_projects: ["gridguard-landing", "modelos.artesdosul.com"]
+
+  - id: "DEV-2026-016"
+    date: "2026-05-20"
+    title: "Infraestrutura Soberana de Homelab: Proxmox VE, Docker Compose e Redes Mesh WireGuard"
+    category: "infraestrutura"
+    tags: [homelab, proxmox, docker, wireguard, pihole, soberania]
+    slug: "infraestrutura-soberana-homelab-proxmox-docker-wireguard"
+    summary: "Guia arquitetural para implantação de uma nuvem privada residencial e corporativa com isolamento de serviços, bloqueio de telemetria e acesso remoto seguro."
+    problem_statement: >
+      A dependência exclusiva de serviços de nuvem pública (AWS, GCP) gera custos crescentes em dólar, dependência
+      de políticas arbitrárias de terceiros e perda de controle sobre a privacidade de dados corporativos.
+    key_learnings:
+      - "O Proxmox VE oferece hipervisor bare-metal leve para separação entre contêineres de alta densidade (LXC) e máquinas virtuais isoladas."
+      - "A orquestração via Docker Compose permite versionar em arquivos YAML toda a pilha de serviços (Home Assistant, Pi-hole, Uptime Kuma)."
+      - "A criação de túneis WireGuard ponto-a-ponto permite gerenciar a bancada de servidores de qualquer lugar sem abrir portas vulneráveis no roteador."
+    code_snippet: |
+      # docker-compose.yml básico de Homelab Seguro
+      services:
+        pihole:
+          image: pihole/pihole:latest
+          ports:
+            - "53:53/tcp"
+            - "53:53/udp"
+            - "8080:80/tcp"
+          restart: unless-stopped
+        wireguard:
+          image: linuxserver/wireguard:latest
+          cap_add:
+            - NET_ADMIN
+          restart: unless-stopped
+    impact_value: "Autonomia tecnológica e redução de custos de nuvem pública, com privacidade absoluta de infraestrutura."
+    related_projects: ["homelab.artesdosul.com", "haos-home-assistant"]

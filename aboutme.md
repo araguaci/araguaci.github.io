@@ -1,175 +1,74 @@
 ---
 layout: page
-title: About me
-subtitle: ✠ KODOISH, KODOISH, KODOISH ADONAI TSEBAYOTH ✠
+title: Engenharia & Arquitetura
+subtitle: Hub Técnico, Automação & Governança de Sistemas
 ---
 
-- [Português](#português)
-  - [📝 **Introdução:**](#-introdução)
-  - [🔰 **Perfil:**](#-perfil)
-  - [👨‍🎓 **Carreira:**](#-carreira)
-  - [🎓 **Educação:**](#-educação)
-  - [🔍 **Palavras Chaves:**](#-palavras-chaves)
-- [English](#english)
-  - [📝 **Introduction:**](#-introduction)
-  - [🔰 **Profile:**](#-profile)
-  - [👨‍🎓 **Career:**](#-career)
-  - [🔰 **Profile:**](#-profile-1)
-  - [🎓 **Graduation:**](#-graduation)
-  - [🔍 **Keywords:**](#-keywords)
-- [For everyone on earth](#for-everyone-on-earth)
-- [Links](#links)
-  - [Hobby Designer, Producer, Creator, Patreon and Hosting by Free Volunteering](#hobby-designer-producer-creator-patreon-and-hosting-by-free-volunteering)
-  - [F.E.C.E.E.S.S. ☆ A.C.E.S. SC](#feceess--aces-sc)
-  - [🌐 **Online Presence:**](#-online-presence)
-  - [📧 **Contact:**](#-contact)
-
-
-> **Você deve ser a mudança que deseja ver no mundo.**  
-> **~~ Mahatma Gandhi**
-
-## Português
-
-Ola, sou Araguaci, bacharel em informática e especializado em desenvolvimento de sistemas e soluções para internet.
-
-### 📝 **Introdução:**
-
-Este espaço é para publicação de ideias, opiniões e pensamentos. Este crescente a censura no mundo e muitos serviços estão sujeitos a uma avaliação e moderação de conteúdo. Desta forma este espaço é para uso pessoal e registro livre de moderação.
-
-### 🔰 **Perfil:**
-
-Análise crítica, organização, disciplina, trabalho em equipe, preocupação com responsabilidade e pontualidade, busca incansável pela qualidade e criatividade.
-
-### 👨‍🎓 **Carreira:**
-
-Desde 1994, trabalhando na criação e desenvolvimento de sistemas, portais, páginas pessoais, websites e sistemas para internet e gerenciamento de processos e rotinas digitais. Especializado no desenvolvimento, análise e gestão de sistemas para atendimento ao cliente, Call Center, CRM, SAC, Helpdesk e Telemarketing. Atuando também com suporte ao cliente e administração remota de banco de dados e portais corporativos.
-
-### 🎓 **Educação:**
-
-- 1994/1998 - Graduação. Bacharelado em Informática, Faculdades POSITIVO.
-- 1999/1999 - Especialização. Produção e Gestão da Informação, UNICENP.
-- 2003/2003 - Especialização. Software Livre / Linux. UFPR.
- 
-### 🔍 **Palavras Chaves:**
-
-- Desenvolvimento / Software 
-- VOIP / Call Center / Linux / Docker / WSL
-- Visual Basic / .NET / MSSQL Server / MySQL / PHP / Python / HTML / CSS 
-- Português / Inglês / Espanhol (learning)
-- Surf / Stand Up Paddle 
- 
+> *"A excelência em engenharia reside na simplicidade, na robustez das fundações e na fidelidade aos fatos técnicos."*
 
 ---
 
-## English 
+## 🏛️ Visão Geral & Filosofia Técnica
 
-Hello, I'm Araguaci, bachelor's degree in computer science and specialized in developing systems and solutions for the internet.
+Este espaço consolida a base de conhecimento, projetos e aprendizados de engenharia do ecossistema **Artes do Sul & Araguaci Dev Hub**. 
 
-### 📝 **Introduction:**
+Com atuação contínua no desenvolvimento de software desde 1994, o foco central é a concepção e sustentação de arquiteturas digitais resilientes, telecomunicações corporativas de missão crítica, automação inteligente de processos e publicação soberana de conhecimento técnico.
 
-This space is for the publication of ideas, opinions and thoughts. There is increasing censorship in the world and many services are subject to content review and moderation. In this way, this space is for personal use and registration free of moderation.
+### Pilares Fundamentais:
+1. **Engenharia Soberana & Padrões Abertos:** Preferência inequívoca por formatos abertos (YAML, JSON Schema, Markdown, Linux, Web Standards) e geração estática distribuída, garantindo longevidade, portabilidade e independência de plataformas proprietárias.
+2. **Documentação Factual Contínua (Daily.Dev):** Cada incidente, refatoração de infraestrutura ou avanço arquitetural é registrado com base em evidências verificáveis de código, commits e telemetria — sem conjecturas ou métricas infladas.
+3. **Automação Segura & Menor Privilégio:** Esteiras de orquestração (via **n8n**, scripts Python dedicados e Webhooks autenticados) projetadas com blindagem estrita contra vazamento de credenciais e isolamento de ambientes.
 
-### 🔰 **Profile:**
+---
 
-Critical analysis, organization, discipline, teamwork, concern with responsibility and punctuality, tireless search for quality and creativity.
+## ⚙️ Domínios de Especialização Técnica
 
+### 1. 📞 Telecomunicações, CTI & Contact Center
+- **Integração Telefonia-Computador (CTI):** Projeto e integração de centrais de atendimento, CRMs corporativos, SAC, Helpdesk e discadores automáticos.
+- **Protocolos & Tecnologias de Voz:** Telefonia IP baseada em SIP, Asterisk, AMI (Asterisk Manager Interface), roteamento dinâmico de chamadas, URAs e interfaces de operação em tempo real.
+- **Resiliência Operacional:** Arquiteturas capazes de manter monitoramento de eventos telefônicos e serviços web no mesmo host sem colisões de portas ou dependências cruzadas.
 
-### 👨‍🎓 **Career:**
+### 2. ⚡ Automação de Processos & Orquestração (n8n & Agentes)
+- **Workflows Inteligentes:** Orquestração de rotinas complexas utilizando instâncias self-hosted do **n8n**, conectando repositórios Git, mensageria e endpoints de serviço.
+- **Protocolos de Contexto (MCP) & IA Aplicada:** Estruturação de ferramentas e agentes autônomos para pair programming e ingestão controlada de dados.
+- **Segurança & Higienização em Tempo Real:** Validação automatizada contra schemas JSON pré-definidos e filtros com regex anti-secret para barrar tokens, chaves criptográficas e strings sensíveis antes de qualquer persistência.
 
-Since 1994, creation and development of systems, portals, personal pages, websites, and specialized systems for internet and websites for managing registrations and routines. Specialization in analysis and development of systems for customer service, CRM, SAC, Helpdesk & Telemarketing. Also acting with customer support and remote administration of database and corporate portals.
+### 3. 🐧 Infraestrutura, DevOps & Homelab Soberano
+- **Sistemas Operacionais & Virtualização:** Administração e hardening de ambientes Linux (Debian, Ubuntu), Proxmox VE e WSL2.
+- **Containerização:** Orquestração de microsserviços via Docker e Docker Compose, com redes isoladas, volumes persistentes e políticas de reinício tolerantes a falhas.
+- **Conectividade Segura:** Malhas privadas ponto a ponto (WireGuard), proxies reversos com certificados automáticos e regras estritas de firewall de borda.
 
-### 🔰 **Profile:**
+### 4. 💻 Desenvolvimento de Software & Aplicações Web
+- **Linguagens & Stacks:** Python, PHP, JavaScript, SQL, C++, HTML5, CSS3, Visual Basic e .NET.
+- **Frontend de Alto Desempenho:** Aplicações Progressive Web Apps (PWA) offline-first, síntese de áudio procedural (Web Audio API), renderização com shaders WebGL (GLSL) e design systems focados em contraste e usabilidade.
+- **Engenharia de Dados & OSINT:** Mineração e cruzamento de bases públicas, processamento de faturas estruturadas e cartografia de dados cívicos com cadeia de custódia verificável.
 
-Critical analysis, organization, discipline, teamwork, concern with responsibility and punctuality, tireless search for quality and creativity.
+---
 
+## 🛡️ Governança, Segurança & Privacidade
 
-### 🎓 **Graduation:**
+Todas as ferramentas e artigos disponibilizados neste portal seguem diretrizes rigorosas de conformidade:
 
-- 1994/1998 - Graduation. Bachelor's Degree in Computer Science, POSITIVO Colleges.
-- 1999/1999 - Specialization. Production and Information Management, UNICENP.
-- 2003/2003 - Specialization. Free Software / Linux. UFPR.
+- **Sem Exposição de Credenciais:** Nenhum token de acesso (PAT), chave privada, senha ou string de conexão transita em código aberto ou arquivos de configuração versionados.
+- **Isolamento de Ambientes:** Ambientes de homologação/laboratório e produção operam com credenciais, portas e configurações de rede completamente segregadas.
+- **Proteção de Dados Pessoais & Cívicos:** Respeito aos princípios de minimização e conformidade com a LGPD, implementando retenção programada de logs e mecanismos de opt-in para telemetria de uso.
 
-### 🔍 **Keywords:**
+---
 
-- Development / Software 
-- VOIP / Call Center / Linux / Docker / WSL
-- Visual Basic / .NET / MSSQL Server / MySQL / PHP / Python / HTML / CSS 
-- Portuguese / English / Spanish (learning)
-- Surf / Stand Up Paddle 
-
---- 
-
-## For everyone on earth
-
-<table style="overflow: hidden; border: none;"><tr><td valign="top" width="50%">
-✠ Que as gotas de chuva molhem suavemente o seu rosto.<br/>
-✠ Que o vento suave refresque seu espírito.<br/>
-✠ Que o sol ilumine o seu coração.<br/>
-✠ Que as tarefas do dia não sejam um peso nos seus ombros.<br/>
-✠ Que Deus envolva você no manto de seu amor.<br/>
-✠ Que a estrada se abra à sua frente.<br/>
-✠ Que o vento sopre levemente em suas costas.<br/>
-✠ Que o sol brilhe morno e suave em sua face.<br/>
-✠ Que a chuva caia de mansinho em seus campos.<br/>
-✠ Até que nos encontremos de novo...<br/>
-✠ Que Deus guarde você na palma de sua mão.
-</td><td valign="top" width="50%">
-✠ Let the raindrops gently wet your face.<br/>
-✠ May the gentle wind refresh his spirit.<br/>
-✠ May the sun light up your heart.<br/>
-✠ That the tasks of the day are not a burden on your shoulders.<br/>
-✠ May God wrap you in the mantle of his love.<br/>
-✠ Let the road open in front of you.<br/>
-✠ Let the wind blow lightly on your back.<br/>
-✠ May the sun shine warm and soft on your face.<br/>
-✠ May the rain fall softly on your fields.<br/>
-✠ Until we meet again...<br/>
-✠ May God keep you in the palm of his hand.
-</td></tr></table>
-
-## Links
-
-### Hobby Designer, Producer, Creator, Patreon and Hosting by Free Volunteering
-
-  - [FLORIPA SURF CLUB SURF SCHOOL – The school that teaches you how to surf on the beach with perfect waves for beginners](http://floripasurfclub.com.br/)
-  - [FLORIPA SUP CLUB - STAND UP PADDLE SURFCLUB](http://www.floripasupclub.com.br/)
-  - [CENTRAL DE AVENTURAS](http://centraldeaventuras.com.br/)
-  - [PROJETO SUP SOCIAL](https://supsocial.vercel.app/)
-
-### F.E.C.E.E.S.S. ☆ A.C.E.S. SC
-  
-  Uniting talents and strengthening education and sport in Santa Catarina
-
-  - [🌊 Federação Catarinense de Especialistas e Escolas de Surf e Stand Up Paddle](https://escolasdesurf.org.br/)
-  - A.C.E.S. SC - Santa Catarina Association of Surf Schools SC
-    - [🏄 HOTSITE F.E.C.E.E.S.S. ☆ A.C.E.S. SC](http://feceess.escolasdesurf.org.br/)
-    - [🏄 Accredited Surf Schools](http://feceess.escolasdesurf.org.br/escolas/)
+## 🌐 Presença Institucional & Projetos
 
 <p align="center">
-  <img height="50%" width="auto" src ="https://github-readme-stats.vercel.app/api?username=araguaci&show_icons=true&count_private=true&theme=blue&hide_border=true&hide=issues,contribs&bg_color=FFFFFF00">
-  <img height="50%" width="auto" src ="https://github-readme-stats.vercel.app/api/top-langs/?username=araguaci&layout=compact&hide_border=true&theme=blue&bg_color=FFFFFF00&langs_count=6&hide=jupyter%20notebook,tex,css,php">
-  <img src ="https://github-readme-streak-stats.herokuapp.com?user=araguaci&theme=blue&hide_border=true&background=FFFFFF00">
+  <a href="https://www.artesdosul.com"><img src="https://img.shields.io/endpoint?color=RGBA%2839%2C%20119%2C%20119%2C%201%29&label=artesdosul&url=https%3A%2F%2Fwww.artesdosul.com%2Fapi.php%3Fcallback%3Dweb" alt="Website" /></a>
+  <a href="https://x.com/artesdosul"><img src="https://img.shields.io/badge/X_Org-%40artesdosul-1d9bf0.svg" alt="X Org" /></a>
+  <a href="https://x.com/araguaci"><img src="https://img.shields.io/badge/X_User-%40araguaci-1d9bf0.svg" alt="X User" /></a>
+  <a href="https://www.linkedin.com/in/araguaci"><img src="https://img.shields.io/badge/LinkedIn-Araguaci-0077b5.svg" alt="LinkedIn" /></a>
+  <a href="https://stop-war-for-ever.vercel.app"><img src="https://img.shields.io/endpoint?color=purple&label=STOP&url=https%3A%2F%2Fwww.artesdosul.com%2Fapi.php%3Fcallback%3Dstop" alt="Stop War" /></a>
+  <a href="https://patreon.com/artesdosul"><img src="https://badgen.net/badge/icon/patreon?icon=patreon&color=orange" alt="Patron" /></a>
+  <a href="https://www.buymeacoffee.com/araguaci"><img src="https://badgen.net/badge/icon/buymeacoffee?icon=buymeacoffee&color=yellow" alt="Buy me a coffee" /></a>
 </p>
-<p align="center">
-  <a href="https://www.buymeacoffee.com/araguaci"> <img align="center" src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" height="50" width="210" alt="araguaci" /></a>
-</p>
 
---- 
-
-[![Website](https://img.shields.io/endpoint?color=RGBA%2839%2C%20119%2C%20119%2C%201%29&label=artesdosul&url=https%3A%2F%2Fwww.artesdosul.com%2Fapi.php%3Fcallback%3Dweb)](https://www.artesdosul.com)
-[![X Org](https://img.shields.io/badge/X_Org-%40artesdosul-1d9bf0.svg)](https://x.com/artesdosul)
-[![X User](https://img.shields.io/badge/X_User-%40araguaci-1d9bf0.svg)](https://x.com/araguaci)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Araguaci-0077b5.svg)](https://www.linkedin.com/in/araguaci)
-[![stop-war-for-ever](https://img.shields.io/endpoint?color=purple&label=STOP&url=https%3A%2F%2Fwww.artesdosul.com%2Fapi.php%3Fcallback%3Dstop)](https://stop-war-for-ever.vercel.app)
-[![Patron](https://badgen.net/badge/icon/patreon?icon=patreon&color=orange)](https://patreon.com/artesdosul) 
-[![Buy me a coffee](https://badgen.net/badge/icon/buymeacoffee?icon=buymeacoffee&color=yellow)](https://buymeacoffee.com/araguaci)  
-
-### 🌐 **Online Presence:**
-
-* [Website](https://www.artesdosul.com)
-* [GitHub](https://github.com/araguaci)
-* [Instagram](https://www.instagram.com/araguaci.andrade/)
-
-### 📧 **Contact:**
-
-* Email: [araguaci@gmail.com](mailto:araguaci@gmail.com)
+### Canais Oficiais:
+- **Portal Principal:** [artesdosul.com](https://www.artesdosul.com)
+- **Repositórios de Código:** [github.com/araguaci](https://github.com/araguaci)
+- **Discussões e Issues:** Aberto a colaborações técnicas via [GitHub Issues](https://github.com/araguaci/araguaci.github.io/issues)
+- **Contato Institucional:** Através do formulário institucional seguro em [artesdosul.com](https://www.artesdosul.com)

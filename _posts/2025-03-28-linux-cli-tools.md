@@ -1,8 +1,9 @@
 ---
 title: CLI tools
 subtitle: "Linux applications and tools for any users/developers."
+date: 2025-03-28
 tags: [tools, software]
-categories: []
+categories: [Software, Linux]
 thumbnail-img: https://pandoc.org/pandoc-cartoon.svgz
 ---
 

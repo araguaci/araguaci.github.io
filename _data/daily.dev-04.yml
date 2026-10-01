@@ -1,0 +1,189 @@
+# Volume 4 — SIO Ecosystem (commits e changelog de ago–set/2026).
+# Fonte: sio-ecosystem/docs/CHANGELOG.md, docs/TODOS.md, código citado em cada entrada.
+# Um tema por entrada. Sem segredo, IP ou hostname.
+
+metadata:
+  year: 2026
+  author: "Araguaci Carlos de Andrade"
+  ecosystem: "Artes do Sul & Araguaci Dev Hub"
+  volume: 4
+  total_entries: 8
+  generated_at: "2026-10-01"
+  status: "pronto"
+  source_note: "Aprendizados do monorepo sio-ecosystem (ago–set/2026). Changelog, TODOS e o código que ainda implementa a regra. Um tema por entrada."
+
+entries:
+  - id: "DEV-2026-049"
+    date: "2026-08-14"
+    title: "O shell com source no .env mistura o produto ao lado"
+    category: "devops"
+    tags: [docker, compose, env, vps]
+    slug: "source-env-contamina-compose-do-produto-ao-lado"
+    summary: "Cada stack lê o .env da própria pasta. Exportar esse arquivo no shell deixa SLUG e usuário de banco valendo para o compose seguinte."
+    problem_statement: >
+      O deploy dava source .env antes do docker compose. SLUG_API e DB_USER ficavam no shell
+      e o produto seguinte herdava label do proxy e URL de banco do stack anterior.
+    key_learnings:
+      - "O Compose lê o .env do diretório do comando. Não é preciso exportar o arquivo no shell."
+      - "SLUG_API e DB_USER exportados sobrevivem ao cd e contaminam o próximo produto."
+      - "docker compose down -v apaga o volume nomeado. Recriar serviço é up -d --no-deps, sem -v."
+    code_snippet: |
+      # No diretório do produto. O Compose lê o .env da pasta.
+      docker compose up -d --build
+      # não: source .env
+      # não: docker compose down -v
+    impact_value: "Subir um produto deixou de reescrever host e banco do stack que estava no shell."
+    related_projects: ["sio-ecosystem"]
+
+  - id: "DEV-2026-050"
+    date: "2026-08-14"
+    title: "Dump do Postgres 17 não entra numa imagem 16, e o formato muda o comando"
+    category: "devops"
+    tags: [postgres, docker, pg_restore, backup]
+    slug: "dump-postgres-17-e-cabecalho-pgdmp"
+    summary: "O restore escolhe pg_restore ou psql pelos cinco primeiros bytes do arquivo. Dump feito no Postgres 17 só restaura em postgres:17-alpine."
+    problem_statement: >
+      pg_restore respondia unsupported version (1.16) quando a imagem era 16.
+      Arquivo SQL plain no pg_restore, ou dump custom no psql, falhava do mesmo jeito.
+    key_learnings:
+      - "migrate-saude-livre-ainativo.sh lê 5 bytes. PGDMP chama pg_restore; o resto vai ao psql."
+      - "unsupported version (1.16) é dump do PostgreSQL 17. O serviço db precisa de postgres:17-alpine."
+      - "POSTGRES_PASSWORD no compose não altera cluster já inicializado. A troca é ALTER USER no volume existente."
+      - "O tar de upload com uma pasta raiz única recebe --strip-components=1. Sem isso o arquivo fica um nível abaixo."
+    code_snippet: |
+      # tools/scripts/migrate-saude-livre-ainativo.sh
+      [ "$(head -c 5 "$file")" = "PGDMP" ] && pg_restore ... || psql ...
+      # unsupported version (1.16) → postgres:17-alpine
+    impact_value: "O restore passou a detectar formato e versão antes de aplicar o dump no volume."
+    related_projects: ["sio-ecosystem"]
+
+  - id: "DEV-2026-051"
+    date: "2026-09-03"
+    title: "O header X-Tenant-Id que diverge do JWT devolve 403"
+    category: "backend"
+    tags: [jwt, tenant, express, imobhub]
+    slug: "jwt-company-id-recusa-header-tenant"
+    summary: "No CRM do ImobHub o tenant da sessão é o companyId do JWT. Um X-Tenant-Id diferente não troca a imobiliária: a API responde 403."
+    problem_statement: >
+      Listar e gravar imóvel e lead filtrava por company_id, mas um header podia apontar
+      outro tenant. Sem a checagem, a sessão e o header divergiam em silêncio.
+    key_learnings:
+      - "auth.middleware.ts grava req.user.companyId e req.tenantId a partir do JWT verificado."
+      - "tenant.middleware.ts, se já há sessão e o header X-Tenant-Id difere, responde 403 com tenant_id não confere com a sessão."
+      - "Sem sessão, o header ainda preenche req.tenantId. Com sessão, o companyId do token é o que vale."
+    code_snippet: |
+      if (sessionTenant && headerTenant && headerTenant !== sessionTenant) {
+        return res.status(403).json({ error: 'tenant_id não confere com a sessão' });
+      }
+      req.tenantId = sessionTenant;
+    impact_value: "Consulta e escrita do CRM ficaram presas à imobiliária do token, não ao header."
+    related_projects: ["sio-ecosystem"]
+
+  - id: "DEV-2026-052"
+    date: "2026-08-20"
+    title: "A triagem de saúde pula o tenant do ImobHub e ainda responde 200"
+    category: "arquitetura"
+    tags: [agentflow, brainos, webhook, tenant]
+    slug: "triagem-healthcare-pula-tenant-imobhub"
+    summary: "O AgentFlow só classifica urgência para tenants da Saúde Livre. O tenant do ImobHub volta skipped, com HTTP 200, para o proxy de sugestão não virar 502."
+    problem_statement: >
+      O mesmo webhook de triagem atendia conversas de imobiliária e de clínica.
+      Recusar com erro fazia o suggest-reply do Omnichannel tratar o isolamento como falha.
+    key_learnings:
+      - "HealthcareVenture::allowsTenant lê blocked_tenants, padrão imobhub-sim, e a allowlist saude-livre-prod."
+      - "SioOmnichannelTriage::fromConversation devolve skipped true, reason venture_isolation e urgency null."
+      - "OmnichannelWebhookController::triage responde JSON desse resultado. O status padrão é 200, não erro."
+    code_snippet: |
+      if (! HealthcareVenture::allowsTenant($tenant)) {
+          return ['skipped' => true, 'reason' => 'venture_isolation', 'urgency' => null];
+      }
+    impact_value: "Conversa do ImobHub deixou de entrar na classificação clínica sem derrubar o proxy."
+    related_projects: ["sio-ecosystem"]
+
+  - id: "DEV-2026-053"
+    date: "2026-08-14"
+    title: "O Nginx do AgentFlow procura um alias que o nome do container não é"
+    category: "devops"
+    tags: [nginx, docker, laravel, agentflow]
+    slug: "nginx-agentflow-alias-e-laravel-sqlite"
+    summary: "O PHP-FPM escuta no alias agentflow_api, não no container_name. Sem DB_CONNECTION no ambiente, o Laravel 11 sobe em sqlite."
+    problem_statement: >
+      O Nginx registrava host not found in upstream agentflow_api. A fila caía porque
+      o Laravel, sem a variável, usava sqlite em vez do Postgres do compose.
+    key_learnings:
+      - "agentflow-api.conf faz fastcgi_pass agentflow_api:9000. O container_name na VPS é agentflow-api."
+      - "O serviço api no compose da VPS declara o alias de rede agentflow_api. Sem esse alias o upstream não resolve."
+      - "O comentário do compose diz que o Laravel 11 cai em sqlite se DB_CONNECTION não vier. O anchor laravel-env fixa DB_CONNECTION: pgsql."
+    code_snippet: |
+      # deployments/ainativo/agentflow/docker-compose.yml
+      networks:
+        internal:
+          aliases:
+            - agentflow_api
+      # x-laravel-env: DB_CONNECTION: pgsql
+    impact_value: "A API do AgentFlow passou a resolver o PHP-FPM e a usar o Postgres do stack."
+    related_projects: ["sio-ecosystem"]
+
+  - id: "DEV-2026-054"
+    date: "2026-08-19"
+    title: "Regra de banco no UFW não alcança porta que o Docker publicou"
+    category: "infraestrutura"
+    tags: [docker, ufw, iptables, postgres]
+    slug: "ufw-nao-filtra-porta-publicada-pelo-docker"
+    summary: "O Docker publica porta por FORWARD e DNAT e ignora o UFW no INPUT. O filtro de 3306, 6379 e 5432 fica na cadeia DOCKER-USER."
+    problem_statement: >
+      Trancar o banco no UFW não mudava o que estava publicado pelo compose.
+      A regra nunca era consultada no caminho que o Docker usa para expor a porta.
+    key_learnings:
+      - "deployments/ainativo/RESTRINGIR_PORTAS_DB.md: a regra entra em DOCKER-USER, cadeia AINATIVO_DB_PORTS."
+      - "restrict-db-ports.sh --persist instala o script em /usr/sbin e a unit restrict-db-ports.service depois do docker.service."
+      - "Nesta VPS os bancos não têm ports no host. O script cobre o dia em que alguém publicar 5432 ou 6379."
+    code_snippet: |
+      sudo /opt/ainativo/src/sio-ecosystem/tools/scripts/restrict-db-ports.sh --persist
+      sudo restrict-db-ports.sh --status
+    impact_value: "Porta de banco publicada pelo Docker passou a depender da cadeia DOCKER-USER, não do UFW de entrada."
+    related_projects: ["sio-ecosystem"]
+
+  - id: "DEV-2026-055"
+    date: "2026-08-19"
+    title: "A home não soma a API de agentes com o AgentFlow"
+    category: "arquitetura"
+    tags: [apex, fastapi, agentflow, adr]
+    slug: "api-agentes-e-agentflow-nao-se-somam"
+    summary: "São dois runtimes. A FastAPI é catálogo HTTP e o AgentFlow é orquestração. A home manda o visitante ao console, não ao JSON da raiz."
+    problem_statement: >
+      A landing somava contagens de origens diferentes e o atalho da home apontava para GET /,
+      que devolve JSON. A pasta de HTML no git também não era a página publicada.
+    key_learnings:
+      - "ADR 0010 separa AgentFlow (8 agentes no Postgres) da API Agentes (35 no FastAPI). 47+ continua blueprint."
+      - "O CTA do card é /console. A sonda usa GET /health. GET / não é interface."
+      - "A página no ar sai de deployments/ainativo/apex/ para o volume do site. O HTML antigo no git não é essa página."
+    code_snippet: |
+      # Contar cada runtime com rótulo. Não somar.
+      # FastAPI: GET /health
+      # AgentFlow: Agent::count() no container da API
+    impact_value: "A home passou a apontar para o console e a citar cada frota com o runtime de onde o número saiu."
+    related_projects: ["sio-ecosystem"]
+
+  - id: "DEV-2026-056"
+    date: "2026-09-17"
+    title: "Visitante sem sessão no Content Factory cai no /kit, não no login"
+    category: "frontend"
+    tags: [react, router, content-factory, auth]
+    slug: "visitante-sem-sessao-cai-no-kit"
+    summary: "A vitrine do pacote é pública. Quem entra na raiz sem sessão é mandado para /kit, e /comprar continua fora desse guard."
+    problem_statement: >
+      A raiz exigia login e escondia o catálogo. O pedido PIX ficava misturado com a biblioteca
+      autenticada, então visitante e comprador caíam no mesmo destino.
+    key_learnings:
+      - "App.tsx: Guard lê isAuthenticated e, se falhar, faz Navigate para /kit."
+      - "As rotas /kit, /login, /about e /comprar ficam fora do Guard. O pedido não exige sessão."
+      - "A rota * também redireciona para /kit. Caminho desconhecido não abre o cockpit."
+    code_snippet: |
+      function Guard({ children }) {
+        const ok = useAuthStore((s) => s.isAuthenticated);
+        if (!ok) return <Navigate to="/kit" replace />;
+        return children;
+      }
+    impact_value: "A raiz pública passou a mostrar o catálogo, e o pedido ficou numa rota própria."
+    related_projects: ["sio-ecosystem"]
