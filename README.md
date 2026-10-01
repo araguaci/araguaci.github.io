@@ -316,7 +316,7 @@ This hub is dedicated to sharing engineering insights, system architecture deep-
 
 Iniciativas comunitárias, voluntariado, preservação esportiva e fomento ao surf e stand up paddle no litoral de Santa Catarina:
 
-- [🏄 Floripa Surf Club](http://floripasurfclub.com.br/) — Escola de surf pioneira com foco em aprendizado seguro e conexão ambiental.
+- [🏄 Floripa Surf Club](http://floripasurfclub.com/) — Escola de surf pioneira com foco em aprendizado seguro e conexão ambiental.
 - [🏄 Floripa SUP Club](http://www.floripasupclub.com.br/) — Stand Up Paddle Club e práticas náuticas em Florianópolis.
 - [🏔️ Central de Aventuras](http://centraldeaventuras.com.br/) — Fomento ao ecoturismo e expedições integradas à natureza.
 - [🤝 Projeto SUP Social](https://supsocial.vercel.app/) — Inclusão social e cidadania através dos esportes náuticos.

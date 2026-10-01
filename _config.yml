@@ -117,16 +117,16 @@ keywords: "artesdosul,araguaci,surf,surfschool,surftrip,floripa,patriamadabrasil
 
 # Personalize the colours in your website. Colour values can be any valid CSS colour
 
-navbar-col: "#EAEAEA"
-navbar-text-col: "#404040"
-navbar-border-col: "#DDDDDD"
-page-col: "#FFFFFF"
-text-col: "#404040"
-link-col: "#008AFF"
-hover-col: "#0085A1"
-footer-col: "#EAEAEA"
-footer-text-col: "#777777"
-footer-link-col: "#404040"
+navbar-col: "#0f172a"
+navbar-text-col: "#f1f5f9"
+navbar-border-col: "rgba(51, 65, 85, 0.4)"
+page-col: "#090d16"
+text-col: "#cbd5e1"
+link-col: "#38bdf8"
+hover-col: "#0ea5e9"
+footer-col: "#070b13"
+footer-text-col: "#94a3b8"
+footer-link-col: "#e2e8f0"
 
 # Alternatively, the navbar, footer, and page background can be set to an image
 # instead of colour
@@ -136,7 +136,7 @@ footer-link-col: "#404040"
 #page-img: "/assets/img/bgimage.png"
 
 # Suggest a colour for mobile browsers to use as the browser's theme. This is only supported by a few mobile browsers.
-#mobile-theme-col: "#0085A1"
+mobile-theme-col: "#0f172a"
 
 # For any extra visual customization, you can include additional CSS files in every page on your site. List any custom CSS files here
 #site-css:
