@@ -17,8 +17,6 @@ image:
   path: /assets/img/benchmark-office-em-rust.webp
 ---
 
-# Benchmark: Office em Rust (XLSX, DOCX, PDF)
-
 > [!NOTE]
 > **Resumo Executivo**: Para ambientes de produção hoje, o ecossistema Rust é altamente maduro em **planilhas (XLSX/ODS)** e em **PDF**. No entanto, a manipulação de documentos Word (**DOCX/DOC**) ainda depende de bibliotecas jovens (versões 0.x ou 1.0 recente), e inexiste conversão direta nativa de DOCX para PDF em Rust puro com fidelidade total de layout.
 
