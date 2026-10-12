@@ -1,0 +1,37 @@
+# Volume novo do Diário de Desenvolvimento.
+# Fato de 2026-10-12: Correção de artigos na pasta docs/ e migração para _posts/estudos/ no Jekyll.
+
+metadata:
+  year: 2026
+  author: "Araguaci Carlos de Andrade"
+  ecosystem: "Artes do Sul & Araguaci Dev Hub"
+  volume: 14
+  total_entries: 1
+  generated_at: "2026-10-12"
+  status: "pronto"
+  source_note: "Reorganização da Constelação Brasil no repositório artesdosul: migração de docs/ para _posts/estudos/ e deploy FTP."
+
+entries:
+  - id: "DEV-2026-077"
+    date: "2026-10-12"
+    title: "Jekyll ignora posts criados diretamente na pasta de build docs"
+    category: "devops"
+    tags: [jekyll, build, markdown, ftp, static-site]
+    slug: "jekyll-ignora-posts-criados-na-pasta-de-build-docs"
+    summary: "Arquivos markdown gravados diretamente no diretório docs/ poluem a pasta de build e não entram no pipeline de coleções do Jekyll. A publicação exige arquivos canônicos em _posts/ com data no prefixo e permalinks por categoria antes do build e do sync FTP."
+    problem_statement: >
+      Quatro artigos temáticos haviam sido gravados como arquivos markdown avulsos dentro do diretório docs/, que atua como pasta de saída configurada em _config.yml (destination: docs). Como consequência, o Jekyll não reconhecia os documentos como posts da coleção, não gerava as tags de metadados nem os permalinks canônicos.
+    key_learnings:
+      - "O diretório docs/ é área de compilação efêmera; arquivos fonte devem ficar em _posts/ para receber layout e permalink."
+      - "A nomenclatura de posts no Jekyll exige o padrão YYYY-MM-DD-slug.md para alimentar a engine de datas e categorias."
+      - "Com permalink definido como :categories/:title/, o Jekyll gera subdiretórios semânticos automáticos na pasta de build."
+      - "O script de sincronização FTP que compara st_size local e ftp.size remoto evita tráfego inútil de milhares de arquivos."
+    code_snippet: |
+      # 1. Fonte canônica em _posts com taxonomia
+      # _posts/estudos/2026-10-11-ciclos-do-brasil.md
+      # 2. Build para a pasta de saída configurada
+      bundle exec jekyll build
+      # 3. Deploy seletivo comparando st_size local com ftp.size remoto
+      python scripts/sync_ftp.py
+    impact_value: "Padronização do fluxo de publicação em _posts/ garantindo integridade de rotas, SEO e sincronização FTP sem sujeira na área de build."
+    related_projects: ["artesdosul"]

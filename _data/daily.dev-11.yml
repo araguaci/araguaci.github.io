@@ -1,0 +1,83 @@
+# Volume novo do Diário de Desenvolvimento.
+# Fatos da sessão de 2026-10-10: importar imagem live no WSL2, mover vhdx, Docker Desktop na rede espelhada.
+# Sem senha, token, IP de produção, hostname ou nome de cliente.
+
+metadata:
+  year: 2026
+  author: "Araguaci Carlos de Andrade"
+  ecosystem: "Artes do Sul & Araguaci Dev Hub"
+  volume: 11
+  total_entries: 3
+  generated_at: "2026-10-10"
+  status: "pronto"
+  source_note: "Sessão no volume WSL. Fatos de comando, journal e docker ps. Um tema por entrada."
+
+entries:
+  - id: "DEV-2026-072"
+    date: "2026-10-10"
+    title: "Imagem live entra no WSL pelo squashfs, não pelo ISO"
+    category: "windows"
+    tags: [wsl, debian, locale, apt]
+    slug: "imagem-live-entra-no-wsl-pelo-squashfs"
+    summary: "O WSL não dá boot num ISO. A distro passa a existir quando o rootfs do squashfs vira um tar com dono numérico e entra por wsl --import."
+    problem_statement: >
+      Uma imagem live amd64 de Debian foi montada no Windows, mas o WSL só importa
+      sistema de arquivos. Extrair o squashfs direto no NTFS perderia dono e suid.
+      No login, o bash avisava que en_US.UTF-8 não existia. O apt falhava ao criar
+      a lista parcial. Um unit de zram falhava no kernel do WSL.
+    key_learnings:
+      - "O rootfs da imagem live está em live/filesystem.squashfs. O import é wsl --import de um tar feito com --numeric-owner, não a montagem do ISO."
+      - "unsquashfs num disco NTFS via /mnt grava tudo como o usuário do Windows. O caminho que preserva dono é um ext4 em loop, e só então o tar."
+      - "A imagem live sobe graphical.target com live-config e LightDM. No WSL esses units se mascaram e o default.target aponta para multi-user.target. O kernel que roda é o do WSL."
+      - "apt-get update devolve Permission denied se /var/lib/apt/lists/partial não existe ou não pertence ao usuário _apt."
+      - "systemd-zram-setup@zram0 falha no kernel Microsoft. Mascarar systemd-zram-setup@.service e gravar zram-size=0 em /etc/systemd/zram-generator.conf."
+      - "A imagem só tinha as locales C e POSIX. O terminal pede en_US.UTF-8. locale-gen en_US.UTF-8 e update-locale LANG=en_US.UTF-8 tiram o aviso setlocale no login."
+    code_snippet: |
+      grep -q '^en_US.UTF-8 UTF-8' /etc/locale.gen || echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen
+      locale-gen en_US.UTF-8
+      update-locale LANG=en_US.UTF-8
+    impact_value: "A distro importada abre shell, resolve repositório e não repete o aviso de locale no login."
+    related_projects: ["raspios-wsl"]
+
+  - id: "DEV-2026-073"
+    date: "2026-10-10"
+    title: "Mover distro WSL leva o vhdx e deixa o resto da pasta"
+    category: "windows"
+    tags: [wsl, vhdx, disco]
+    slug: "mover-distro-wsl-leva-so-o-vhdx"
+    summary: "wsl --manage --move troca o lugar do ext4.vhdx e o BasePath do registro. Arquivos irmãos da pasta antiga não entram nessa operação."
+    problem_statement: >
+      Uma distro WSL2 parada ocupava outro volume. O disco virtual precisava ir
+      para o volume de trabalho sem exportar e reimportar. Na pasta de origem
+      havia também o tar de instalação, um executável e scripts.
+    key_learnings:
+      - "wsl --terminate e depois wsl --manage NOME --move CAMINHO movem o ext4.vhdx. A distro precisa estar parada. O registro BasePath passa a apontar para o caminho novo."
+      - "O comando não move tar, executável nem script que estejam ao lado do vhdx. Esses arquivos pedem uma cópia à parte, senão a pasta fica partida entre os dois volumes."
+      - "Antes de apagar a origem, o BasePath e um boot com cat /etc/os-release têm de concordar com o disco novo."
+    code_snippet: |
+      wsl --terminate NOME
+      wsl --manage NOME --move D:\destino\NOME
+    impact_value: "A distro sobe a partir do volume novo, com o mesmo nome, sem passar por export e import."
+    related_projects: ["raspios-wsl"]
+
+  - id: "DEV-2026-074"
+    date: "2026-10-10"
+    title: "Porta do Docker Desktop aparece na distro WSL pelo wslrelay"
+    category: "devops"
+    tags: [docker, wsl, nginx, php]
+    slug: "porta-do-docker-desktop-aparece-no-wsl"
+    summary: "Container do Docker Desktop não mora nas outras distros WSL. A rede espelhada publica as portas dele no localhost, e o nginx que resolve o upstream na subida entra em loop se esse upstream está parado."
+    problem_statement: >
+      Um portal em nginx reiniciava sem publicar porta. O log dizia host not
+      found in upstream. O serviço de que ele depende estava Exited. Noutra
+      distro WSL, o Apache não escutava a porta 80 e o ss listava portas sem
+      processo local. No container PHP, o log repetia que ipconfig não existia.
+    key_learnings:
+      - "proxy_pass com nome fixo de container é resolvido na subida do nginx. Com o upstream parado, o processo sai com host not found in upstream e a política de restart repete o ciclo. O upstream sobe antes do proxy."
+      - "exec('ipconfig') no PHP foi escrito para Windows. Dentro do container Linux o shell responde ipconfig: not found. O ajuste é no código montado no volume, não no entrypoint, quando o exec está no projeto PHP."
+      - "ss numa distro WSL mostra a porta do Docker Desktop sem PID local. No Windows o dono é wslrelay.exe. O Apache dessa distro recebe AH00072 ao tentar a porta 80. Não se encerra o wslrelay. Muda-se o Listen."
+      - "O binário docker visto dentro da distro pode ser o do Docker Desktop montado em /mnt. docker ps nesse caso lista o engine do Windows, não um engine instalado na distro."
+    code_snippet: |
+      proxy_pass http://servico-upstream:8090/api/;
+    impact_value: "O reparo do portal, do PHP e do Apache da distro deixa de ser feito no lugar errado."
+    related_projects: ["lorentz-vps-stack"]

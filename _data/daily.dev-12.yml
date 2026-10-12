@@ -1,0 +1,39 @@
+# Volume novo do Diário de Desenvolvimento.
+# Fatos da sessão de 2026-10-10: onde o Cursor guarda estado local e por que o disco não encolhe com VACUUM.
+# Sem senha, token, IP de produção, hostname ou nome de cliente.
+
+metadata:
+  year: 2026
+  author: "Araguaci Carlos de Andrade"
+  ecosystem: "Artes do Sul & Araguaci Dev Hub"
+  volume: 12
+  total_entries: 1
+  generated_at: "2026-10-10"
+  status: "pronto"
+  source_note: "Medição local em AppData e leitura somente do state.vscdb (PRAGMA e contagem de chaves). Um tema."
+
+entries:
+  - id: "DEV-2026-075"
+    date: "2026-10-10"
+    title: "Os 17 GB do Cursor estão no state.vscdb, e o VACUUM não devolve espaço"
+    category: "windows"
+    tags: [cursor, sqlite, appdata, vacuum]
+    slug: "state-vscdb-do-cursor-nao-encolhe-no-vacuum"
+    summary: "Os 17,3 GB que pareciam memória do Cursor são o SQLite de globalStorage, a cópia .backup e o CLI do agente. O banco vivo quase não tem página livre, então VACUUM não devolve disco."
+    problem_statement: >
+      A busca por uma pasta de memória não achou memories nem %USERPROFILE%\.cursor\rules.
+      A conta fechou em três itens de %APPDATA%\Cursor\User\globalStorage: state.vscdb
+      com 12,15 GB, state.vscdb.backup com 3,18 GB e anysphere.cursor-agent-worker com
+      1,97 GB. No momento da medição o volume C: tinha cerca de 20,9 GiB livres.
+    key_learnings:
+      - "A soma de 17,3 GB é state.vscdb (12,15 GB), state.vscdb.backup (3,18 GB) e a pasta anysphere.cursor-agent-worker (1,97 GB)."
+      - "state.vscdb tem ItemTable (1317 chaves), composerHeaders (606 conversas, 27 arquivadas) e cursorDiskKV (752715 chaves, 382083 com prefixo agentKv:blob). PRAGMA freelist_count devolveu 1, com page_size 4096 e page_count 3184602. VACUUM não encolhe esse arquivo."
+      - "O peso do agent-worker está em agent-cli\\.local\\share\\cursor-agent\\versions. Havia 11 pastas, de 2026.06.26-7079533 até 2026.09.18-9a7762b. Isso é instalador do CLI, não o texto do chat."
+      - "CachedData tinha 34 hashes de instalação e 1,61 GB no total. A pasta mais nova na medição era cd6d2a1f2e56e9841f0ed9c7c24542087b4e69b0, de 9 de outubro de 2026. As outras são sobra de atualização."
+      - "User Rules ficam na conta do Cursor. Apagar state.vscdb apaga o histórico local. Apagar só o .backup tira a cópia antiga e deixa o banco que ainda abre os chats."
+    code_snippet: |
+      PRAGMA page_size;       -- 4096
+      PRAGMA page_count;      -- 3184602
+      PRAGMA freelist_count;  -- 1
+    impact_value: "Dá para recuperar o backup e as versões velhas do editor e do CLI sem mexer no banco que ainda abre os chats."
+    related_projects: ["cursor"]
