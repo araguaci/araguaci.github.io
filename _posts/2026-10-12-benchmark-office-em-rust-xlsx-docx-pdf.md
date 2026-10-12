@@ -3,7 +3,7 @@ layout: post
 title: "Benchmark: Office em Rust (XLSX, DOCX, PDF)"
 subtitle: "Maturidade, crates e arquitetura para planilhas, documentos Word e PDFs em produção"
 description: "Análise profunda de maturidade do ecossistema Rust em 2026 para Office: XLSX, DOCX e PDF. Comparativo de calamine, rust_xlsxwriter, umya-spreadsheet, Typst, lopdf, docx-rs e suítes completas."
-date: 2026-10-12 18:00:00 -0300
+date: 2026-10-12 12:00:00 -0300
 publishdate: 2026-10-12
 author: "Araguaci Carlos de Andrade"
 authors: "Araguaci Carlos de Andrade"
