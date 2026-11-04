@@ -3,7 +3,8 @@ layout: post
 title: "Engenharia de Contraste em Headers Heróicos: Stacking Context e Overlay Gradiente"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-003"
 description: "Técnica definitiva de camadas CSS (z-index e pseudo-elementos) para garantir leitura de títulos sobre qualquer imagem de fundo sem recorrer a caixas opacas."
-date: 2026-10-01 00:00:00+00:00
+date: 2026-10-01 00:00:00-03:00
+redirect_from: /2026-09-30-engenharia-contraste-headers-heroicos-stacking-context/
 categories: devlog
 category: frontend
 tags: [css, acessibilidade, wcag, beautiful-jekyll, design-system]

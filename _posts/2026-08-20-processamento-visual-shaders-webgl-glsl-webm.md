@@ -3,7 +3,8 @@ layout: post
 title: "Processamento Visual com Shaders WebGL (GLSL) e Gravação Nativa WebM no Cliente"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-008"
 description: "Construção de estúdios visuais generativos de efeitos CRT, aberração cromática RGB e ruído analógico com renderização na placa de vídeo."
-date: 2026-08-20 00:00:00+00:00
+date: 2026-08-20 00:00:00-03:00
+redirect_from: /2026-08-19-processamento-visual-shaders-webgl-glsl-webm/
 categories: devlog
 category: frontend
 tags: [webgl, glsl, shaders, canvas, video-export]

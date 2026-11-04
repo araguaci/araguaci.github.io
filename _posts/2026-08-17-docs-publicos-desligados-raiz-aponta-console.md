@@ -3,7 +3,8 @@ layout: post
 title: "Com a documentação pública desligada, a raiz da API aponta para o console"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-057"
 description: "O Swagger aberto na internet depende de AGENTS_DOCS. Com o valor 0, /docs e /openapi.json somem e o campo docs da raiz passa a ser /console/docs."
-date: 2026-08-17 00:00:00+00:00
+date: 2026-08-17 00:00:00-03:00
+redirect_from: /2026-08-16-docs-publicos-desligados-raiz-aponta-console/
 categories: devlog
 category: backend
 tags: [fastapi, openapi, oauth, agentes]

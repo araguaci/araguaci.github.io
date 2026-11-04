@@ -3,7 +3,8 @@ layout: post
 title: "Porta do Docker Desktop aparece na distro WSL pelo wslrelay"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-074"
 description: "Container do Docker Desktop não mora nas outras distros WSL. A rede espelhada publica as portas dele no localhost, e o nginx que resolve o upstream na subida entra em loop se esse upstream está parado."
-date: 2026-10-10 00:00:00+00:00
+date: 2026-10-10 00:00:00-03:00
+redirect_from: /2026-10-09-porta-do-docker-desktop-aparece-no-wsl/
 categories: devlog
 category: devops
 tags: [docker, wsl, nginx, php]

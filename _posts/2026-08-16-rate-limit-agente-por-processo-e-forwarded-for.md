@@ -3,7 +3,8 @@ layout: post
 title: "O limite de execução do agente é por processo e lê o primeiro IP encaminhado"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-059"
 description: "POST /agent tem um teto por minuto. O contador vive na memória daquele processo e a chave é o primeiro endereço de X-Forwarded-For."
-date: 2026-08-16 00:00:00+00:00
+date: 2026-08-16 00:00:00-03:00
+redirect_from: /2026-08-15-rate-limit-agente-por-processo-e-forwarded-for/
 categories: devlog
 category: backend
 tags: [fastapi, rate-limit, agentes]

@@ -3,7 +3,8 @@ layout: post
 title: "Governança de Dados Cívicos e OSINT: Cadeia de Custódia Digital com Hash SHA-256 e IPFS"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-032"
 description: "Metodologia de coleta de evidências cívicas e investigativas imutáveis com ancoragem criptográfica de integridade e espelhamento distribuído."
-date: 2026-04-20 00:00:00+00:00
+date: 2026-04-20 00:00:00-03:00
+redirect_from: /2026-04-19-governanca-dados-civicos-osint-cadeia-custodia-sha256-ipfs/
 categories: devlog
 category: osint
 tags: [osint, jurimetria, sha256, ipfs, transparencia, governanca]

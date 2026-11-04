@@ -3,7 +3,8 @@ layout: post
 title: "A Armadilha do 'vendor/bundle' no Jekyll: Exclusão Obrigatória no _config.yml"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-002"
 description: "Como evitar que o Jekyll tente processar arquivos de template internos das gems instaladas como se fossem posts do próprio blog."
-date: 2026-10-01 00:00:00+00:00
+date: 2026-10-01 00:00:00-03:00
+redirect_from: /2026-09-30-armadilha-vendor-bundle-jekyll-exclude/
 categories: devlog
 category: devops
 tags: [jekyll, bundler, config-yml, debugging, ruby]

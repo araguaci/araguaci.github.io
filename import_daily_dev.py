@@ -9,12 +9,26 @@ Roteiro: docs/roteiro-automacao-diario-dev.md
 import os
 import sys
 import glob
+from datetime import date, timedelta
 
 sys.stdout.reconfigure(encoding='utf-8')
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, '_data')
 POSTS_DIR = os.path.join(BASE_DIR, '_posts')
+
+# Até este id, os artigos foram publicados com a data em UTC. Como o site usa o fuso
+# de São Paulo, a URL ficou um dia antes da data do aprendizado e precisa continuar respondendo.
+ULTIMO_ID_COM_URL_ANTIGA = 77
+
+
+def redirect_da_url_antiga(entry):
+    """Linha redirect_from do artigo que já foi publicado com a URL um dia antes."""
+    if int(entry['id'].rsplit('-', 1)[1]) > ULTIMO_ID_COM_URL_ANTIGA:
+        return ''
+    anterior = date.fromisoformat(str(entry['date'])) - timedelta(days=1)
+    return f"redirect_from: /{anterior.isoformat()}-{entry['slug']}/\n"
+
 
 def detect_language(snippet):
     s = snippet.strip()
@@ -49,7 +63,8 @@ def detect_language(snippet):
 def load_file(filename):
     try:
         import yaml
-        full_path = os.path.join(DATA_DIR, filename) if not os.path.isabs(filename) else filename
+        # Aceita tanto daily.dev-17.yml quanto _data/daily.dev-17.yml
+        full_path = os.path.join(DATA_DIR, os.path.basename(filename)) if not os.path.isabs(filename) else filename
         if not os.path.exists(full_path):
             print(f"Arquivo não encontrado: {full_path}")
             return []
@@ -99,8 +114,8 @@ layout: post
 title: "{e.get('title')}"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #{e.get('id')}"
 description: "{e.get('summary')}"
-date: {e.get('date')} 00:00:00+00:00
-categories: devlog
+date: {e.get('date')} 00:00:00-03:00
+{redirect_da_url_antiga(e)}categories: devlog
 category: {e.get('category')}
 tags: [{tags_str}]
 ---

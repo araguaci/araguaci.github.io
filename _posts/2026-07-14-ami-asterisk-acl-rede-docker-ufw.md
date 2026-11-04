@@ -3,7 +3,8 @@ layout: post
 title: "AMI do Asterisk visto do container: negar tudo e permitir a rede Docker"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-042"
 description: "O LorentzCTI na bridge não alcançava o AMI do Issabel em rede do host. A sessão só apareceu com permit da faixa Docker e a mesma faixa liberada no firewall, sem publicar a porta na internet."
-date: 2026-07-14 00:00:00+00:00
+date: 2026-07-14 00:00:00-03:00
+redirect_from: /2026-07-13-ami-asterisk-acl-rede-docker-ufw/
 categories: devlog
 category: telefonia
 tags: [asterisk, ami, ufw, docker, cti]

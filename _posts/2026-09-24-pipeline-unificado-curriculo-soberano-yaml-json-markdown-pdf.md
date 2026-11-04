@@ -3,7 +3,8 @@ layout: post
 title: "Pipeline Unificado de Currículo Soberano: De YAML Único para JSON Resume, Markdown e PDF"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-023"
 description: "Automação editorial baseada em Single Source of Truth que compila dados profissionais em JSON Schema internacional, Markdown para GitHub e PDF de alta precisão."
-date: 2026-09-24 00:00:00+00:00
+date: 2026-09-24 00:00:00-03:00
+redirect_from: /2026-09-23-pipeline-unificado-curriculo-soberano-yaml-json-markdown-pdf/
 categories: devlog
 category: devops
 tags: [json-resume, yaml, python, weasyprint, automacao, cv]

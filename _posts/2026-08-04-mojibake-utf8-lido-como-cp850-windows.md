@@ -3,7 +3,8 @@ layout: post
 title: "Mojibake no Windows: UTF-8 lido como CP850 e gravado de novo"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-037"
 description: "Documentos do laboratório apareceram com caixas no lugar de acentos porque um editor abriu UTF-8 na página OEM do console e salvou por cima."
-date: 2026-08-04 00:00:00+00:00
+date: 2026-08-04 00:00:00-03:00
+redirect_from: /2026-08-03-mojibake-utf8-lido-como-cp850-windows/
 categories: devlog
 category: devops
 tags: [utf-8, windows, encoding, git]

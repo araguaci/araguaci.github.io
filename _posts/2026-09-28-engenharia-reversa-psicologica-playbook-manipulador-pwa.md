@@ -3,7 +3,8 @@ layout: post
 title: "Engenharia Reversa Psicológica: O Playbook do Manipulador como PWA Educativo Offline-First"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-020"
 description: "Desenvolvimento de aplicação de referência sobre psicologia comportamental e desarmamento de táticas manipulativas com motor de busca local e funcionamento offline total."
-date: 2026-09-28 00:00:00+00:00
+date: 2026-09-28 00:00:00-03:00
+redirect_from: /2026-09-27-engenharia-reversa-psicologica-playbook-manipulador-pwa/
 categories: devlog
 category: frontend
 tags: [pwa, offline-first, dark-psychology, search-index, service-worker]

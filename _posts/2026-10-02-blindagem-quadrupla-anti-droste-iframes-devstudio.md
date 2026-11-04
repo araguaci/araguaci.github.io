@@ -4,7 +4,8 @@ title: "Blindagem quádrupla erradica o efeito Droste de aninhamento recursivo e
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-062"
 description: "Ferramentas embutidas em iframes dentro do dashboard causavam loop visual de espelhamento recursivo ao navegar internamente. A injeção sistemática de frame-busting, diretiva base global e guarda de pathname isolou a execução de cada módulo.
 "
-date: 2026-10-02 00:00:00+00:00
+date: 2026-10-02 00:00:00-03:00
+redirect_from: /2026-10-01-blindagem-quadrupla-anti-droste-iframes-devstudio/
 categories: devlog
 category: frontend
 tags: [frontend, pwa, iframe, javascript, arquitetura, web]

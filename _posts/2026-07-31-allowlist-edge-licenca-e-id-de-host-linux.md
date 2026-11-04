@@ -3,7 +3,8 @@ layout: post
 title: "Licença e painéis de administração só para a allowlist do edge"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-038"
 description: "O gerador de licença deixou de ficar público no proxy. No container Linux, a licença também deixou de chamar o comando VOL, que não existe fora do Windows."
-date: 2026-07-31 00:00:00+00:00
+date: 2026-07-31 00:00:00-03:00
+redirect_from: /2026-07-30-allowlist-edge-licenca-e-id-de-host-linux/
 categories: devlog
 category: seguranca
 tags: [caddy, allowlist, licenca, docker, php]

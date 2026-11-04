@@ -3,7 +3,8 @@ layout: post
 title: "Data Science em Saúde Pública: Mineração de Séries Históricas DATASUS (SIM) 2014–2025"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-011"
 description: "Extração, normalização e identificação visual de anomalias epidemiológicas em milhões de registros oficiais de óbito do Brasil."
-date: 2026-08-06 00:00:00+00:00
+date: 2026-08-06 00:00:00-03:00
+redirect_from: /2026-08-05-data-science-saude-publica-datasus-sim-2014-2025/
 categories: devlog
 category: datascience
 tags: [datasus, estatistica, epidemiologia, python, recharts]

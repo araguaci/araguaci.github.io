@@ -3,7 +3,8 @@ layout: post
 title: "Visitante sem sessão no Content Factory cai no /kit, não no login"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-056"
 description: "A vitrine do pacote é pública. Quem entra na raiz sem sessão é mandado para /kit, e /comprar continua fora desse guard."
-date: 2026-09-17 00:00:00+00:00
+date: 2026-09-17 00:00:00-03:00
+redirect_from: /2026-09-16-visitante-sem-sessao-cai-no-kit/
 categories: devlog
 category: frontend
 tags: [react, router, content-factory, auth]

@@ -3,7 +3,8 @@ layout: post
 title: "SIP pede a rede do host, e o tema do Issabel lia a coluna errada"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-046"
 description: "Registro e áudio não fecham bem atrás do NAT da bridge. Em produção o PBX usa a rede do host. O tema escuro quebrava porque a consulta de variáveis globais do MySQL pedia colunas com outro nome."
-date: 2026-07-06 00:00:00+00:00
+date: 2026-07-06 00:00:00-03:00
+redirect_from: /2026-07-05-sip-rede-do-host-e-colunas-mysql-do-tema/
 categories: devlog
 category: telefonia
 tags: [sip, docker, issabel, mysql, rtp]

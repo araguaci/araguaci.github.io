@@ -3,7 +3,8 @@ layout: post
 title: "O que o laboratório Docker não mostra na ida para a VPS"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-039"
 description: "Compose verde no WSL não garante certificado, caminho de volume, driver SQL nem URL pública. O corte de ambiente quebrou em TLS, symlink e driver legado."
-date: 2026-07-30 00:00:00+00:00
+date: 2026-07-30 00:00:00-03:00
+redirect_from: /2026-07-29-lab-docker-nao-cobre-cutover-vps/
 categories: devlog
 category: devops
 tags: [vps, tls, symlink, php, sql-server, caddy]

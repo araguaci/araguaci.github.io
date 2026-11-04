@@ -3,7 +3,8 @@ layout: post
 title: "Regra de banco no UFW não alcança porta que o Docker publicou"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-054"
 description: "O Docker publica porta por FORWARD e DNAT e ignora o UFW no INPUT. O filtro de 3306, 6379 e 5432 fica na cadeia DOCKER-USER."
-date: 2026-08-19 00:00:00+00:00
+date: 2026-08-19 00:00:00-03:00
+redirect_from: /2026-08-18-ufw-nao-filtra-porta-publicada-pelo-docker/
 categories: devlog
 category: infraestrutura
 tags: [docker, ufw, iptables, postgres]

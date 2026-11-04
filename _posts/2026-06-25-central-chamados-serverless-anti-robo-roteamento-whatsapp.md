@@ -3,7 +3,8 @@ layout: post
 title: "Central de Chamados Serverless & Anti-Robô com Roteamento Regional WhatsApp"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-029"
 description: "Implementação de helpdesk corporativo com emissão de protocolo transparente no cliente e roteamento geográfico direto para atendentes em Santa Catarina e São Paulo."
-date: 2026-06-25 00:00:00+00:00
+date: 2026-06-25 00:00:00-03:00
+redirect_from: /2026-06-24-central-chamados-serverless-anti-robo-roteamento-whatsapp/
 categories: devlog
 category: arquitetura
 tags: [serverless, helpdesk, whatsapp-api, anti-bot, edge]

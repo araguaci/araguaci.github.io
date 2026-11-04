@@ -3,7 +3,8 @@ layout: post
 title: "Acento no SQL derruba o sqlsrv do Linux sem CharacterSet UTF-8"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-069"
 description: "A mesma lista de clientes abria no WAMP e, no container, pintava uma linha 00000. O COUNT passava porque não tem acento. O SELECT da grade carrega o literal Não e o unixODBC responde HY090 se a conexão não declara UTF-8."
-date: 2026-10-07 00:00:00+00:00
+date: 2026-10-07 00:00:00-03:00
+redirect_from: /2026-10-06-acento-no-sql-exige-charset-utf8-no-sqlsrv/
 categories: devlog
 category: devops
 tags: [php, sqlserver, docker, unixodbc]

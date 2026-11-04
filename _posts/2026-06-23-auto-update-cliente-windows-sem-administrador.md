@@ -3,7 +3,8 @@ layout: post
 title: "Atualizar o cliente Windows sem pedir administrador"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-047"
 description: "O instalador gravava em Arquivos de Programas e o atualizador falhava para o operador sem elevação. A pasta do aplicativo passou a permitir modificação pelos usuários, e o INI da empresa saiu do Git."
-date: 2026-06-23 00:00:00+00:00
+date: 2026-06-23 00:00:00-03:00
+redirect_from: /2026-06-22-auto-update-cliente-windows-sem-administrador/
 categories: devlog
 category: windows
 tags: [inno-setup, dotnet, atualizacao, seguranca]

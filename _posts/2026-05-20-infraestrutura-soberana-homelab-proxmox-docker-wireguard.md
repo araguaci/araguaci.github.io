@@ -3,7 +3,8 @@ layout: post
 title: "Infraestrutura Soberana de Homelab: Proxmox VE, Docker Compose e Redes Mesh WireGuard"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-016"
 description: "Guia arquitetural para implantação de uma nuvem privada residencial e corporativa com isolamento de serviços, bloqueio de telemetria e acesso remoto seguro."
-date: 2026-05-20 00:00:00+00:00
+date: 2026-05-20 00:00:00-03:00
+redirect_from: /2026-05-19-infraestrutura-soberana-homelab-proxmox-docker-wireguard/
 categories: devlog
 category: infraestrutura
 tags: [homelab, proxmox, docker, wireguard, pihole, soberania]

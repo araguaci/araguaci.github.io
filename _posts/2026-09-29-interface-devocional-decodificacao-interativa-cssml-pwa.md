@@ -3,7 +3,8 @@ layout: post
 title: "Design de Interface Devocional & Decodificação Interativa: A Sagrada Medalha de São Bento (CSSML PWA)"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-019"
 description: "Modelagem de Progressive Web App devocional interativo com decodificador SVG em tempo real de siglas latinas da Cruz Sagrada e oração com áudio gregoriano."
-date: 2026-09-29 00:00:00+00:00
+date: 2026-09-29 00:00:00-03:00
+redirect_from: /2026-09-28-interface-devocional-decodificacao-interativa-cssml-pwa/
 categories: devlog
 category: frontend
 tags: [pwa, css-grid, svg, audio-api, ux, devocional]

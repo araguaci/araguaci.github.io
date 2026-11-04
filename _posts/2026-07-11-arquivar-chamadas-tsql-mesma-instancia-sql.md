@@ -3,7 +3,8 @@ layout: post
 title: "Arquivar o mês de chamadas com T-SQL, sem arquivo de backup"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-044"
 description: "Montar Base Histórica deixou de ser BACKUP e RESTORE em arquivo. O worker copia tabela a tabela entre bases da mesma instância e grava o que fez."
-date: 2026-07-11 00:00:00+00:00
+date: 2026-07-11 00:00:00-03:00
+redirect_from: /2026-07-10-arquivar-chamadas-tsql-mesma-instancia-sql/
 categories: devlog
 category: backend
 tags: [sql-server, dotnet, cti, arquivamento]

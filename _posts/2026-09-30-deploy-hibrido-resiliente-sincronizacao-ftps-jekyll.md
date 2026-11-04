@@ -3,7 +3,8 @@ layout: post
 title: "Deploy Híbrido Resiliente: Sincronização Atômica via FTPS e Preservação de Artefatos Jekyll"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-017"
 description: "Arquitetura de deploy contínuo multi-alvo sincronizando Vercel e servidores Linux via FTPS passivo com verificação atômica de integridade MD5 e proteção do diretório docs/."
-date: 2026-09-30 00:00:00+00:00
+date: 2026-09-30 00:00:00-03:00
+redirect_from: /2026-09-29-deploy-hibrido-resiliente-sincronizacao-ftps-jekyll/
 categories: devlog
 category: devops
 tags: [devops, ftp, ci-cd, jekyll, vercel, python]

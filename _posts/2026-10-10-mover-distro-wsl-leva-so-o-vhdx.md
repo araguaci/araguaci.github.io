@@ -3,7 +3,8 @@ layout: post
 title: "Mover distro WSL leva o vhdx e deixa o resto da pasta"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-073"
 description: "wsl --manage --move troca o lugar do ext4.vhdx e o BasePath do registro. Arquivos irmãos da pasta antiga não entram nessa operação."
-date: 2026-10-10 00:00:00+00:00
+date: 2026-10-10 00:00:00-03:00
+redirect_from: /2026-10-09-mover-distro-wsl-leva-so-o-vhdx/
 categories: devlog
 category: windows
 tags: [wsl, vhdx, disco]

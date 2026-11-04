@@ -3,7 +3,8 @@ layout: post
 title: "Arquitetura PWA Offline-First para Aplicações Devocionais e Espirituais"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-004"
 description: "Como projetar Progressive Web Apps autônomos que funcionam perfeitamente sem conexão de internet, com feedback sensorial táctil e síntese de áudio leve."
-date: 2026-09-28 00:00:00+00:00
+date: 2026-09-28 00:00:00-03:00
+redirect_from: /2026-09-27-arquitetura-pwa-offline-first-aplicacoes-devocionais/
 categories: devlog
 category: arquitetura
 tags: [pwa, service-worker, offline-first, localstorage, web-audio]

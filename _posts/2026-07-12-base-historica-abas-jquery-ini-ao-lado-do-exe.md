@@ -3,7 +3,8 @@ layout: post
 title: "Abas da Base Histórica sem Bootstrap e o INI ao lado do executável"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-043"
 description: "A tela de arquivamento abria em branco porque as abas dependiam de JavaScript do Bootstrap que a página não carregava. O worker .NET lia o INI em Arquivos de Programas em vez da pasta do executável."
-date: 2026-07-12 00:00:00+00:00
+date: 2026-07-12 00:00:00-03:00
+redirect_from: /2026-07-11-base-historica-abas-jquery-ini-ao-lado-do-exe/
 categories: devlog
 category: backend
 tags: [php, jquery, dotnet, sql-server]

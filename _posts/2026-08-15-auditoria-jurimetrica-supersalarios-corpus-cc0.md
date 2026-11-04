@@ -3,7 +3,8 @@ layout: post
 title: "Auditoria Jurimétrica de Supersalários e Captura Institucional com Corpus CC0"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-009"
 description: "Mineração de dados de remuneração de magistrados, quebra de 'penduricalhos' indenizatórios e disponibilização de base aberta sob Creative Commons Zero."
-date: 2026-08-15 00:00:00+00:00
+date: 2026-08-15 00:00:00-03:00
+redirect_from: /2026-08-14-auditoria-jurimetrica-supersalarios-corpus-cc0/
 categories: devlog
 category: osint
 tags: [jurimetria, dados-abertos, cc0, judiciario, transparência]

@@ -3,7 +3,8 @@ layout: post
 title: "A lista da direita do Issabel some no fundo branco do jQuery UI"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-065"
 description: "O menu .rnav herdava background white do jQuery UI enquanto o tema pintava o link com cor clara. A regra que escurecia o painel do operador não alcançava esse menu."
-date: 2026-10-04 00:00:00+00:00
+date: 2026-10-04 00:00:00-03:00
+redirect_from: /2026-10-03-menu-rnav-jquery-ui-fundo-branco/
 categories: devlog
 category: frontend
 tags: [css, jquery, issabel, tema]

@@ -3,7 +3,8 @@ layout: post
 title: "Ramal que só existe em arquivo de peer não aparece na lista do Issabel"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-064"
 description: "Peers em arquivo customizado registram no Asterisk e não entram na tela de extensões. A lista lê users, devices e sip, e o ramal 411 ainda colidia com o código de facilidade da lista telefônica."
-date: 2026-10-04 00:00:00+00:00
+date: 2026-10-04 00:00:00-03:00
+redirect_from: /2026-10-03-ramal-issabel-users-devices-e-codigo-411/
 categories: devlog
 category: telefonia
 tags: [asterisk, issabel, sip, php, chan-sip]

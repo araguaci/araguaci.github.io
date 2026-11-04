@@ -3,7 +3,8 @@ layout: post
 title: "Jekyll ignora posts criados diretamente na pasta de build docs"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-077"
 description: "Arquivos markdown gravados diretamente no diretório docs/ poluem a pasta de build e não entram no pipeline de coleções do Jekyll. A publicação exige arquivos canônicos em _posts/ com data no prefixo e permalinks por categoria antes do build e do sync FTP."
-date: 2026-10-12 00:00:00+00:00
+date: 2026-10-12 00:00:00-03:00
+redirect_from: /2026-10-11-jekyll-ignora-posts-criados-na-pasta-de-build-docs/
 categories: devlog
 category: devops
 tags: [jekyll, build, markdown, ftp, static-site]

@@ -3,7 +3,8 @@ layout: post
 title: "A chamada SIP atende sem voz quando o SDP fica no IP local"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-076"
 description: "O ramal registrou, a chamada atendeu e o microfone chegou ao Janus, mas a faixa remota ficou muda. O Contact público não corrige o endereço de mídia: sem sdp_ip o c= do SDP continua no IP local, e o comedia só aprende o caminho depois do primeiro RTP."
-date: 2026-10-12 00:00:00+00:00
+date: 2026-10-12 00:00:00-03:00
+redirect_from: /2026-10-11-chamada-sip-atende-sem-voz-com-sdp-no-ip-local/
 categories: devlog
 category: telefonia
 tags: [janus, asterisk, sip, rtp, nat]

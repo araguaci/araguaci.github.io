@@ -16,6 +16,8 @@ gem "jekyll"
 
 gem "jekyll-sitemap" 
 
+gem "jekyll-redirect-from"
+
 gem "kramdown-parser-gfm" 
 
 gem "kramdown" 

@@ -3,7 +3,8 @@ layout: post
 title: "Design Memorial & Telemetria F1: A Trilogia Ayrton Senna Lotus 98T em Web Experience"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-022"
 description: "Engenharia de experiência imersiva comemorativa de automobilismo combinando estética John Player Special, telemetria de 1.200 cv e simulação de rotação do turbo Renault EF15B."
-date: 2026-09-26 00:00:00+00:00
+date: 2026-09-26 00:00:00-03:00
+redirect_from: /2026-09-25-design-memorial-telemetria-f1-trilogia-ayrton-senna-lotus-98t/
 categories: devlog
 category: frontend
 tags: [svg, webgl, telemetria, ayrton-senna, ux, storytelling]

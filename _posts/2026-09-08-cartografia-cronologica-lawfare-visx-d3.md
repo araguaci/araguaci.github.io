@@ -3,7 +3,8 @@ layout: post
 title: "Cartografia Cronológica de Lawfare: Modelagem de Dossiês Interativos com Visx e D3"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-007"
 description: "Visualização interativa de centenas de atos jurídicos, ordens de exceção e inquéritos sigilosos sem sobrecarga de renderização no navegador."
-date: 2026-09-08 00:00:00+00:00
+date: 2026-09-08 00:00:00-03:00
+redirect_from: /2026-09-07-cartografia-cronologica-lawfare-visx-d3/
 categories: devlog
 category: osint
 tags: [osint, visx, d3js, lawfare, investigacao, timeline]

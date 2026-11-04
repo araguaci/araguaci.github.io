@@ -3,7 +3,8 @@ layout: post
 title: "A triagem de saúde pula o tenant do ImobHub e ainda responde 200"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-052"
 description: "O AgentFlow só classifica urgência para tenants da Saúde Livre. O tenant do ImobHub volta skipped, com HTTP 200, para o proxy de sugestão não virar 502."
-date: 2026-08-20 00:00:00+00:00
+date: 2026-08-20 00:00:00-03:00
+redirect_from: /2026-08-19-triagem-healthcare-pula-tenant-imobhub/
 categories: devlog
 category: arquitetura
 tags: [agentflow, brainos, webhook, tenant]

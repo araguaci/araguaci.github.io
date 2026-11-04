@@ -3,7 +3,8 @@ layout: post
 title: "Modelagem Financeira e Unit Economics para Micro-SaaS: Da Ideia ao Breakeven"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-014"
 description: "Construção de simuladores interativos no navegador para cálculo de LTV, CAC, Payback e validação de MVPs antes de escrever código."
-date: 2026-06-30 00:00:00+00:00
+date: 2026-06-30 00:00:00-03:00
+redirect_from: /2026-06-29-modelagem-financeira-unit-economics-micro-saas/
 categories: devlog
 category: saas
 tags: [saas, unit-economics, cac-ltv, breakeven, empreendedorismo]

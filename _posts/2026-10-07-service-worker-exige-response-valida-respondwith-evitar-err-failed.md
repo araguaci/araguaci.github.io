@@ -3,7 +3,8 @@ layout: post
 title: "Service Worker exige Response valida em respondWith para evitar ERR_FAILED na Vercel"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-071"
 description: "Ao implementar cache PWA, o metodo respondWith do Service Worker quebrou assets estaticos na Vercel por receber undefined. Passou a valer a regra de nunca resolver promises sem Response valida e desativar preload de fontes nao renderizadas de imediato."
-date: 2026-10-07 00:00:00+00:00
+date: 2026-10-07 00:00:00-03:00
+redirect_from: /2026-10-06-service-worker-exige-response-valida-respondwith-evitar-err-failed/
 categories: devlog
 category: frontend
 tags: [pwa, service-worker, astro, vercel, cache]

@@ -3,7 +3,8 @@ layout: post
 title: "O tronco SIP falha quando o nome e o id não compartilham collation"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-063"
 description: "Gravar o tronco pelo provisionador oficial quebrava no MySQL com mistura de collation entre trunks.name e sip.id. A comparação passou a usar o collation de cada coluna, e o registro no Asterisk só é confiável segundos depois do reload."
-date: 2026-10-04 00:00:00+00:00
+date: 2026-10-04 00:00:00-03:00
+redirect_from: /2026-10-03-tronco-sip-collation-e-registro-atrasado/
 categories: devlog
 category: telefonia
 tags: [asterisk, mysql, issabel, sip, chan-sip]

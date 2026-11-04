@@ -3,7 +3,8 @@ layout: post
 title: "Visualização Sonora Reativa em Tempo Real: FFT e Web Audio API no AudioVisualizer 3D"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-025"
 description: "Arquitetura de processamento espectral de frequências sonoras com AnalyserNode e deformação de malha tridimensional em 60 FPS com interpolação linear."
-date: 2026-08-22 00:00:00+00:00
+date: 2026-08-22 00:00:00-03:00
+redirect_from: /2026-08-21-visualizacao-sonora-reativa-fft-web-audio-api/
 categories: devlog
 category: frontend
 tags: [web-audio, fft, visualizer, audio-reactive, javascript]

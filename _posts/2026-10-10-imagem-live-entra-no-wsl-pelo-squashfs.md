@@ -3,7 +3,8 @@ layout: post
 title: "Imagem live entra no WSL pelo squashfs, não pelo ISO"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-072"
 description: "O WSL não dá boot num ISO. A distro passa a existir quando o rootfs do squashfs vira um tar com dono numérico e entra por wsl --import."
-date: 2026-10-10 00:00:00+00:00
+date: 2026-10-10 00:00:00-03:00
+redirect_from: /2026-10-09-imagem-live-entra-no-wsl-pelo-squashfs/
 categories: devlog
 category: windows
 tags: [wsl, debian, locale, apt]

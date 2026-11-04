@@ -3,7 +3,8 @@ layout: post
 title: "Portais Geográficos & Ecoturismo: Vetores SVG e Leaflet com Performance 100 PageSpeed"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-030"
 description: "Substituição de SDKs pesados de mapas comerciais por arquitetura leve com Leaflet, camadas GeoJSON vetoriais e tiles estáticos para guias de turismo sustentável."
-date: 2026-06-05 00:00:00+00:00
+date: 2026-06-05 00:00:00-03:00
+redirect_from: /2026-06-04-portais-geograficos-ecoturismo-vetores-svg-leaflet-pagespeed/
 categories: devlog
 category: frontend
 tags: [gis, leaflet, ecoturismo, performance, openstreetmap]

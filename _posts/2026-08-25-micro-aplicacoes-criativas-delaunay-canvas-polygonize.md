@@ -3,7 +3,8 @@ layout: post
 title: "Engenharia de Micro-Aplicações Criativas: Algoritmos de Delaunay e Canvas Generativo (Polygonize 3D)"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-024"
 description: "Geração procedimental de malhas poligonais e arte computacional no cliente com Triangulação de Delaunay e otimização de renderização com TypedArrays."
-date: 2026-08-25 00:00:00+00:00
+date: 2026-08-25 00:00:00-03:00
+redirect_from: /2026-08-24-micro-aplicacoes-criativas-delaunay-canvas-polygonize/
 categories: devlog
 category: frontend
 tags: [canvas, delaunay, procedural, web-graphics, math, javascript]

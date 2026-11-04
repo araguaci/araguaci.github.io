@@ -3,7 +3,8 @@ layout: post
 title: "A home não soma a API de agentes com o AgentFlow"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-055"
 description: "São dois runtimes. A FastAPI é catálogo HTTP e o AgentFlow é orquestração. A home manda o visitante ao console, não ao JSON da raiz."
-date: 2026-08-19 00:00:00+00:00
+date: 2026-08-19 00:00:00-03:00
+redirect_from: /2026-08-18-api-agentes-e-agentflow-nao-se-somam/
 categories: devlog
 category: arquitetura
 tags: [apex, fastapi, agentflow, adr]

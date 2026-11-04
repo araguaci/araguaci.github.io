@@ -3,7 +3,8 @@ layout: post
 title: "Engenharia de Prompt Avançada e Agentes Autônomos de Código em Pair Programming"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-012"
 description: "Padrões sistemáticos para maximizar a assertividade de modelos LLM em refatoração de código legado, geração de testes e arquitetura de software."
-date: 2026-07-28 00:00:00+00:00
+date: 2026-07-28 00:00:00-03:00
+redirect_from: /2026-07-27-engenharia-prompt-agentes-autonomos-pair-programming/
 categories: devlog
 category: ia
 tags: [ia-generativa, prompt-engineering, agentes, pair-programming, llm]

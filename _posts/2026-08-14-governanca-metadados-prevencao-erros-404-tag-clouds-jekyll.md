@@ -3,7 +3,8 @@ layout: post
 title: "Governança de Metadados e Prevenção de Erros 404 em Tag Clouds no Jekyll Estático"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-026"
 description: "Estratégia de normalização taxonômica e criação de coleções seguras no Jekyll para evitar links quebrados em nuvens de tags geradas no GitHub Pages."
-date: 2026-08-14 00:00:00+00:00
+date: 2026-08-14 00:00:00-03:00
+redirect_from: /2026-08-13-governanca-metadados-prevencao-erros-404-tag-clouds-jekyll/
 categories: devlog
 category: devops
 tags: [jekyll, metadata, taxonomy, safe-mode, github-pages]

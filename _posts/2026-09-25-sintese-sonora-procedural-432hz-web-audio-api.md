@@ -3,7 +3,8 @@ layout: post
 title: "Síntese Sonora Procedural em 432Hz & Ressonância Schumann com Web Audio API"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-005"
 description: "Substituição de arquivos de áudio pesados de meditação por geradores procedurais de ruído rosa, frequências harmônicas e filtros passa-baixa em tempo real."
-date: 2026-09-25 00:00:00+00:00
+date: 2026-09-25 00:00:00-03:00
+redirect_from: /2026-09-24-sintese-sonora-procedural-432hz-web-audio-api/
 categories: devlog
 category: frontend
 tags: [web-audio, 432hz, som-procedural, brown-noise, performance]

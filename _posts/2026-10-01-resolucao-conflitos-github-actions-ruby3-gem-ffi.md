@@ -3,7 +3,8 @@ layout: post
 title: "Resolução de Conflitos no GitHub Actions: Modernização de Ruby 2.6 para 3.3 e a Falha da Gem FFI"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-001"
 description: "Diagnóstico profundo e correção definitiva de falha em pipeline de CI no GitHub Actions decorrente do uso de containers legados com Ruby 2.6 incompatíveis com gems modernas."
-date: 2026-10-01 00:00:00+00:00
+date: 2026-10-01 00:00:00-03:00
+redirect_from: /2026-09-30-resolucao-conflitos-github-actions-ruby3-gem-ffi/
 categories: devlog
 category: devops
 tags: [github-actions, ruby, jekyll, ffi, ci-cd, bundler]

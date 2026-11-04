@@ -3,7 +3,8 @@ layout: post
 title: "403 no Operador Web e o erro 130 do React por export que faltava"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-041"
 description: "O softphone WebRTC entrou no Supervisor no lugar do cliente analógico. O Apache devolvia 403 na pasta e o bundle React quebrava ao importar a tela de login."
-date: 2026-07-15 00:00:00+00:00
+date: 2026-07-15 00:00:00-03:00
+redirect_from: /2026-07-14-operador-web-403-apache-e-react-error-130/
 categories: devlog
 category: frontend
 tags: [apache, react, webrtc, webphone, php]

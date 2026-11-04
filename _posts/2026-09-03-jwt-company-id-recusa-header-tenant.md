@@ -3,7 +3,8 @@ layout: post
 title: "O header X-Tenant-Id que diverge do JWT devolve 403"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-051"
 description: "No CRM do ImobHub o tenant da sessão é o companyId do JWT. Um X-Tenant-Id diferente não troca a imobiliária: a API responde 403."
-date: 2026-09-03 00:00:00+00:00
+date: 2026-09-03 00:00:00-03:00
+redirect_from: /2026-09-02-jwt-company-id-recusa-header-tenant/
 categories: devlog
 category: backend
 tags: [jwt, tenant, express, imobhub]

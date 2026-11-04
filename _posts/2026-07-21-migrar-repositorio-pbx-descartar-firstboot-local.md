@@ -3,7 +3,8 @@ layout: post
 title: "Trocar o repositório do PBX na VPS sem perder o firstboot local"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-040"
 description: "A VPS ainda apontava para o fork antigo do Issabel. O pull só fechou depois de descartar o firstboot alterado no servidor e alinhar o remote canônico."
-date: 2026-07-21 00:00:00+00:00
+date: 2026-07-21 00:00:00-03:00
+redirect_from: /2026-07-20-migrar-repositorio-pbx-descartar-firstboot-local/
 categories: devlog
 category: devops
 tags: [git, issabel, docker, asterisk]

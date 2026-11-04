@@ -3,7 +3,8 @@ layout: post
 title: "O histórico do agente guarda metadados sempre e o prompt só com opt-in"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-058"
 description: "Cada execução grava quem rodou, qual agente e o status. O texto do prompt e da saída só entra no SQLite se o pedido pedir e a retenção for maior que zero."
-date: 2026-08-17 00:00:00+00:00
+date: 2026-08-17 00:00:00-03:00
+redirect_from: /2026-08-16-historico-agente-prompt-so-com-opt-in/
 categories: devlog
 category: seguranca
 tags: [sqlite, fastapi, lgpd, agentes]

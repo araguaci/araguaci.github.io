@@ -251,6 +251,7 @@ exclude:
 plugins:
   - jekyll-paginate
   - jekyll-sitemap
+  - jekyll-redirect-from
 
 #remote_theme: jekyll-theme-chirpy
 remote_theme: daattali/beautiful-jekyll@5.0.0

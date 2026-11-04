@@ -3,7 +3,8 @@ layout: post
 title: "Helpdesk com três modos de WhatsApp e o service worker que invalidava a resposta"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-035"
 description: "Portal de suporte com token de acompanhamento e um único gateway WhatsApp (log, WAHA ou Meta), depois de corrigir cache do service worker, assets do Vite e o e-mail de senha em inglês."
-date: 2026-09-18 00:00:00+00:00
+date: 2026-09-18 00:00:00-03:00
+redirect_from: /2026-09-17-helpdesk-whatsapp-gateway-e-service-worker-response/
 categories: devlog
 category: arquitetura
 tags: [laravel, whatsapp, service-worker, vite, smtp]

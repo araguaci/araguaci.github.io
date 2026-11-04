@@ -3,7 +3,8 @@ layout: post
 title: "Dump do Postgres 17 não entra numa imagem 16, e o formato muda o comando"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-050"
 description: "O restore escolhe pg_restore ou psql pelos cinco primeiros bytes do arquivo. Dump feito no Postgres 17 só restaura em postgres:17-alpine."
-date: 2026-08-14 00:00:00+00:00
+date: 2026-08-14 00:00:00-03:00
+redirect_from: /2026-08-13-dump-postgres-17-e-cabecalho-pgdmp/
 categories: devlog
 category: devops
 tags: [postgres, docker, pg_restore, backup]

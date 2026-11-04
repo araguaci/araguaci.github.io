@@ -3,7 +3,8 @@ layout: post
 title: "Orquestração de Agentes com MCP (Model Context Protocol): O Fim dos Scripts Ad-Hoc"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-027"
 description: "Padronização da integração de agentes autônomos com APIs corporativas (Google Drive, WhatsApp, Git) via especificação aberta Model Context Protocol."
-date: 2026-07-20 00:00:00+00:00
+date: 2026-07-20 00:00:00-03:00
+redirect_from: /2026-07-19-orquestracao-agentes-mcp-model-context-protocol/
 categories: devlog
 category: ia
 tags: [mcp, llm, agentes, automacao, composio, tool-use]

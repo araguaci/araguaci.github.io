@@ -4,7 +4,8 @@ title: "Symlink no PATH faz o auditor achar o render no diretório errado"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-061"
 description: "Depois do install, o comando no PATH apontava para um symlink e o script resolvia SCRIPT_DIR como a pasta do binário, não a da lib. O relatório só voltou a gerar quando o install passou a usar um wrapper com exec no .sh real.
 "
-date: 2026-10-01 00:00:00+00:00
+date: 2026-10-01 00:00:00-03:00
+redirect_from: /2026-09-30-symlink-path-renderizador-diretorio-errado/
 categories: devlog
 category: infraestrutura
 tags: [bash, docker, nginx, openssl, devops, seguranca]

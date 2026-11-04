@@ -3,7 +3,8 @@ layout: post
 title: "Estratégia Editorial para X Articles: Long-Forms Técnicos sem Ruído de Threads"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-028"
 description: "Metodologia de conversão e polimento de documentos técnicos complexos para publicação no formato longo nativo do X (Twitter Articles) com máxima retenção."
-date: 2026-07-10 00:00:00+00:00
+date: 2026-07-10 00:00:00-03:00
+redirect_from: /2026-07-09-estrategia-editorial-x-articles-long-forms-sem-ruido/
 categories: devlog
 category: conteudo
 tags: [xcom, copywriting, editorial, markdown, content-strategy]

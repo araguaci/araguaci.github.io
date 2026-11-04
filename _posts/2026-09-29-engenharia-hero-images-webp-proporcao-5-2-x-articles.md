@@ -3,7 +3,8 @@ layout: post
 title: "Engenharia de Hero Images de Alto Impacto: Conversão WebP Lossless e Formato 5:2 para X Articles"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-018"
 description: "Pipeline automatizado de geração, corte áureo e compressão de imagens de capa em formato estrito 5:2 para X Articles e webapps de altíssimo desempenho."
-date: 2026-09-29 00:00:00+00:00
+date: 2026-09-29 00:00:00-03:00
+redirect_from: /2026-09-28-engenharia-hero-images-webp-proporcao-5-2-x-articles/
 categories: devlog
 category: frontend
 tags: [webp, design, performance, pillow, xcom, seo]

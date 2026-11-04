@@ -3,7 +3,8 @@ layout: post
 title: "No PHP 8 null não serve para strlen nem para propriedade"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-070"
 description: "A lista de clientes avisava strlen(null) em short_name e leitura de DetailAdd num grid que continuava NULL. Os dois vinham de código que no PHP antigo seguia com valor vazio ou aviso mudo."
-date: 2026-10-07 00:00:00+00:00
+date: 2026-10-07 00:00:00-03:00
+redirect_from: /2026-10-06-php8-null-em-strlen-e-propriedade/
 categories: devlog
 category: backend
 tags: [php, php8, legado]

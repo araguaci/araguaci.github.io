@@ -3,7 +3,8 @@ layout: post
 title: "Comunicação IoT de Ultrabaixa Latência (<5ms) com Protocolo ESP-NOW em Microcontroladores"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-006"
 description: "Arquitetura de rede em malha proprietária para telemetria local e acionamento de atuadores sem uso de roteadores Wi-Fi ou servidores em nuvem."
-date: 2026-09-15 00:00:00+00:00
+date: 2026-09-15 00:00:00-03:00
+redirect_from: /2026-09-14-comunicacao-iot-ultrabaixa-latencia-esp-now/
 categories: devlog
 category: iot
 tags: [esp32, esp-now, iot, sistemas-embarcados, wireless]

@@ -3,7 +3,8 @@ layout: post
 title: "O Issabel 5 do laboratório não ocupa o lugar do container Issabel 4"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-066"
 description: "A stack oficial continua com Issabel 4 em Docker. O Issabel 5 entra como VM quando a máquina já o tem ou quando se quer a versão nova, e os dois não podem publicar 5060 e 443 no mesmo host."
-date: 2026-10-04 00:00:00+00:00
+date: 2026-10-04 00:00:00-03:00
+redirect_from: /2026-10-03-issabel5-vm-nao-substitui-container/
 categories: devlog
 category: infraestrutura
 tags: [issabel, docker, hyper-v, windows, ssh]

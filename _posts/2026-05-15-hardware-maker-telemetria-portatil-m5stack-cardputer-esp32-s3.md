@@ -3,7 +3,8 @@ layout: post
 title: "Hardware Maker & Telemetria Portátil com M5Stack Cardputer e ESP32-S3 em FreeRTOS"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-031"
 description: "Desenvolvimento de firmware para terminal portátil de bancada com teclado integrado, display IPS e barramento SPI acelerado por DMA para auditoria de redes de sensores."
-date: 2026-05-15 00:00:00+00:00
+date: 2026-05-15 00:00:00-03:00
+redirect_from: /2026-05-14-hardware-maker-telemetria-portatil-m5stack-cardputer-esp32-s3/
 categories: devlog
 category: iot
 tags: [esp32-s3, m5stack, freertos, c-plus-plus, hardware, maker]

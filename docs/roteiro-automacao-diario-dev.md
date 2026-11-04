@@ -85,4 +85,6 @@ python diario_dev.py verificar
 
 `importar` sem argumento processa todo `daily.dev-*.yml` e regrava os posts existentes.
 
+A data do artigo é gravada no fuso do site (`-03:00`), então a URL sai com o dia do aprendizado. Os ids até `ULTIMO_ID_COM_URL_ANTIGA`, em `import_daily_dev.py`, foram publicados com a URL um dia antes e levam `redirect_from`. Não mude esse número.
+
 Dependência: `pyyaml`.

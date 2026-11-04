@@ -3,7 +3,8 @@ layout: post
 title: "Preferências de interface por usuário e trilha de navegação com prazo"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-034"
 description: "Navbar, tamanho de ícone, layout dos módulos e favoritos passaram a viver no usuário. A trilha de navegação só grava quando o opt-in está ligado e é podada aos 90 dias."
-date: 2026-09-19 00:00:00+00:00
+date: 2026-09-19 00:00:00-03:00
+redirect_from: /2026-09-18-preferencias-ui-por-usuario-log-navegacao-opt-in/
 categories: devlog
 category: frontend
 tags: [laravel, lgpd, ui, scheduler, mysql]

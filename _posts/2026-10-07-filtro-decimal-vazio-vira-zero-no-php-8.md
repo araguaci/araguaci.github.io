@@ -3,7 +3,8 @@ layout: post
 title: "No PHP 8 um filtro decimal vazio vira comparação com zero"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-068"
 description: "O reset da lista de clientes montava WHERE de faturamento igual a zero dos dois lados, sem ninguém ter digitado filtro. No PHP 8, converter null com ew_StrToFloat devolve 0, e 0 diferente de string vazia passa a ser verdadeiro."
-date: 2026-10-07 00:00:00+00:00
+date: 2026-10-07 00:00:00-03:00
+redirect_from: /2026-10-06-filtro-decimal-vazio-vira-zero-no-php-8/
 categories: devlog
 category: backend
 tags: [php, php8, sql, adodb]

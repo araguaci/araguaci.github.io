@@ -3,7 +3,8 @@ layout: post
 title: "git pull na VPS não troca a imagem do monitor que já está no ar"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-067"
 description: "O site mostrava a versão antiga do monitor com o Git já à frente. A imagem copia o código na build, e um pull com árvore suja nem chega a atualizar os arquivos."
-date: 2026-10-04 00:00:00+00:00
+date: 2026-10-04 00:00:00-03:00
+redirect_from: /2026-10-03-git-pull-nao-reconstroi-imagem-do-monitor/
 categories: devlog
 category: devops
 tags: [docker, git, monitor, vps]

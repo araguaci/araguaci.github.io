@@ -3,7 +3,8 @@ layout: post
 title: "Auditoria Tarifária Energética B2B com Parser de Faturas e Inteligência de Dados"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-015"
 description: "Como converter arquivos PDF herméticos de distribuidoras de energia em diagnósticos automáticos de economia tarifária e prevenção de multas."
-date: 2026-06-10 00:00:00+00:00
+date: 2026-06-10 00:00:00-03:00
+redirect_from: /2026-06-09-auditoria-tarifaria-energetica-b2b-parser-faturas/
 categories: devlog
 category: datascience
 tags: [energia, parser-pdf, auditoria-fiscal, chartjs, b2b]

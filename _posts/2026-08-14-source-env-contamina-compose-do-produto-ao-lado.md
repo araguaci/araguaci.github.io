@@ -3,7 +3,8 @@ layout: post
 title: "O shell com source no .env mistura o produto ao lado"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-049"
 description: "Cada stack lê o .env da própria pasta. Exportar esse arquivo no shell deixa SLUG e usuário de banco valendo para o compose seguinte."
-date: 2026-08-14 00:00:00+00:00
+date: 2026-08-14 00:00:00-03:00
+redirect_from: /2026-08-13-source-env-contamina-compose-do-produto-ao-lado/
 categories: devlog
 category: devops
 tags: [docker, compose, env, vps]

@@ -3,7 +3,8 @@ layout: post
 title: "Cartografia de Saúde Holística & Medicina Integrativa: O PWA Mapa da Cura e Frequências Rife"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-021"
 description: "Construção de bússola terapêutica interativa em SVG para fitoterapia, biofísica e frequências sonoras integrativas com compartilhamento social via WhatsApp."
-date: 2026-09-27 00:00:00+00:00
+date: 2026-09-27 00:00:00-03:00
+redirect_from: /2026-09-26-cartografia-saude-holistica-pwa-mapa-da-cura-frequencias/
 categories: devlog
 category: frontend
 tags: [pwa, medicina-integrativa, svg, tooltips, saude-digital]

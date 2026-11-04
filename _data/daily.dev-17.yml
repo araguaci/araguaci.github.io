@@ -1,0 +1,648 @@
+# Volume novo do Diário de Desenvolvimento.
+# Fatos de 2026-05-29 a 2026-11-04, vindos das memórias de trabalho. Cada entrada mantém o dia do aprendizado.
+
+metadata:
+  year: 2026
+  author: "Araguaci Carlos de Andrade"
+  ecosystem: "Artes do Sul & Araguaci Dev Hub"
+  volume: 17
+  total_entries: 31
+  generated_at: "2026-11-04"
+  status: "pronto"
+  source_note: "Memórias do Claude Code, segundo cérebro, docs/MEMORIA-MONOREPO.md e commits, conferidos em 2026-11-04. Sem credencial, chave, IP, hostname ou nome de cliente."
+
+entries:
+  - id: "DEV-2026-080"
+    date: "2026-05-29"
+    title: "Um corpus analítico precisa dizer ao modelo de linguagem como tratar evidência"
+    category: "ia"
+    tags: [llm, metodologia, corpus, osint]
+    slug: "corpus-analitico-protocolo-para-modelo-de-linguagem"
+    summary: "Um modelo pode entender um dado documentado e ainda assim diluí-lo como se fosse opinião. A metodologia do lawfare-timeline passou a nomear esse padrão e a dar ao modelo marcadores para reconhecê-lo nas próprias respostas."
+    problem_statement: >
+      O projeto documenta padrões com metodologia explícita, e a colaboração com IA precisa manter a mesma régua ao longo do tempo.
+      O risco observado é a falsa equivalência: o modelo compreende o conteúdo e o descarta por metadado de fonte, tom ou campo político aparente.
+    key_learnings:
+      - "O METHODOLOGY.md define o padrão P04b, a falsa equivalência que neutraliza um dado sem produzir conteúdo ofensivo, e registra que ela pode ocorrer sem intenção."
+      - "Os marcadores são verificáveis na resposta: citar 'alguns críticos argumentam' sem refutar o dado disponível, ou propor perspectivas igualmente válidas diante de um padrão com evidência."
+      - "A classificação separa o que está confirmado (ev-confirmed) do que é inferência (ev-inference). Item confirmado no corpus é tratado como dado, não como perspectiva."
+      - "Campo booleano também exige prova: vetor_correcao_disponivel só recebe false com evidência positiva de bloqueio."
+      - "Faixas de IDs protegidas só aceitam merge com validação explícita, e essa regra fica escrita junto com o schema."
+    impact_value: "O protocolo para modelos virou parte da metodologia versionada, e não uma instrução repetida a cada sessão."
+    related_projects: ["lawfare-timeline"]
+
+  - id: "DEV-2026-081"
+    date: "2026-06-12"
+    title: "Junction libera o disco C: sem mudar o caminho, e a limpeza não pode atravessá-la"
+    category: "windows"
+    tags: [windows, junction, disco, powershell, manutencao]
+    slug: "junction-libera-disco-e-limpeza-nao-atravessa"
+    summary: "O C: chegou a 7,4 GB livres, com caches e a VM do Claude Desktop ocupando a maior parte. Mover a VM por junction resolveu na hora, e a limpeza recorrente virou um script com dry-run e lista de caminhos permitidos."
+    problem_statement: >
+      A pasta vm_bundles do Claude Desktop ocupava 11,8 GB, e os caches de NuGet, npm e pip somavam cerca de 34 GB.
+      O app espera a pasta no caminho original, e o disco volta a encher com o uso normal de desenvolvimento.
+    key_learnings:
+      - "Mover a pasta para outro disco e criar uma junction no caminho original mantém o app funcionando sem configuração nova."
+      - "A junction cria uma dependência: se o app acusar erro de VM, confira primeiro se o disco de destino está montado e se a junction continua intacta."
+      - "O CleanGuard só apaga com -Executar. Sem esse parâmetro, faz apenas o dry-run."
+      - "A lista de raízes permitidas fica no código, e o script recusa qualquer caminho fora dela. Também nunca atravessa junction ou symlink, o que protege a própria pasta migrada."
+      - "A tarefa agendada de toda segunda roda o perfil seguro, sem administrador. O perfil completo, com Temp do sistema, Windows Update e WinSxS, fica para execução manual."
+    code_snippet: |
+      # Sem -Executar, só mostra o que seria apagado
+      .\cleanguard.ps1
+      .\cleanguard.ps1 -Executar
+      .\cleanguard.ps1 -Executar -Perfil completo
+    impact_value: "O espaço do C: passou a ser recuperado por rotina semanal, sem limpeza manual a cada aperto."
+    related_projects: ["00-cleanguard"]
+
+  - id: "DEV-2026-082"
+    date: "2026-06-15"
+    title: "O motor de alertas já estava no banco, e faltava só agendar e notificar"
+    category: "backend"
+    tags: [mysql, php, stored-procedure, alertas, phpmaker]
+    slug: "motor-de-alertas-ja-estava-no-banco"
+    summary: "A primeira tentativa de automatizar alertas de consumo reimplementou em PHP o que uma migration já tinha criado. Ao reaproveitar o que existia, a entrega ficou reduzida a um script de agendamento e notificação."
+    problem_statement: >
+      O pedido era a fase A da automação: alertas e relatórios sobre as faturas já importadas.
+      A tabela e as regras novas ficaram redundantes e em conflito com scripts/migration_relatorios_executivos.sql, já aplicada no banco local.
+    key_learnings:
+      - "Antes de escrever regra de negócio, procure também em migrations, procedures e views. O motor estava em sp_gera_alertas() e sp_processa_executivo(), fora do PHP."
+      - "A tabela alerta já evitava duplicidade com UNIQUE(idfilial, tipo, competencia) e tinha o ciclo ABERTO, NOTIFICADO, RESOLVIDO e IGNORADO."
+      - "O que faltava coube no monitor.php: chamar o orquestrador, enviar o resumo por e-mail e marcar NOTIFICADO, com --dry-run e --notify."
+      - "Para o setup Docker funcionar, o ewcfg.php passou a ler as credenciais por getenv(), com o .env fora do Git."
+    impact_value: "As regras de alerta continuam em um lugar só, e o dashboard executivo segue lendo a mesma tabela."
+    related_projects: ["lorentz-energy"]
+
+  - id: "DEV-2026-083"
+    date: "2026-06-18"
+    title: "Canal de WhatsApp em produção usa a Cloud API, e a solução por QR Code fica no laboratório"
+    category: "arquitetura"
+    tags: [whatsapp, meta, waha, integracao]
+    slug: "whatsapp-cloud-api-e-qr-code-so-no-laboratorio"
+    summary: "A primeira versão do plano apoiava o canal em WAHA, que não é a API oficial. A revisão contra o código trocou a base por Meta Cloud API e cortou o que não era necessário ao piloto."
+    problem_statement: >
+      A versão 1.0 do plano previa WAHA self-hosted, custo zero de API, orquestrador Node.js e sincronização dupla entre SQL Server e MySQL.
+      Comparada ao repositório, ela citava um passo de QR Code que não existe na API oficial e ignorava o que o código já tinha.
+    key_learnings:
+      - "WAHA, Evolution e Baileys ficam só para protótipo: não são a API oficial e carregam risco de banimento."
+      - "Custo de API por conversa precisa estar no plano. O 'R$ 0' da versão anterior subestimava o gasto real na Meta."
+      - "O orquestrador Node.js saiu porque a ponte PHP/Laravel existente basta. Stack extra sem necessidade também é custo de operação."
+      - "A sincronização dupla virou opcional numa fase posterior. No piloto há uma única fonte operacional, o que reduz a complexidade."
+      - "Revisar o plano contra o código revelou que o WhatsAppService só persistia localmente e não chamava a Meta."
+    impact_value: "O plano passou a descrever o que pode ir para produção, com os estudos de WAHA isolados em projetos/."
+    related_projects: ["omnichannel-system", "lorentz-supervisor"]
+
+  - id: "DEV-2026-084"
+    date: "2026-06-21"
+    title: "Modernizar sem parar o legado muda como se projeta cada integração nova"
+    category: "arquitetura"
+    tags: [legado, whatsapp, modernizacao, strangler-fig]
+    slug: "integracao-nova-precisa-servir-legado-e-base-moderna"
+    summary: "Novos clientes passaram a exigir WhatsApp enquanto a base instalada segue no stack legado. A regra passou a ser projetar a integração para funcionar no legado e servir também à plataforma moderna."
+    problem_statement: >
+      O negócio precisa fechar contratos novos sem quebrar quem já roda CTI, URA, cliente desktop e Supervisor em produção.
+      Desenvolver o canal só na plataforma nova deixaria esses clientes de fora, e desenvolvê-lo só no legado obrigaria a refazer tudo depois.
+    key_learnings:
+      - "Modernizar e manter o legado são duas frentes simultâneas: o legado continua recebendo as soluções novas."
+      - "A integração precisa encaixar no Supervisor e no CTI legados e ao mesmo tempo servir de base para a plataforma moderna."
+      - "Listar nominalmente os projetos em produção evita tratar como descartável algo de que um cliente ainda depende."
+    impact_value: "O planejamento do WhatsApp passou a considerar o legado e a plataforma moderna desde o início."
+    related_projects: ["omnichannel-system", "lorentz-supervisor", "lorentz-cti"]
+
+  - id: "DEV-2026-085"
+    date: "2026-06-21"
+    title: "Nem todo segredo encontrado no histórico tem a mesma urgência"
+    category: "seguranca"
+    tags: [segredos, git, rotacao, filter-repo]
+    slug: "segredo-no-historico-urgencia-depende-da-exposicao"
+    summary: "A varredura dos repositórios encontrou credenciais com riscos muito diferentes. A prioridade passou a seguir a exposição real de cada uma, e a rotação ficou à frente da reescrita do histórico."
+    problem_statement: >
+      Ao preparar os repositórios para trabalhar com o claude.ai, apareceram credenciais em código e no histórico do Git.
+      Tratar todas igualmente levaria a recompilar componentes legados com pressa, enquanto o risco real estava em outra credencial.
+    key_learnings:
+      - "Credencial de banco acessível por IP público é o risco real e vem primeiro. Credencial de banco que só escuta na interface local, em repositório privado, tem urgência menor."
+      - "Reescrever o histórico não dispensa a rotação: a credencial já esteve em remotos e em outros clones. A rotação é o que neutraliza o risco."
+      - "Credencial presa em código compilado só muda com nova compilação. A correção de longo prazo é parametrizar, seguindo o padrão de configuração externa."
+      - "Arquivo de configuração sai do versionamento e dá lugar a um .sample. Antes do git pull no servidor, faça backup do arquivo real, porque a remoção do versionamento pode apagá-lo."
+    code_snippet: |
+      # Depois de rotacionar, limpar o histórico é a etapa seguinte, não a primeira
+      git filter-repo --replace-text expressoes.txt
+    impact_value: "A correção foi ordenada pela exposição real, sem expor o legado a uma recompilação apressada."
+    related_projects: ["omnichannel"]
+
+  - id: "DEV-2026-086"
+    date: "2026-06-21"
+    title: "Repositório-cópia para a IA duplica código que já tem origem própria"
+    category: "devops"
+    tags: [git, github, claude, repositorios]
+    slug: "repositorio-copia-para-ia-duplica-a-origem"
+    summary: "Um repositório focado foi criado para trabalhar o WhatsApp com o claude.ai e logo passou a duplicar código. A decisão foi conectar a ferramenta aos repositórios reais e descontinuar a cópia."
+    problem_statement: >
+      O repositório lorentz-whatsapp reunia num só lugar o que interessava à integração.
+      Esse código já tinha origem própria em dois repositórios, então cada ajuste passaria a existir em dois lugares.
+    key_learnings:
+      - "Com uma fonte única da verdade, a ferramenta enxerga o histórico real e o trabalho não precisa de um passo de sincronização."
+      - "Antes de conectar um repositório, confira o que há nele: chave de terceiro em documento e arquivo de configuração versionado saem antes."
+      - "A decisão vale para os dois lados: a pasta local foi removida e o repositório remoto, que ficou redundante, foi marcado para exclusão."
+    impact_value: "O trabalho do canal voltou a acontecer nos repositórios que vão para produção."
+    related_projects: ["omnichannel-system", "lorentz-supervisor"]
+
+  - id: "DEV-2026-087"
+    date: "2026-06-21"
+    title: "Uma pasta que parece cópia pode ser junction do mesmo repositório"
+    category: "windows"
+    tags: [windows, junction, git, checkout]
+    slug: "pasta-que-parece-copia-pode-ser-junction"
+    summary: "Em 2026-06-21, a pasta supervisor parecia um checkout independente, mas apontava para supervisor-php733. Quem ignora isso supõe duas árvores de trabalho onde só existe uma."
+    problem_statement: >
+      Duas pastas com o mesmo conteúdo sugeriam dois checkouts.
+      Na verdade, supervisor era uma junction do Windows para supervisor-php733, com o mesmo .git e o mesmo HEAD.
+    key_learnings:
+      - "O atributo DL em Get-ChildItem indica diretório com reparse point. O nome e o conteúdo da pasta não mostram isso."
+      - "Mudar de branch em uma das pastas muda também a outra, porque as duas compartilham o HEAD."
+      - "Esse tipo de fato envelhece: naquele dia era uma junction, e em 2026-11-04 supervisor já era um repositório comum e supervisor-php733 não existia mais na máquina. Confira antes de confiar na anotação."
+    code_snippet: |
+      Get-ChildItem D:\projeto | Where-Object { $_.Attributes -match 'ReparsePoint' }
+    impact_value: "Conferir o tipo da pasta passou a vir antes de qualquer decisão sobre qual checkout é o canônico."
+    related_projects: ["lorentz-supervisor"]
+
+  - id: "DEV-2026-088"
+    date: "2026-06-21"
+    title: "O piloto do assistente de IA começa pelo suporte do próprio sistema"
+    category: "ia"
+    tags: [ia, whatsapp, rag, suporte, piloto]
+    slug: "piloto-do-assistente-comeca-pelo-proprio-suporte"
+    summary: "Um assistente de IA exposto logo a clientes externos arrisca errar no domínio deles. O piloto usa o suporte do próprio Lorentz, e a fase de voz só abre quando os indicadores chegam ao valor definido."
+    problem_statement: >
+      A fase 4 do plano da URA para o WhatsApp precisava validar passagem de contexto, IA por texto e escalonamento.
+      Era preciso escolher um domínio de baixo risco, em que a equipe conseguisse avaliar se a resposta estava certa.
+    key_learnings:
+      - "Instalação, configuração, administração e troubleshooting são um domínio que a equipe domina, logo o erro aparece rápido e o valor interno é imediato."
+      - "A base de perguntas é ancorada na configuração real, e a matriz de escalonamento define quando a IA para e passa para uma pessoa."
+      - "Toda conversa escalada vira candidata a nova FAQ, com curadoria quinzenal. O piloto evolui com chamados reais."
+      - "A passagem de fase tem número: voz só com autoatendimento de pelo menos 40% e precisão de triagem de pelo menos 85%. São metas do roteiro, ainda sem medição do piloto."
+    impact_value: "O avanço do assistente passou a depender de critério escrito, e não de impressão sobre a qualidade das respostas."
+    related_projects: ["omnichannel", "lorentz-supervisor"]
+
+  - id: "DEV-2026-089"
+    date: "2026-06-22"
+    title: "Polyrepo a partir de um monorepo com 25 repositórios embutidos pede dois caminhos"
+    category: "devops"
+    tags: [git, subtree, filter-repo, polyrepo, github]
+    slug: "polyrepo-de-monorepo-com-repositorios-embutidos"
+    summary: "O monorepo local não tinha remoto próprio e guardava cerca de 25 repositórios embutidos sem .gitmodules. A migração usou subtree split para o que estava rastreado direto e renomeação para o que já tinha repositório."
+    problem_statement: >
+      Desktop VB.NET e C++, web PHP e Laravel e infraestrutura conviviam na mesma pasta, com necessidades de acesso diferentes.
+      Faltava repartir por domínio sem perder histórico e sem misturar projetos de terceiros.
+    key_learnings:
+      - "Pasta rastreada direto sai com git subtree split e push para o repositório novo. Repositório embutido só precisa ser renomeado no GitHub, o que preserva histórico e cria redirecionamento."
+      - "git filter-repo limpou o histórico do cliente desktop antes da publicação, removendo uma biblioteca de 77 MB."
+      - "O nome desejado pode estar ocupado por um fork antigo na própria conta. Renomeie o fork antes, para liberar o nome ao servidor real."
+      - "Projetos de terceiros não entram nos repositórios próprios nem são renomeados."
+      - "Repositórios antigos sobrepostos ficam para decisão humana. Definir qual é o canônico não é tarefa de automação."
+    code_snippet: |
+      git subtree split --prefix=<pasta> -b export/<repo>
+      git push https://github.com/<conta>/<repo>.git export/<repo>:main
+    impact_value: "Cada componente passou a ter repositório privado próprio, com acesso controlado por domínio."
+    related_projects: ["lorentz-client", "lorentz-omnichannel", "lorentz-docs"]
+
+  - id: "DEV-2026-090"
+    date: "2026-07-15"
+    title: "Dois checkouts do mesmo produto divergiram em 1.425 arquivos, e só o hash mostrou"
+    category: "devops"
+    tags: [git, php, checkout, hash]
+    slug: "checkouts-do-mesmo-produto-diferem-e-so-o-hash-mostra"
+    summary: "Duas pastas do Supervisor pareciam variações pequenas uma da outra. Com a comparação por hash, ficou claro que nenhuma das duas podia ser tratada como cópia da outra."
+    problem_statement: >
+      Havia dois checkouts paralelos do Supervisor e dúvida sobre qual usar.
+      Nomes de pasta e branch não diziam o que cada um continha.
+    key_learnings:
+      - "A comparação por MD5 achou cerca de 4.332 arquivos em comum, 1.425 deles com conteúdo diferente."
+      - "Cada lado tinha funcionalidades que o outro não recebeu, então adotar um e apagar o outro perderia trabalho."
+      - "O relatório entrou no repositório e as regras do agente passaram a apontar para ele, para evitar a repetição da dúvida a cada sessão."
+    impact_value: "A escolha do checkout passou a ser feita com um relatório na mão, e não pelo nome da pasta."
+    related_projects: ["lorentz-supervisor"]
+
+  - id: "DEV-2026-091"
+    date: "2026-07-31"
+    title: "Correção feita às pressas na VPS volta ao laboratório por commit, sem perder o trabalho local"
+    category: "devops"
+    tags: [git, vps, php, deploy, hotfix]
+    slug: "correcao-na-vps-volta-ao-laboratorio-por-commit"
+    summary: "Para estabilizar a produção, houve ajustes feitos direto na VPS, enquanto o laboratório tinha centenas de arquivos em andamento. O caminho foi publicar pelo Git o que estava na VPS e guardar o trabalho local em branch antes de sincronizar."
+    problem_statement: >
+      A jornada foi do laboratório a uma VPS, depois a um ambiente Docker no WSL, depois a outra VPS, e por fim de volta ao laboratório para consolidar.
+      Na volta, o código em produção e o laboratório já tinham andado por caminhos diferentes.
+    key_learnings:
+      - "Correção feita na VPS precisa virar commit lá e ir para o remoto. Fora do Git, a próxima atualização pode apagá-la."
+      - "Antes de alinhar o laboratório com a produção, um branch guardou os 221 arquivos em andamento. Nada se perdeu no alinhamento."
+      - "O produto não foi reescrito. É o mesmo código migrando de PHP 5.6.40 para 7.3.33, 7.4.33 e 8.2.26, e registrar essa linhagem evita tratar cada pasta como um sistema à parte."
+      - "A regra ficou escrita: ajuste destinado à VPS nasce no checkout do laboratório, segue por push e chega ao servidor com git pull."
+    code_snippet: |
+      git switch -c lab-wip-pre-pull
+      git add -A && git commit -m "wip: laboratório antes de alinhar com a VPS"
+      git switch lorentz-vps && git pull --ff-only
+    impact_value: "O laboratório voltou a coincidir com a produção, com o trabalho anterior recuperável em branch próprio."
+    related_projects: ["lorentz-supervisor", "lorentz-vps-stack"]
+
+  - id: "DEV-2026-092"
+    date: "2026-07-31"
+    title: "Produto novo que parece variação de outro entra como irmão, sobre um núcleo comum"
+    category: "arquitetura"
+    tags: [iot, arquitetura, produto, monolito]
+    slug: "produto-irmao-sobre-nucleo-comum-sem-clonar-monolito"
+    summary: "Automação de hotel parecia uma extensão natural do sistema de energia. A decisão foi criar um produto irmão sobre um núcleo de IoT compartilhado, sem renomear nem clonar o monólito."
+    problem_statement: >
+      O Lorentz Energy é um produto B2B de contas e indicadores tarifários, em PHPMaker, e o novo pedido envolvia dispositivos em campo.
+      Os atalhos eram trocar os rótulos do Energy para Hotel ou clonar o monólito. As duas opções foram rejeitadas e ficaram registradas no desenho.
+    key_learnings:
+      - "O Energy segue como produto de contas e KPIs. O núcleo novo é lorentz-iot, com lorentz-hotel como vertical em cima dele."
+      - "A opção aprovada desenvolve IoT e Hotel em paralelo, com sprints separados."
+      - "A ponte com o Energy é opcional e fica só para a fase 3, o que mantém os produtos separados até lá."
+      - "O primeiro teste de campo é uma bomba e uma boia em casa, controladas pelo celular através da VPS, e serve também de vitrine para o eletricista e a diretoria."
+    impact_value: "Os dois produtos podem evoluir separados e dividir só o que de fato é comum."
+    related_projects: ["lorentz-iot", "lorentz-hotel", "lorentz-energy"]
+
+  - id: "DEV-2026-093"
+    date: "2026-08-01"
+    title: "O ID válido da licença é o que o executável daquela máquina grava, não o da ferramenta do lab"
+    category: "telefonia"
+    tags: [ura, licenca, vbnet, campo]
+    slug: "id-da-licenca-e-o-que-o-executavel-grava"
+    summary: "Na visita a campo, a licença gerada com a ferramenta do laboratório foi recusada, embora o procedimento estivesse certo. O binário em produção era de outro build e calculava outro ID."
+    problem_statement: >
+      A URA instalada registrou 'Licença inválida ID Local' com uma licença gerada a partir do ID impresso pela ferramenta do lab.
+      O executável em produção tinha gravado no INI um ID começando em 1970, diferente do valor que a ferramenta mostrava.
+    key_learnings:
+      - "Gerada de novo com o ID que aquele executável gravou no INI, a licença passou a mostrar 'Licença OK' no log."
+      - "ID de máquina começando em 19700101 é sintoma de data de instalação zerada ou anormal naquele build."
+      - "Ferramenta de apoio e produto precisam vir do mesmo build. Em campo, consulte a versão e o tamanho do binário instalado antes de gerar a licença."
+      - "Na versão seguinte, data zerada ou ausente passou a dar falha explícita, em vez de gerar um ID enganoso, e o código morto de WMIC saiu."
+    impact_value: "A licença de campo passou a ser gerada a partir do que o binário instalado informa."
+    related_projects: ["ura", "ura-dtmf-lab"]
+
+  - id: "DEV-2026-094"
+    date: "2026-08-06"
+    title: "Capacidade de IoT se define em patamares, antes do primeiro cliente em produção"
+    category: "arquitetura"
+    tags: [iot, capacidade, teste-de-carga, planejamento]
+    slug: "capacidade-de-iot-definida-em-patamares"
+    summary: "O desenho inicial dizia o que construir, mas não até quantos dispositivos ele aguentaria. O plano de expansão fixou três patamares, com limites e o que precisa estar pronto para passar de um ao outro."
+    problem_statement: >
+      Um laboratório com poucos dispositivos não diz nada sobre uma pousada inteira ou uma rede delas.
+      Sem limites escritos, o primeiro cliente real seria também o primeiro teste de carga.
+    key_learnings:
+      - "L0, laboratório: até 10 dispositivos. L1, uma pousada: até 80 dispositivos e 20 req/s de ingestão. L2, rede: até 500 dispositivos e 100 req/s. São metas de projeto, ainda não medidas."
+      - "O limite inclui latência: p95 de ingestão abaixo de 200 ms em L1 e de 300 ms em L2, para um servidor lento não passar por aprovado."
+      - "O bloqueio seguinte ficou explícito: limite de requisições, token por dispositivo e retenção, depois MariaDB, e teste de carga antes da primeira pousada."
+    impact_value: "A ida para produção passou a ter uma condição verificável, e não uma estimativa de que deve aguentar."
+    related_projects: ["lorentz-iot", "lorentz-hotel"]
+
+  - id: "DEV-2026-095"
+    date: "2026-10-04"
+    title: "Limpar o Visual Studio começa por saber o que cada solução realmente compila"
+    category: "windows"
+    tags: [visual-studio, dotnet, disco, msvc]
+    slug: "limpar-visual-studio-pelo-que-as-solucoes-compilam"
+    summary: "Havia gigabytes em cargas do Visual Studio que pareciam dispensáveis, mas o build desktop depende de versões específicas. O levantamento projeto a projeto separou o que pode sair do que precisa ficar."
+    problem_statement: >
+      O disco estava cheio, e o Painel de Controle não mostra o tamanho real de cada componente.
+      Apagar um SDK errado só apareceria quando o build falhasse.
+    key_learnings:
+      - "Meça as pastas. Só UWPNuGetPackages tinha 3,5 GB, e a carga MAUI somava cerca de 1,1 GB no SDK Android e 2,5 GB em packs."
+      - "Procure a versão nos projetos: o .NET 3.1 não aparecia em server, client nem ura, mas o targeting pack 4.7.2 era usado pelo launcher."
+      - "O SDK 9 compila projeto net8.0 se o targeting pack 8.0 continuar instalado, então esse pack e o runtime 8.0 ficam na máquina."
+      - "O attsip fixa PlatformToolset v143 e Windows SDK 10.0.26100. O SDK 10.0.19041 pôde sair, mas esse não."
+      - "A remoção passa pelo Visual Studio Installer, em Modificar, e não por apagar a pasta na mão."
+    impact_value: "A limpeza passou a ter uma lista do que sai e do que fica, sem quebrar o build do cliente, do servidor e da URA."
+    related_projects: ["lorentz-client", "lorentz-cti", "ura"]
+
+  - id: "DEV-2026-096"
+    date: "2026-10-23"
+    title: "O comando ares que fala com a TV autentica só no terminal do usuário"
+    category: "devops"
+    tags: [webos, lg, ares, terminal, sandbox]
+    slug: "comando-ares-da-tv-autentica-so-no-terminal-do-usuario"
+    summary: "O mesmo comando de instalação na TV falhava no shell do agente e funcionava na aba do usuário. A autenticação depende de uma passphrase que o shell isolado não enxerga, então o fluxo foi dividido em duas etapas."
+    problem_statement: >
+      ares-install e ares-launch falhavam com 'All configured authentication methods failed' quando rodados pelo shell do agente.
+      O dispositivo estava configurado, e o mesmo comando funcionava no terminal do usuário.
+    key_learnings:
+      - "A passphrase gravada com ares-setup-device --modify não fica visível para o PowerShell isolado do agente."
+      - "O empacotamento não fala com a TV, então npm run build roda em qualquer um dos shells."
+      - "Instalação e abertura ficam no terminal do usuário: node scripts/deploy.js ou npm run launch."
+      - "A mensagem de falha fala em autenticação, mas chave e dispositivo estavam certos. A diferença estava em qual shell executava o comando."
+    code_snippet: |
+      # Shell do agente: só empacota
+      npm run build
+      # Terminal do usuário: fala com a TV
+      node scripts/deploy.js
+    impact_value: "O deploy na TV deixou de falhar por causa do shell, com cada etapa no lugar em que funciona."
+    related_projects: ["querencia"]
+
+  - id: "DEV-2026-097"
+    date: "2026-10-24"
+    title: "Valor fixo no template faz o render apagar o que a produção tinha ligado"
+    category: "devops"
+    tags: [docker, bash, python, configuracao, deploy]
+    slug: "valor-fixo-no-template-apaga-ajuste-da-producao"
+    summary: "O render-config regenerava os INI com opções fixas em zero, apagando o que tinha sido ligado no servidor. As opções viraram chaves de ambiente, e a revisão achou outros defeitos na mesma família de scripts."
+    problem_statement: >
+      MonitorarChamadasPabx e GravarInternas estavam com 0 no template, então cada render desligava o que a VPS ou o MonitorOPS tinha gravado.
+      O deploy parecia certo e a opção sumia sem aviso.
+    key_learnings:
+      - "O mecanismo mudou para LORENTZ_CTI_MONITORAR_CHAMADAS_PABX e LORENTZ_CTI_GRAVAR_INTERNAS, mas sem a chave o render ainda grava 0. Inclua a chave no .env antes do próximo render."
+      - "sed com senha contendo &, | ou aspas corrompia a linha ou derrubava o script. A troca virou str.replace em Python."
+      - "source do .env inteiro executava uma nota colada no arquivo. O filtro KEY=VAL, que o Caddy já tinha, foi para os quatro scripts bash, com remoção do CR do Windows."
+      - "Aspas em volta do valor no .env iam parar no INI, porque o bash as tirava e o leitor Python não. Dois leitores do mesmo arquivo precisam ter a mesma regra."
+      - "Placeholder que o script não substituía chegava ao .env do PBX como valor literal. Vale conferir o arquivo gerado, não só o exit code."
+    code_snippet: |
+      # Lê só linhas KEY=VAL, sem executar o resto do arquivo
+      grep -E '^[A-Za-z_][A-Za-z0-9_]*=' .env | tr -d '\r'
+    impact_value: "O render deixou de desfazer ajustes da produção quando a chave está no .env, e senhas com caracteres especiais pararam de quebrar o script."
+    related_projects: ["lorentz-vps-stack"]
+
+  - id: "DEV-2026-098"
+    date: "2026-10-30"
+    title: "A chave SSH no agente do Windows não funciona pelo ssh do Git Bash"
+    category: "windows"
+    tags: [ssh, windows, git-bash, wsl, crlf]
+    slug: "chave-no-agente-do-windows-nao-serve-ao-git-bash"
+    summary: "Na mesma máquina há três ambientes de shell, e cada um enxerga coisas diferentes. A conexão só funciona pelo OpenSSH do Windows, e o bash chamado do PowerShell não é o Git Bash."
+    problem_statement: >
+      A chave com passphrase está carregada no ssh-agent do Windows, mas o ssh do Git Bash não consegue usá-la.
+      No PowerShell, chamar bash abria o WSL, e o git de lá apontava alterações em arquivos que ninguém tinha mudado.
+    key_learnings:
+      - "O ssh do MSYS não usa o agente do Windows. Dentro do Git Bash, chame /c/Windows/System32/OpenSSH/ssh.exe pelo caminho completo."
+      - "No PowerShell, bash resolve para System32/bash.exe, ou seja, para o WSL. Confira qual executável está sendo chamado antes de culpar o script."
+      - "O git do WSL vê o CRLF do checkout do Windows como alteração. Os arquivos estão iguais, e o que difere é a ferramenta."
+      - "Um script de deploy em PowerShell fixa o caminho certo, e ninguém precisa lembrar disso a cada conexão."
+    code_snippet: |
+      # Dentro do Git Bash, usando a chave do agente do Windows
+      /c/Windows/System32/OpenSSH/ssh.exe minha-vps
+    impact_value: "A conexão e o deploy passaram a seguir um caminho conhecido, sem falso alarme de arquivo alterado."
+    related_projects: ["iplive"]
+
+  - id: "DEV-2026-099"
+    date: "2026-10-30"
+    title: "Em VPS compartilhada, todo comando fica restrito ao projeto"
+    category: "infraestrutura"
+    tags: [docker, compose, nginx, fail2ban, vps]
+    slug: "em-vps-compartilhada-todo-comando-fica-no-projeto"
+    summary: "O serviço novo entrou numa VPS de produção que já roda dezenas de outros containers. Qualquer comando global de limpeza derrubaria os vizinhos, então toda operação ficou limitada ao projeto."
+    problem_statement: >
+      O deploy do iplive divide a máquina com outros produtos em produção.
+      O serviço também precisa de backup, proteção contra força bruta e um jeito público de checar a saúde, sem atingir o que já estava lá.
+    key_learnings:
+      - "Nada de down nem prune globais. Use um nome de projeto no Compose e só comandos com esse escopo."
+      - "O Nginx é compartilhado: rode nginx -t antes de cada reload. Um erro em um site impede o reload de todos."
+      - "O serviço escuta só em 127.0.0.1, e o Nginx faz a publicação."
+      - "A jail do fail2ban para Asterisk usa a chain DOCKER-USER, porque tráfego de porta publicada passa pelo FORWARD. O protocol=all faz o bloqueio valer além do TCP."
+      - "Backup diário por cron e um /healthz público fecham o mínimo de operação sem depender dos vizinhos."
+    code_snippet: |
+      docker compose -p iplive up -d
+      nginx -t && systemctl reload nginx
+    impact_value: "O serviço entrou em produção com backup, proteção e checagem de saúde, sem comandos que alcançassem os outros containers."
+    related_projects: ["iplive"]
+
+  - id: "DEV-2026-100"
+    date: "2026-11-02"
+    title: "Rijndael-256 do mcrypt não é AES-256, e o porte para PHP 8 deixou de abrir as senhas"
+    category: "seguranca"
+    tags: [php, mcrypt, phpseclib, criptografia, dotnet, compatibilidade]
+    slug: "rijndael-256-do-mcrypt-nao-e-aes-256"
+    summary: "O porte para PHP 8 trocou a cifra do mcrypt por AES-256-CBC, supondo que fossem equivalentes, e as senhas gravadas deixaram de abrir. O novo critério é gerar o mesmo texto, byte a byte, em todos os runtimes em uso."
+    problem_statement: >
+      Sem o mcrypt no PHP 8, a migração adotou AES-256-CBC, e o login com as senhas existentes parou de funcionar.
+      O inventário das bases mostrou que quase todas as senhas estavam no formato antigo e nenhuma no novo.
+    key_learnings:
+      - "O 256 de MCRYPT_RIJNDAEL_256 é o tamanho do bloco. O AES tem sempre bloco de 128 bits, e o 256 de AES-256 é o tamanho da chave. São algoritmos diferentes."
+      - "O OpenSSL do PHP não oferece bloco de 256 bits. phpseclib 2.x é código puro e roda do PHP 5.6 ao 8.x. No .NET moderno, o caminho é BouncyCastle."
+      - "Quando o outro lado compara o texto cifrado, 'decifra igual' não basta. O critério é o mesmo Base64 byte a byte em PHP 5.6, PHP 8, .NET 4.8 e .NET 9."
+      - "O mcrypt real continua sendo a referência: uma imagem Docker de PHP 5.6 gera os vetores que os novos implementadores precisam reproduzir."
+      - "A conferência das bases roda em memória e só devolve contagens. Senha de cliente não vai para arquivo, nem durante um diagnóstico."
+    code_snippet: |
+      // Bloco de 256 bits, ausente no OpenSSL do PHP
+      $c = new \phpseclib\Crypt\Rijndael(\phpseclib\Crypt\Rijndael::MODE_CBC);
+      $c->setBlockLength(256);
+    impact_value: "A correção do login ganhou um critério verificável, e o legado em produção fica protegido de outra troca de formato."
+    related_projects: ["omnichannel"]
+
+  - id: "DEV-2026-101"
+    date: "2026-11-03"
+    title: "Em servidor de telefonia com 128 GB, o limite de clientes é a CPU"
+    category: "infraestrutura"
+    tags: [capacidade, asterisk, proxmox, sqlserver, sipp]
+    slug: "em-servidor-de-telefonia-o-limite-e-a-cpu"
+    summary: "A máquina inicial para atender vários call centers tem muita memória e poucos núcleos. A estimativa aponta CPU e disco como limite, e nenhum número deve ser vendido antes de um teste de carga."
+    problem_statement: >
+      Operar como provedor significa colocar vários call centers na mesma máquina: 128 GB de RAM, 8 núcleos físicos e discos SAS.
+      Um erro de dimensionamento corta o áudio de todos os clientes, não só do último a entrar.
+    key_learnings:
+      - "A estimativa é de 2 a 3 clientes com VM e PBX próprios, ou 3 a 4 com PBX compartilhado por faixa de ramal, e cerca de 40 a 60 chamadas simultâneas gravadas. Vem de premissas documentadas, sem medição."
+      - "Largura de banda não é o gargalo: 40 chamadas em G.711 ficam na ordem de 10 Mbit/s. O que pesa é a CPU do Asterisk e o disco das gravações."
+      - "VM de telefonia não deve ter vCPU em oversubscription: use relação de 1 para 1 com o núcleo físico."
+      - "SSD em RAID 1 fica para sistema, VMs e SQL, e o SAS só para gravação e backup."
+      - "SQL Server Developer não pode ir para produção: o licenciamento pede Express ou SPLA, e isso entra no custo por cliente."
+      - "Antes de vender além da estimativa, faça teste de carga com SIPp e some os picos de todos os clientes."
+    impact_value: "Cada cliente novo nessa máquina passa a ser avaliado pela soma dos picos de chamadas, não pela RAM livre."
+    related_projects: ["lorentz-vps-stack"]
+
+  - id: "DEV-2026-102"
+    date: "2026-11-03"
+    title: "O painel mostra a fila da unidade, e o guichê só chama os serviços do próprio grupo"
+    category: "frontend"
+    tags: [laravel, atp, filas, ux, mensagens]
+    slug: "painel-mostra-a-fila-e-o-guiche-so-chama-seu-grupo"
+    summary: "O botão de chamar parecia quebrado enquanto o painel e o monitor mostravam senhas esperando. O código estava certo, e faltava a tela explicar a diferença entre as duas filas."
+    problem_statement: >
+      O atendente clicava em chamar e nada acontecia, com senhas visíveis no painel.
+      As senhas eram de um serviço que o grupo dele não atende, e ninguém logado atendia aquele serviço.
+    key_learnings:
+      - "Duas telas podem mostrar recortes diferentes da mesma fila. Se quem olha não vê a diferença, o comportamento correto parece defeito."
+      - "A mensagem de fila vazia agora diz quais serviços têm gente esperando e quantas senhas: 'Aguardando em serviços que você não atende: Financeiro (2).'"
+      - "O monitor ganhou a coluna Atendentes (guichê aberto, fora de pausa, com o serviço no grupo) e o aviso 'sem atendente' quando há senha esperando e ninguém disponível."
+      - "Diagnosticar antes de corrigir evitou mudar o distribuidor, que estava certo."
+    code_snippet: |
+      // A fila da unidade pode ter senhas de serviços que o grupo não atende
+      $meus = array_keys(app(Distribuidor::class)->servicosDo($u));
+      $fora = Senha::with('servico')->where('unidade_id', $u->unidade_id)
+          ->where('status', Senha::AGUARDANDO)
+          ->whereDate('data', now()->toDateString())
+          ->whereNotIn('servico_id', $meus)->get()
+          ->groupBy(fn ($s) => $s->servico->nome)->map->count();
+    impact_value: "A supervisão vê a falta de atendente no monitor, e o atendente sabe por que não veio nenhuma senha."
+    related_projects: ["lorentz-atp"]
+
+  - id: "DEV-2026-103"
+    date: "2026-11-03"
+    title: "Quando o formulário de contato só recebe spam, a saída pode ser retirá-lo"
+    category: "arquitetura"
+    tags: [formularios, spam, jekyll, suporte]
+    slug: "formulario-que-so-recebe-spam-pode-ser-retirado"
+    summary: "Praticamente todas as mensagens que chegavam pelo site eram spam de robôs. Em vez de mais uma camada de filtro, o site trocou o formulário por caminhos que já qualificam o contato."
+    problem_statement: >
+      Os formulários do site enchiam a caixa de entrada de mensagens automáticas, e o contato real quase não aparecia.
+      Manter o formulário exigiria filtrar para sempre um canal que trazia pouco.
+    key_learnings:
+      - "Antes de reforçar a proteção, olhe o que o canal entrega. Se quase nada presta, o problema é o canal, e não o filtro."
+      - "/contact/ e o layout do showcase passaram a levar ao simulador do Studio e a /suporte/, caminhos em que a pessoa já diz o que quer."
+      - "A retirada precisa ir até o fim: o último formulário ativo só saiu no dia seguinte, junto com o contato.php, e os endpoints nos serviços externos ainda precisam ser desativados."
+    impact_value: "O site parou de oferecer um canal que só trazia spam, e o contato passou pelo simulador e pelo suporte."
+    related_projects: ["artesdosul"]
+
+  - id: "DEV-2026-104"
+    date: "2026-11-04"
+    title: "Contraste vira teste que lê o CSS, e um tema novo não passa abaixo de 4,5:1"
+    category: "frontend"
+    tags: [acessibilidade, wcag, contraste, tokens, phpunit]
+    slug: "contraste-vira-teste-que-le-o-css"
+    summary: "As telas da equipe pareciam legíveis, e a medição encontrou pares de texto bem abaixo do mínimo em todos os temas. O contraste passou a ser verificado na suíte de testes, tema a tema."
+    problem_statement: >
+      Etiquetas do tema claro estavam entre 2,66:1 e 3,83:1, e o texto branco sobre botão verde ou azul nos temas escuros ficava entre 1,6:1 e 4,06:1.
+      No omnichannel-system, a mesma medição encontrou 14 pares abaixo do mínimo.
+    key_learnings:
+      - "O teste lê os tokens direto do CSS, então um tema novo entra na medição sem ajuste no teste, e a falha informa o par e a razão medida."
+      - "Texto branco fixo sobre cor de acento quebra nos temas escuros. Os tokens --sobre-acento, --sobre-ok e --sobre-erro dão a cada tema o próprio texto sobre botão."
+      - "O texto fraco era o pior caso: --tenue estava em 2,56:1. Listas vazias, rodapé e títulos de grupo passaram para --suave, porque essas partes também precisam ser lidas."
+      - "No sistema Vue, os temas vêm de um mapeamento de paletas. A correção ficou em CONTRAST_OVERRIDES, e npm run check:contraste mede 18 pares nos 3 temas."
+    code_snippet: |
+      foreach (self::PARES as [$frente, $fundo]) {
+          $razao = self::razao($t[$frente], $t[$fundo]);
+          $this->assertGreaterThanOrEqual(4.5, $razao, "--{$frente} sobre --{$fundo}: ".round($razao, 2).':1');
+      }
+    impact_value: "O mínimo de 4,5:1 passou a ser conferido por teste, e uma cor nova abaixo dele não passa despercebida."
+    related_projects: ["lorentz-atp", "lorentz-cidadao", "omnichannel-system"]
+
+  - id: "DEV-2026-105"
+    date: "2026-11-04"
+    title: "O menu usa a mesma policy da tela, e nenhum perfil vê um link que dá 403"
+    category: "arquitetura"
+    tags: [laravel, policy, inertia, vue, permissoes, ux]
+    slug: "menu-usa-a-mesma-policy-da-tela"
+    summary: "O operador via no menu telas que devolviam 403, porque o menu tinha uma regra e a tela outra. Com as duas usando a mesma policy, um teste percorre o menu de cada perfil e garante que elas continuem iguais."
+    problem_statement: >
+      Em um sistema de 148 telas, abrir cada módulo com cada perfil mostrou o operador vendo Usuários, Empresas e Licenças no menu, todas com 403.
+      A diretoria também pediu ambiente com menu lateral ou com blocos e cards, ajustável por perfil.
+    key_learnings:
+      - "Meça antes de mexer: abrir tudo com cada perfil revelou o problema real, que uma revisão visual do menu não mostraria."
+      - "ModuleAccess pergunta ao Gate usando viewAny, a mesma permissão da tela. Assim, o menu acompanha qualquer mudança de permissão sem manutenção à parte."
+      - "A limpeza roda ao gravar e ao ler o layout. Gravar barra requisição forjada, e ler tira da tela salva o que perdeu permissão ou licença depois."
+      - "Num sistema grande, trocar o shell primeiro melhora todas as telas de uma vez. O interior de cada uma fica para a etapa seguinte, e a nota do guia deixa isso à vista: 4,5 para 8,5 de 15."
+      - "Esconder um item do menu não retira a permissão, e a tela de configuração avisa isso. Sem o aviso, o administrador pensa que bloqueou o acesso."
+    code_snippet: |
+      public function roleAllows(User $user, string $moduleName): bool
+      {
+          $model = config("ui_shell.module_policies.{$moduleName}");
+
+          return $model === null || Gate::forUser($user)->allows('viewAny', $model);
+      }
+    impact_value: "Em 20 testes dedicados, nenhum item do menu leva a tela recusada, e um perfil de uma empresa não afeta outra."
+    related_projects: ["omnichannel-system"]
+
+  - id: "DEV-2026-106"
+    date: "2026-11-04"
+    title: "A suíte falhava antes do primeiro teste, porque o MySQL local usa MyISAM por padrão"
+    category: "devops"
+    tags: [mysql, myisam, innodb, laravel, phpunit]
+    slug: "suite-falhava-antes-do-primeiro-teste-por-myisam"
+    summary: "Das 196 execuções, 192 falhavam com 'key too long', e por isso a suíte não dizia nada sobre o código. Com o motor declarado, ela voltou a rodar e mostrou 64 falhas que já existiam."
+    problem_statement: >
+      O servidor MySQL local tem MyISAM como padrão, e o limite de chave desse motor derrubava as migrations antes de qualquer teste.
+      Ao mudar para InnoDB, apareceu o erro 1824, porque migrations antigas referenciam tabelas criadas depois delas.
+    key_learnings:
+      - "Declare o motor em config/database.php, com env('DB_ENGINE', 'InnoDB'). Transação de teste e chave estrangeira dependem dele, então o padrão do servidor não pode decidir."
+      - "MyISAM aceita a declaração de chave estrangeira e não a aplica. A base de dev antiga continua sem essa proteção até ser recriada."
+      - "Os eventos MigrationsStarted e MigrationsEnded desligam a checagem de chave estrangeira durante as migrations. É uma solução provisória, e o certo é corrigir a ordem."
+      - "Antes de atribuir uma falha à entrega, compare com a base: rodar o main numa worktree temporária deu as mesmas 64 falhas, teste a teste, nenhuma nova."
+      - "Suíte que nunca roda dá falsa segurança: as 64 falhas estavam ali, escondidas pelo erro de configuração."
+    code_snippet: |
+      Event::listen(MigrationsStarted::class, fn () => Schema::disableForeignKeyConstraints());
+      Event::listen(MigrationsEnded::class, fn () => Schema::enableForeignKeyConstraints());
+    impact_value: "A suíte voltou a rodar em cerca de 1 minuto, com 152 de 216 testes passando e uma lista real do que corrigir."
+    related_projects: ["omnichannel-system"]
+
+  - id: "DEV-2026-107"
+    date: "2026-11-04"
+    title: "A trilha de auditoria não gravava porque o Eloquent preenchia uma coluna que a tabela não tem"
+    category: "backend"
+    tags: [laravel, eloquent, auditoria, testes]
+    slug: "trilha-de-auditoria-nao-gravava-por-updated-at"
+    summary: "O model AuditLog existia, mas gravar por ele falhava, porque o Eloquent tentava preencher updated_at. Só o primeiro teste que dependia de um registro de auditoria expôs o defeito."
+    problem_statement: >
+      A tabela audit_logs só tem created_at, e faz sentido, porque a trilha não muda depois de gravada.
+      O model mantinha o comportamento padrão do Eloquent e preenchia updated_at em todo insert.
+    key_learnings:
+      - "UPDATED_AT = null no model desliga só essa coluna e mantém o created_at."
+      - "A existência do model não prova que o recurso funciona. A prova é um teste que grava e lê o registro."
+      - "Esse defeito só apareceu quando a tela de perfis passou a gravar na trilha. Hoje ela é a única a usar AuditLog::create, então os outros eventos sensíveis ainda não têm registro por esse caminho."
+    code_snippet: |
+      class AuditLog extends Model
+      {
+          // A trilha não muda depois de gravada: a tabela só tem created_at
+          public const UPDATED_AT = null;
+      }
+    impact_value: "A configuração de perfis passou a ficar registrada na trilha, e ficou claro o quanto ainda falta cobrir."
+    related_projects: ["omnichannel-system"]
+
+  - id: "DEV-2026-108"
+    date: "2026-11-04"
+    title: "O laço de reparo removeu as tabelas que tinha acabado de criar, e a tela só quebrou depois"
+    category: "devops"
+    tags: [mysql, laravel, migrations, incidente, verificacao]
+    slug: "laco-de-reparo-removeu-tabelas-que-acabou-de-criar"
+    summary: "Ao reparar a base de dev, um laço repetiu o passo de remover tabelas vazias antes de cada migration e apagou quatro tabelas recém-criadas. Sem nenhum dado perdido, o erro só apareceu quando o usuário abriu uma tela que dependia delas."
+    problem_statement: >
+      /pause-reasons passou a responder 500 com 'Table support_tickets doesn't exist', embora a migration constasse como executada.
+      A remoção de tabelas vazias foi repetida a cada passada do laço, e a segunda passada levou as tabelas que a primeira tinha criado.
+    key_learnings:
+      - "Passo destrutivo fica fora do laço e roda uma vez, sobre uma lista conferida. 'Só apaga se estiver vazia' não protege uma tabela recém-criada, porque ela ainda está vazia."
+      - "A tabela de migrations registra o que rodou, não o que existe. Ao remover uma tabela à mão, apague também o registro, ou a migration nunca mais será executada."
+      - "A restauração precisa incluir as migrations seguintes: a coluna requester_phone, de outra migration, tinha sumido junto com a tabela."
+      - "A verificação anterior só abriu as telas principais dos fluxos, e nenhuma delas usava essas tabelas. Depois de reparar a base, abra todas as telas do menu de cada perfil."
+      - "A auditoria agora confere se cada model tem tabela, e a varredura abriu 37, 34, 10 e 8 telas nos quatro perfis, todas com 200. Ela confere só o status, não as ações internas."
+    code_snippet: |
+      // Todo model tem tabela?
+      $t = (new $c)->getTable();
+      if (! Schema::hasTable($t)) {
+          $faltam[] = "$c ($t)";
+      }
+    impact_value: "O reparo de base passou a terminar com a conferência de todos os models e de todas as telas por perfil, não só dos fluxos em andamento."
+    related_projects: ["omnichannel-system"]
+
+  - id: "DEV-2026-109"
+    date: "2026-11-04"
+    title: "Nome de arquivo com travessão derruba o Jekyll na Vercel, e o Windows não mostra o erro"
+    category: "devops"
+    tags: [jekyll, vercel, utf-8, locale, ruby]
+    slug: "nome-de-arquivo-nao-ascii-derruba-jekyll-na-vercel"
+    summary: "O build passava no Windows e falhava na Vercel, por causa de um arquivo estático com caractere fora do ASCII no nome. Uma variável de ambiente resolveu sem mudar nenhuma URL pública."
+    problem_statement: >
+      O jekyll build na Vercel parou com a mensagem "\xE2" from ASCII-8BIT to UTF-8 em um arquivo estático com travessão no nome.
+      O mesmo build funcionava na máquina Windows, e renomear o arquivo mudaria uma URL já publicada.
+    key_learnings:
+      - "O byte xE2 é o início do travessão em UTF-8, e ASCII-8BIT mostra que o Ruby leu o nome do arquivo sem encoding definido."
+      - "LC_ALL=C.UTF-8 no projeto da Vercel dá o locale que o ambiente de build não define."
+      - "Ajustar o ambiente preserva as URLs públicas. Renomear o arquivo resolveria o erro, mas quebraria quem já tem o link."
+    code_snippet: |
+      # Variável de ambiente do projeto na Vercel
+      LC_ALL=C.UTF-8
+    impact_value: "O build voltou a passar na Vercel sem mudar nenhum endereço publicado."
+    related_projects: ["artesdosul"]
+
+  - id: "DEV-2026-110"
+    date: "2026-11-04"
+    title: "Com jekyll-optional-front-matter, nota solta no repositório pode virar página pública"
+    category: "devops"
+    tags: [jekyll, privacidade, markdown, notas]
+    slug: "optional-front-matter-publica-nota-solta"
+    summary: "O plugin faz o Jekyll tratar arquivo Markdown sem front matter como página. Por isso, as notas pessoais ficaram numa pasta fora do repositório do site."
+    problem_statement: >
+      Era preciso decidir onde guardar as notas de trabalho, e o repositório do site era um lugar possível.
+      No site, com jekyll-optional-front-matter ativo, um .md solto pode sair publicado como página, ainda que não tenha cabeçalho.
+    key_learnings:
+      - "Não ter front matter não torna um arquivo privado: com o plugin, o .md vira página renderizada. Só o que está no exclude ou fora da pasta fica de fora do build."
+      - "A pasta de notas foi para fora do repositório. Depender de uma lista exclude é arriscado, porque um novo arquivo fora da lista já seria publicado."
+      - "Antes de guardar texto privado em um repositório de site, confira os plugins ativos no _config.yml."
+    impact_value: "As notas ficam fora do alcance do build do site, sem depender de uma lista de exclusão."
+    related_projects: ["artesdosul", "segundo-cerebro"]

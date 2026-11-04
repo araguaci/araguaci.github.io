@@ -3,7 +3,8 @@ layout: post
 title: "O cliente Docker da distro fala uma API que o daemon já não usa"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-045"
 description: "O painel não listava containers porque o pacote docker.io negociava a API 1.41 com um daemon 1.52. No mesmo host, as portas 80 e 443 já pertenciam ao PBX."
-date: 2026-07-10 00:00:00+00:00
+date: 2026-07-10 00:00:00-03:00
+redirect_from: /2026-07-09-docker-cli-api-antiga-e-portas-ocupadas-pelo-pbx/
 categories: devlog
 category: devops
 tags: [docker, api, portas, pwa, php]

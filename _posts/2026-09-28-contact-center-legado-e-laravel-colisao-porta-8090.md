@@ -3,7 +3,8 @@ layout: post
 title: "Dois contact centers no mesmo host: a porta 8090 já era do CTI"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-033"
 description: "O Supervisor PHP com SQL Server segue em produção enquanto o Omnichannel Laravel sobe ao lado, com MySQL próprio e uma porta que não disputa a API do LorentzCTI."
-date: 2026-09-28 00:00:00+00:00
+date: 2026-09-28 00:00:00-03:00
+redirect_from: /2026-09-27-contact-center-legado-e-laravel-colisao-porta-8090/
 categories: devlog
 category: arquitetura
 tags: [docker, laravel, sql-server, mysql, portas, omnichannel]

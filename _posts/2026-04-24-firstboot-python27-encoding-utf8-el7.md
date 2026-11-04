@@ -3,7 +3,8 @@ layout: post
 title: "Firstboot em Python 2.7: acento sem cabeçalho de encoding derruba o EL7"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-048"
 description: "O CentOS 7 do Issabel ainda roda Python 2.7 no primeiro boot. Um snippet com caractere fora de ASCII, sem declaring encoding, interrompe a provisão antes do PBX subir."
-date: 2026-04-24 00:00:00+00:00
+date: 2026-04-24 00:00:00-03:00
+redirect_from: /2026-04-23-firstboot-python27-encoding-utf8-el7/
 categories: devlog
 category: devops
 tags: [python, issabel, centos, utf-8, docker]

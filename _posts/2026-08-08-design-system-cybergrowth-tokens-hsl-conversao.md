@@ -3,7 +3,8 @@ layout: post
 title: "Arquitetura de Design System Cyber-Growth: Tokens HSL e Alta Conversão"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-010"
 description: "Princípios para construção de interfaces web que unem estética cinematográfica futurista a tempos de carregamento instantâneos e altas taxas de conversão."
-date: 2026-08-08 00:00:00+00:00
+date: 2026-08-08 00:00:00-03:00
+redirect_from: /2026-08-07-design-system-cybergrowth-tokens-hsl-conversao/
 categories: devlog
 category: frontend
 tags: [design-system, cybergrowth, css-tokens, glassmorphism, microanimacoes]

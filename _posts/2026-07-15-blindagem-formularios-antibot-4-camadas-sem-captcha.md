@@ -3,7 +3,8 @@ layout: post
 title: "Blindagem de Formulários Anti-Bot em 4 Camadas sem Fricção de Captchas"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-013"
 description: "Arquitetura de proteção sentinela contra robôs e spammers automatizados sem forçar usuários humanos a decifrarem quebra-cabeças irritantes."
-date: 2026-07-15 00:00:00+00:00
+date: 2026-07-15 00:00:00-03:00
+redirect_from: /2026-07-14-blindagem-formularios-antibot-4-camadas-sem-captcha/
 categories: devlog
 category: segurança
 tags: [segurança, antibot, honeypot, telemetria, webcrypto]

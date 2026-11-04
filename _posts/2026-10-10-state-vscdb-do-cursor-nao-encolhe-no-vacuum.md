@@ -3,7 +3,8 @@ layout: post
 title: "Os 17 GB do Cursor estão no state.vscdb, e o VACUUM não devolve espaço"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-075"
 description: "Os 17,3 GB que pareciam memória do Cursor são o SQLite de globalStorage, a cópia .backup e o CLI do agente. O banco vivo quase não tem página livre, então VACUUM não devolve disco."
-date: 2026-10-10 00:00:00+00:00
+date: 2026-10-10 00:00:00-03:00
+redirect_from: /2026-10-09-state-vscdb-do-cursor-nao-encolhe-no-vacuum/
 categories: devlog
 category: windows
 tags: [cursor, sqlite, appdata, vacuum]

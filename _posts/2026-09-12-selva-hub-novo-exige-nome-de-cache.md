@@ -3,7 +3,8 @@ layout: post
 title: "Hub novo no Ecossistema Selva só aparece quando o nome do cache muda"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-060"
 description: "O service worker entrega a lista de hubs do cache antes da rede. Incluir um hub no JSON não chega ao visitante enquanto CACHE_NAME for o mesmo."
-date: 2026-09-12 00:00:00+00:00
+date: 2026-09-12 00:00:00-03:00
+redirect_from: /2026-09-11-selva-hub-novo-exige-nome-de-cache/
 categories: devlog
 category: frontend
 tags: [service-worker, pwa, cache]

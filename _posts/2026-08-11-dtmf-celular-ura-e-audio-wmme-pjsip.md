@@ -3,7 +3,8 @@ layout: post
 title: "DTMF de celular na URA e o dispositivo de áudio que o PJSIP não abria"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-036"
 description: "Dígito de celular some quando a URA espera tom na faixa de voz e o tronco entrega RFC 2833. No laboratório, o softphone falha se o PJSIP foi compilado sem o host de áudio do Windows."
-date: 2026-08-11 00:00:00+00:00
+date: 2026-08-11 00:00:00-03:00
+redirect_from: /2026-08-10-dtmf-celular-ura-e-audio-wmme-pjsip/
 categories: devlog
 category: telefonia
 tags: [dtmf, ura, pjsip, asterisk, panasonic]

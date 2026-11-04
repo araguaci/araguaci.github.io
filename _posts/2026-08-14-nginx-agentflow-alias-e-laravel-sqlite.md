@@ -3,7 +3,8 @@ layout: post
 title: "O Nginx do AgentFlow procura um alias que o nome do container não é"
 subtitle: "Diário de Desenvolvimento 2026 • Registro #DEV-2026-053"
 description: "O PHP-FPM escuta no alias agentflow_api, não no container_name. Sem DB_CONNECTION no ambiente, o Laravel 11 sobe em sqlite."
-date: 2026-08-14 00:00:00+00:00
+date: 2026-08-14 00:00:00-03:00
+redirect_from: /2026-08-13-nginx-agentflow-alias-e-laravel-sqlite/
 categories: devlog
 category: devops
 tags: [nginx, docker, laravel, agentflow]
