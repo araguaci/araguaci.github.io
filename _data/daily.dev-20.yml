@@ -1,0 +1,212 @@
+# Volume novo do Diário de Desenvolvimento.
+# Fatos de 2026-11-04: medição dos projetos Laravel e migração de um sistema legado. Anonimizado.
+
+metadata:
+  year: 2026
+  author: "Araguaci Carlos de Andrade"
+  ecosystem: "Artes do Sul & Araguaci Dev Hub"
+  volume: 20
+  total_entries: 8
+  generated_at: "2026-11-04"
+  status: "pronto"
+  source_note: "Medição de composer.json, código, git e suítes de teste dos projetos Laravel, e commits da migração de um sistema VB6 com Access, em 2026-11-04. Anonimizado: sem cliente, servidor ou credencial."
+
+entries:
+  - id: "DEV-2026-124"
+    date: "2026-11-04"
+    title: "Blade com pouco JS deu mais teste por linha nos meus projetos Laravel, e Inertia com Vue só se paga em tela rica"
+    category: "arquitetura"
+    tags: [laravel, blade, inertia, livewire, filament, arquitetura]
+    slug: "qual-camada-laravel-usar-medicao-dos-projetos"
+    summary: "Havia projetos em Blade, Inertia com Vue, Livewire, Filament e API, sem critério registrado para escolher entre eles. A medição do código passou a definir Blade como padrão e as outras camadas como exceção com motivo."
+    problem_statement: >
+      A pergunta era qual camada usar no próximo projeto, e a resposta vinha de impressão. Medi composer.json,
+      linhas de código, migrations, histórico do git e casos de teste. Primeiro precisei retirar da conta os repositórios
+      clonados: os que tinham mais commits tinham zero commits meus. Os projetos resolvem problemas diferentes,
+      então a comparação orienta a escolha, mas não é um experimento controlado.
+    key_learnings:
+      - "Blade com Bootstrap ou Alpine: serve para sistema de gestão, celular, impressão e PWA offline. Um único código, e o teste HTTP enxerga a tela inteira. Foi o que juntou mais teste por linha."
+      - "Inertia com Vue: serve para painel rico e muito interativo. Foi o maior projeto medido, com 211 componentes além do PHP, e o teste em PHP não alcança o que acontece nesses componentes."
+      - "Livewire: tela interativa sem escrever JS, com o custo de depender do servidor a cada interação. Só um projeto usa de verdade, com 16 componentes."
+      - "API com Sanctum: serve quando há mais de um consumidor, como app ou integração. Os meus são os menores e têm poucos testes, então a evidência é fraca."
+      - "Filament: o painel saiu sem nenhuma view própria, mas o projeto medido não tem testes. Mostra velocidade, não confiabilidade."
+      - "Contar commits engana: um projeto recebeu 17 commits em um dia porque partiu de uma base importada, e outro tem o histórico dividido com o repositório inteiro. Linhas, testes e dias ativos dizem mais."
+    code_snippet: |
+      Projeto                 Camada         Linhas app  Testes  Por mil linhas
+      monitor-laravel         Blade                8802     212              24
+      05-orcamento            Blade+Alpine        10568     159              15
+      lorentz-atp             Blade                5047      73              14
+      lorentz-cidadao         Blade                3312      34              10
+      omnichannel-system      Inertia+Vue         28863     249               9
+
+      Os três primeiros foram executados. Os dois últimos foram contados no código.
+    impact_value: "O próximo sistema de gestão começa em Blade, e usar outra camada passou a exigir um motivo escrito."
+    related_projects: ["monitor-laravel", "05-orcamento", "lorentz-atp", "lorentz-cidadao", "omnichannel-system"]
+
+  - id: "DEV-2026-125"
+    date: "2026-11-04"
+    title: "MySQL, PostgreSQL ou SQLite: nos meus projetos quase nada dependia do banco, e o teste no banco errado é o risco real"
+    category: "arquitetura"
+    tags: [mysql, postgres, sqlite, postgis, laravel, testes]
+    slug: "qual-banco-usar-mysql-postgres-sqlite-medicao"
+    summary: "A escolha do banco parecia uma decisão de desempenho, sem nenhuma medição por trás. A busca no código mostrou quase nenhum recurso exclusivo, então passou a valer o padrão MySQL com InnoDB, PostgreSQL só com motivo e SQLite fora da produção."
+    problem_statement: >
+      Os projetos usam MySQL, PostgreSQL e SQLite. Busquei recursos exclusivos de cada banco e encontrei quase nada:
+      dialeto de MySQL entre zero e duas ocorrências por projeto, nenhuma busca textual do PostgreSQL e nenhum vetor.
+      A exceção é um sistema com PostGIS e JSONB. Vários projetos usam MySQL no ambiente e SQLite em memória nos testes.
+    key_learnings:
+      - "MySQL 8 com InnoDB: bom padrão para sistema transacional multiempresa em banco compartilhado. Importou 147 mil pagamentos em 39 segundos dentro de uma transação. A armadilha é o padrão MyISAM de ambientes locais, que ignora o rollback sem avisar."
+      - "PostgreSQL: vale quando o domínio pede o recurso. Consulta geográfica com PostGIS e JSONB são motivos concretos. Preferência sem recurso não é motivo."
+      - "SQLite em memória: bom para protótipo e para rodar testes sem instalar nada. O risco é aprovar em um motor o que vai rodar em outro. Quando o esquema usa enum e DEFAULT com expressão, a suíte precisa rodar no banco de produção."
+      - "Não concluí qual é mais rápido. A mesma suíte levou 146 segundos em uma rodada e 44 na seguinte, então a carga da máquina pesou mais que o banco."
+      - "Suíte vermelha com SQLite não prova culpa do banco. As 11 falhas que investiguei vinham de um erro no layout, que transformava respostas 403 em 500."
+    code_snippet: |
+      <!-- phpunit.xml: o mesmo motor da produção, em um banco só de teste -->
+      <env name="DB_CONNECTION" value="mysql"/>
+      <env name="DB_DATABASE" value="app_test"/>
+    impact_value: "A decisão de banco passou a ter uma pergunta só: qual recurso deste domínio o padrão não atende."
+    related_projects: ["monitor-laravel", "05-orcamento", "lorentz-cidadao", "omnichannel-system"]
+
+  - id: "DEV-2026-126"
+    date: "2026-11-04"
+    title: "A decisão dizia Livewire, e o sistema ficou pronto com zero componentes, porque a ronda precisava funcionar sem sinal"
+    category: "arquitetura"
+    tags: [laravel, livewire, pwa, offline, decisoes]
+    slug: "decisao-dizia-livewire-codigo-tem-zero-componentes"
+    summary: "A arquitetura foi registrada como Laravel com Livewire, e o registro seguiu assim depois que o código tomou outro rumo. A contagem encontrou zero componentes, então o registro foi corrigido e a decisão passou a citar o requisito que a mudou."
+    problem_statement: >
+      O pacote continuava no composer.json e a nota de decisão citava Livewire. A contagem deu zero usos nas views e
+      zero classes de componente. O requisito que apareceu depois foi registrar pagamento na rua, sem sinal, com fila
+      local e reenvio. Isso foi feito com Blade, service worker e JS simples, porque cada interação do Livewire precisa do servidor.
+    key_learnings:
+      - "Pacote no composer.json não prova uso. Conte o uso real nas views e nas classes antes de citar a tecnologia em uma decisão ou comparação."
+      - "Requisito offline decide a camada de tela cedo. Se a tela precisa funcionar sem rede, a interação tem de rodar no aparelho."
+      - "A fila offline precisa de identidade: cada registro leva um UUID gerado no aparelho, e o reenvio não duplica o pagamento."
+      - "Decisão registrada também envelhece. Quando um requisito muda a arquitetura, acrescente a nova decisão com o motivo em vez de deixar a antiga valendo."
+    impact_value: "O registro de decisões voltou a descrever o sistema real, e o requisito offline virou critério de escolha da camada."
+    related_projects: ["monitor-laravel"]
+
+  - id: "DEV-2026-127"
+    date: "2026-11-04"
+    title: "A importação do legado era lenta porque o id vinha vazio, e todas as linhas atualizavam o mesmo registro"
+    category: "backend"
+    tags: [laravel, migracao, access, legado, importacao, mysql]
+    slug: "importacao-lenta-id-vazio-todas-as-linhas-no-mesmo-registro"
+    summary: "A migração de um sistema VB6 com Access parecia presa, e a primeira suspeita foram as chaves estrangeiras. A causa era a coluna de id vazia na origem, e a identidade passou a ser um hash do conteúdo com o número da ocorrência."
+    problem_statement: >
+      O upsert por id de origem tratava todas as linhas como o mesmo pagamento, porque a coluna existia e estava vazia.
+      O processo ficava lento e o total não fechava. Desligar as chaves estrangeiras não era a solução, e elas continuaram ligadas.
+    key_learnings:
+      - "Coluna com nome de chave não é chave. Antes de usar um id de origem, conte quantos valores distintos ele tem."
+      - "Sem chave confiável, use um hash do conteúdo somado ao número da ocorrência. Duas linhas iguais continuam sendo dois pagamentos, e reimportar não duplica nada."
+      - "Compare os totais com a origem no final da importação. Foram 12 conferências contra o Access, e divergência desfaz a transação inteira."
+      - "A importação correta levou 39 segundos para 147 mil pagamentos, com as chaves estrangeiras ligadas. Desligá-las teria escondido o erro sem resolver a causa."
+    code_snippet: |
+      // A segunda linha idêntica recebe outra identidade e fica marcada para conferência.
+      $ocorrencia = $vistos[$conteudo] ?? 0;
+      $vistos[$conteudo] = $ocorrencia + 1;
+      $id = hexdec(substr(sha1($conteudo."|{$ocorrencia}"), 0, 15)) + (1 << 60);
+    impact_value: "A migração passou a poder ser ensaiada quantas vezes for preciso, com o resultado conferido contra a origem."
+    related_projects: ["monitor-laravel"]
+
+  - id: "DEV-2026-128"
+    date: "2026-11-04"
+    title: "Somar todos os pontos do GPS conta quilômetro com a moto parada, e isso não serve para pagar comissão"
+    category: "backend"
+    tags: [gps, laravel, php, geolocalizacao, testes]
+    slug: "somar-pontos-gps-conta-km-com-moto-parada"
+    summary: "O km de cada monitor ia virar base de comissão, e o cálculo somava todos os pontos recebidos. A soma passou a descartar ruído, salto e falta de sinal, com os limites escritos e testados."
+    problem_statement: >
+      A distância era a soma da fórmula de haversine entre pontos consecutivos. Parado, o GPS oscila alguns metros,
+      e cada oscilação virava distância. O cálculo também usava só os pontos que cabiam no limite do mapa.
+    key_learnings:
+      - "Meça a partir do último ponto aceito, e não do anterior. Um passo mínimo de 30 metros elimina a oscilação com a moto parada."
+      - "Ponto com precisão pior que 50 metros é descartado, e o ponto seguinte volta a medir do último bom."
+      - "Velocidade acima de 150 km/h entre dois pontos é erro de leitura. Mais de 15 minutos sem sinal também não soma, porque a linha reta não diz por onde a moto andou."
+      - "Número que vira dinheiro precisa de dia a dia para conferência. O total sozinho não permite contestar nem corrigir."
+      - "O filtro não cobre tudo: o celular pode parar de enviar com a tela bloqueada, o que tira km de quem trabalhou. Isso só se confere em ronda real, e ainda não foi testado."
+    code_snippet: |
+      if ($km * 1000 < self::MIN_STEP_M) {        // parado: só atualiza o tempo
+          $this->anchor['t'] = $timestamp;
+          return 0.0;
+      }
+      if ($km / ($seconds / 3600) > self::MAX_SPEED_KMH) {
+          return 0.0;                             // salto impossível
+      }
+    impact_value: "A rota do dia e o relatório mensal usam o mesmo cálculo, e a regra pode ser explicada a quem recebe por ele."
+    related_projects: ["monitor-laravel"]
+
+  - id: "DEV-2026-129"
+    date: "2026-11-04"
+    title: "O campo status existia e o login não olhava: quem foi desligado continuava entrando no sistema"
+    category: "seguranca"
+    tags: [laravel, autenticacao, middleware, seguranca, testes]
+    slug: "login-nao-olhava-status-desligado-continuava-entrando"
+    summary: "Ao criar logins individuais, apareceu que usuário inativo entrava normalmente. O login passou a recusá-lo, a sessão aberta é encerrada e a situação do login acompanha a do cadastro."
+    problem_statement: >
+      A tabela de usuários tinha a coluna status, mas o AuthenticatesUsers só confere e-mail e senha.
+      O teste do bloqueio também mostrou outro furo: a verificação de troca obrigatória de senha rodava antes
+      da verificação de inativo, então a pessoa desligada ainda ficava logada na tela de senha.
+    key_learnings:
+      - "Coluna de situação não faz nada sozinha. Inclua o status em credentials() no LoginController."
+      - "Recusar o login não basta: a sessão já aberta continua valendo. Um middleware próprio encerra a sessão a cada requisição."
+      - "A ordem dos middlewares é regra de segurança. O de usuário ativo vem antes de qualquer um que redirecione."
+      - "O cadastro de origem deve comandar o acesso: ao inativar ou excluir o funcionário, o login é bloqueado sem depender de alguém lembrar."
+      - "Formulário com $request->all() e user_id em $fillable permitia vincular qualquer usuário. O vínculo passou a existir só na ação própria."
+    code_snippet: |
+      protected function credentials(Request $request): array
+      {
+          return $request->only($this->username(), 'password') + ['status' => 'active'];
+      }
+
+      // bootstrap/app.php: o primeiro da fila
+      $middleware->web(append: [EnsureActiveUser::class, RequirePasswordChange::class]);
+    impact_value: "Desligar um funcionário no cadastro passou a encerrar o acesso dele na requisição seguinte."
+    related_projects: ["monitor-laravel"]
+
+  - id: "DEV-2026-130"
+    date: "2026-11-04"
+    title: "O commit falhou, o script seguiu em frente, e a tag da versão nova foi publicada no commit da versão anterior"
+    category: "devops"
+    tags: [git, powershell, release, automacao]
+    slug: "commit-falhou-script-seguiu-tag-no-commit-anterior"
+    summary: "Um único comando encadeava commit, tag e push, sem conferir o resultado de cada passo. A tag da versão foi parar no commit errado, e os passos de publicação passaram a depender do sucesso do anterior."
+    problem_statement: >
+      A mensagem foi passada com here-string para git commit -F -, e o Git tratou o texto como caminho de arquivo.
+      O commit falhou com erro de pathspec, mas o PowerShell executou as linhas seguintes. A tag nova ficou no commit
+      da versão anterior e foi enviada ao remoto. Conferi o arquivo VERSION dentro da tag e ele mostrava o número antigo.
+    key_learnings:
+      - "No PowerShell, um comando nativo que falha não interrompe o script. Confira $LASTEXITCODE depois de cada passo que vale a pena proteger."
+      - "Grave a mensagem em um arquivo e use git commit -F arquivo. Não depende das regras de aspas do shell."
+      - "Depois de publicar, confira o conteúdo da tag: git show v1.2.3:VERSION mostra o erro na hora."
+      - "Corrigir tag publicada exige push --force, e essa decisão ficou com o responsável pelo repositório. Apagar e recriar teria o mesmo efeito, então também não é atalho."
+    code_snippet: |
+      git commit -q -F $arquivoDaMensagem
+      if ($LASTEXITCODE -ne 0) { "commit falhou"; exit 1 }
+      git tag -a v1.2.3 -m "v1.2.3"
+      if ($LASTEXITCODE -ne 0) { "tag falhou"; exit 1 }
+      git show v1.2.3:VERSION
+    impact_value: "A tag só é criada depois de um commit confirmado, e a conferência do conteúdo virou parte da publicação."
+    related_projects: ["monitor-laravel"]
+
+  - id: "DEV-2026-131"
+    date: "2026-11-04"
+    title: "O teste apontou estouro de largura no celular, e o que faltava era o CSS que o file:// não carregava"
+    category: "frontend"
+    tags: [chrome, headless, css, testes, mobile]
+    slug: "estouro-de-largura-falso-css-nao-carregava-em-file"
+    summary: "Uma conferência em Chrome headless mostrou 748 pixels de conteúdo em uma tela de 375, o que parecia defeito de layout. O problema estava na conferência, e o método passou a carregar o tema de um servidor local."
+    problem_statement: >
+      Salvei o HTML das telas e abri com file://. A folha de estilo do tema usa caminho a partir da raiz e não carregou,
+      então a regra que contém a tabela não existia na conferência. A captura com largura de 390 também saiu cortada,
+      porque o Chrome headless não reduziu a janela abaixo de cerca de 500 pixels.
+    key_learnings:
+      - "Caminho iniciado em barra não resolve em file://. Acrescente base href apontando para um servidor local antes de conferir o layout."
+      - "Para simular celular no headless, use um iframe com a largura desejada dentro de uma janela maior."
+      - "Meça em vez de olhar: compare scrollWidth com clientWidth no próprio documento. Com o tema carregado, os dois deram 375."
+      - "Antes de corrigir um defeito, confira se a ferramenta reproduz as condições reais. A página parecia sem tema, e esse foi o sinal de que a medição estava errada."
+    code_snippet: |
+      <base href="http://127.0.0.1:8123/">
+      <iframe src="tela.html" style="width:390px;height:844px;border:0"></iframe>
+    impact_value: "A conferência visual passou a medir a página como o usuário recebe, e o layout correto não foi alterado por engano."
+    related_projects: ["monitor-laravel"]
