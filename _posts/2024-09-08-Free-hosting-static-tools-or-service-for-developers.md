@@ -98,6 +98,15 @@ share-img: /assets/img/develop.png
 
 [Visit](https://www.netlify.com/?utm_source=freestuffdev)
 
+## OxyPages
+
+- Static website hosting. Paste HTML or drop a file, folder, ZIP, PDF or built app and get an HTTPS link in seconds, no account needed to try.
+- Tags: hosting, hosting-static
+- Free Offer:
+  - 1 website 25 MB storage 5,000 page views per month Free subdomain with SSL Builds from GitHub No ads Personal non-commercial use
+
+[Visit](https://oxypages.com/)
+
 ## Render
 
 - Render is a unified cloud to build and run all your apps and websites with free SSL, a global CDN, private networks and auto deploys from Git.
