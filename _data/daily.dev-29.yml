@@ -1,0 +1,48 @@
+# Volume novo do Diário de Desenvolvimento.
+# Cole entradas a partir de _data/templates/diario.entrada.modelo.yml
+# Roteiro: docs/roteiro-automacao-diario-dev.md
+
+metadata:
+  year: 2026
+  author: "Araguaci Carlos de Andrade"
+  ecosystem: "Artes do Sul & Araguaci Dev Hub"
+  volume: 29
+  total_entries: 1
+  generated_at: "2026-11-17"
+  status: "pronto"
+  source_note: "Reestruturação de coleções Jekyll, filtros Liquid, temas dinâmicos e SEO local no portal Classificados Bombinhas (classibombinhas.com.br)."
+
+entries:
+  - id: "DEV-2026-160"
+    date: "2026-11-17"
+    title: "Coleções customizadas no Jekyll exigem extração manual de categorias e url_encode isolado no parâmetro"
+    category: "frontend"
+    tags: [jekyll, liquid, seo, schema-org, css-variables, static-site]
+    slug: "colecoes-customizadas-jekyll-extracao-categorias-url-encode-parametro"
+    summary: "Páginas de categorias e tags baseadas em site.categories e site.tags ficavam vazias num projeto Jekyll cuja base de dados residia na coleção site.anuncios, além de gerarem URLs quebradas por serialização de array e encadeamento incorreto de url_encode. A migração para agregação direta sobre site.anuncios com extração do primeiro item da categoria e codificação restrita ao valor da query string restaurou toda a navegação e indexação."
+    problem_statement: >
+      No projeto Jekyll Classificados Bombinhas (classibombinhas.com.br), os 124 registros de
+      estabelecimentos e serviços estavam armazenados na coleção _anuncios (site.anuncios), sem
+      arquivos em _posts. Como os layouts categories.html e tags.html iteravam sobre
+      site.categories e site.tags — objetos que o Jekyll popula exclusivamente a partir de
+      site.posts —, as rotas /categories, /tags e /tag renderizavam vazias. Adicionalmente, ao
+      referenciar page.categories ou anuncio.categories diretamente em links e blocos case do
+      Liquid, o Jekyll devolvia um array de um elemento (ex.: ["webdesigner"]), gerando URLs
+      como /categories?cat=%5B%22webdesigner%22%5D, enquanto o filtro encadeado
+      '/tag?t=' | append: t | url_encode codificava o caminho inteiro para /%2Ftag%3Ft=Valor.
+      Por fim, a presença de jekyll-archives em _config.yml quebrava o build quando executado
+      fora do bundle que continha a gem opcional.
+    key_learnings:
+      - "No Jekyll, site.categories e site.tags indexam apenas site.posts; projetos baseados em collections customizadas (como site.anuncios) precisam agregar categorias e tags iterando diretamente sobre a coleção com where e uniq."
+      - "A chave categories no frontmatter de um item de coleção é desserializada como lista mesmo quando declarada como string simples; usar anuncio.categories | first | default: anuncio.categories garante uma string limpa para comparações e URLs."
+      - "Filtros Liquid executam da esquerda para a direita: aplicar url_encode após append na rota ('/tag?t=' | append: t | url_encode) escapa também a barra e o ponto de interrogação; o filtro deve incidir somente sobre o parâmetro ({{ '/tag' | relative_url }}?t={{ t | url_encode }})."
+      - "Para evitar Flash of Unstyled Content (FOUC) em sites estáticos multi-página com temas dinâmicos, o snapshot de variáveis CSS salvo em localStorage deve ser reaplicado por um script inline síncrono no <head> antes da folha de estilos principal."
+    code_snippet: |
+      {% assign cat_slug = anuncio.categories | first | default: anuncio.categories %}
+      {% assign uniq_tags = anuncio.tags | uniq %}
+      <a href="{{ '/categories' | relative_url }}?cat={{ cat_slug }}">{{ cat_name }}</a>
+      {% for t in uniq_tags %}
+        <a href="{{ '/tag' | relative_url }}?t={{ t | url_encode }}">#{{ t }}</a>
+      {% endfor %}
+    impact_value: "O portal classibombinhas.com.br passou a indexar 124 anúncios em 14 categorias e 98 tags sem links quebrados, com busca global por atalhos (/ e Ctrl+Espaço), 5 temas dinâmicos sem FOUC e grafo Schema.org JSON-LD validado."
+    related_projects: ["classibombinhas.com.br", "artesdosul"]

@@ -1,0 +1,85 @@
+# Volume novo do Diário de Desenvolvimento.
+# Fatos de 2026-11-07: integração da Tríade Artes do Sul (EcoSul, IPLive e AgendaSul). Anonimizado.
+
+metadata:
+  year: 2026
+  author: "Araguaci Carlos de Andrade"
+  ecosystem: "Artes do Sul & Araguaci Dev Hub"
+  volume: 21
+  total_entries: 3
+  generated_at: "2026-11-07"
+  status: "pronto"
+  source_note: "Incidentes e descobertas da orquestração de microsserviços da Tríade (Asterisk AMI, Agent-Native e PostgreSQL) em 2026-11-07. Anonimizado: sem credencial, segredo, chave ou dados de clientes."
+
+entries:
+  - id: "DEV-2026-132"
+    date: "2026-11-07"
+    title: "Actions do Agent-Native rodam em prefixo próprio e exigem requiresAuth false para telemetria pública"
+    category: "backend"
+    tags: [agent-native, nitro, h3, auth, api, typescript]
+    slug: "agent-native-core-actions-auth-guard-telemetria"
+    summary: "Tentativas de liberar rotas públicas de actions pelo caminho convencional da API resultavam em erro 401 silencioso no frontend. Descobrimos que o framework despacha sob o prefixo interno /_agent-native/actions e exige flag declarativa na definição da action para contornar o guard."
+    problem_statement: >
+      O indicador de status da telefonia e o seletor de temas no cabeçalho apareciam desconectados para usuários sem sessão logada. As requisições de telemetria recebiam HTTP 401 do middleware runAuthGuard, mesmo com tentativas de liberação em /api/actions/* no arquivo de rotas.
+    key_learnings:
+      - "Actions do @agent-native/core são registradas sob o prefixo /_agent-native/actions e não em /api/actions/."
+      - "Para expor uma action sem exigir cookie de sessão, deve-se declarar requiresAuth: false e http: { method: 'GET' } no defineAction."
+      - "O registerAuthPublicPaths deve incluir o caminho exato do framework para que o middleware H3 libere a rota sem interceptação."
+    code_snippet: |
+      export default defineAction({
+        description: "Telemetria de saúde da malha",
+        requiresAuth: false,
+        http: { method: "GET" },
+        readOnly: true,
+        schema: z.object({}),
+        run: async () => ({ online: true }),
+      });
+    impact_value: "Telemetria de infraestrutura e temas visuais passaram a responder 200 OK imediatamente para qualquer visitante, eliminando telas falsas de desconexão."
+    related_projects: ["triade-artesdosul", "ecosul"]
+
+  - id: "DEV-2026-133"
+    date: "2026-11-07"
+    title: "Asterisk AMI Originate exige atendimento da perna A no ramal e sincronização de CDR pede carga histórica idempotente"
+    category: "telefonia"
+    tags: [asterisk, ami, pjsip, cdr, webrtc, telefonia]
+    slug: "asterisk-ami-originate-duas-pernas-sincronizacao-cdr"
+    summary: "O disparo de chamadas pelo discador parecia congelar após o envio bem-sucedido do comando AMI e os relatórios de CDR permaneciam zerados. Descobrimos que a originação por ramal aguarda o operador atender a perna A antes de discar para o cliente e que a API de CDR filtrava entregas já confirmadas."
+    problem_statement: >
+      Ao clicar em discar no discador automático, a API retornava sucesso mas a chamada não chegava ao telefone externo. Paralelamente, o PABX acumulava chamadas em banco mas o CRM continuava sem nenhum registro de atendimento para exibir nos relatórios.
+    key_learnings:
+      - "No comando AMI Originate com Channel e Exten, o Asterisk toca primeiro o ramal do operador e só inicia a perna externa quando o ramal atende."
+      - "O operador precisa estar com o ramal PJSIP ou softphone WebRTC registrado e ativo no navegador para receber o toque preparatório."
+      - "Rotinas de consumo de CDR com filtro pending=1 ignoram registros previamente confirmados (acked), necessitando de uma flag para sincronização histórica idempotente."
+    code_snippet: |
+      // Asterisk AMI Originate: disca callerExt primeiro, depois destination
+      state.amiClient.sendAction({
+        Action: 'Originate',
+        Channel: `PJSIP/${callerExt}`,
+        Exten: destination,
+        Context: 'from-internal',
+        Priority: '1',
+        Async: 'true',
+      });
+    impact_value: "O console de discagem passou a instruir o operador com clareza sobre o atendimento prévio e os relatórios passaram a puxar o histórico completo de chamadas."
+    related_projects: ["triade-artesdosul", "ecosul", "iplive"]
+
+  - id: "DEV-2026-134"
+    date: "2026-11-07"
+    title: "Divergência de identificador de organização entre microsserviços bloqueava ingestão de gravações de voz"
+    category: "arquitetura"
+    tags: [multitenancy, microservices, audio, postgresql, docker, lgpd]
+    slug: "multitenancy-org-id-mismatch-bloqueio-silencioso-audios"
+    summary: "A integração entre o PABX e o CRM de gravações não gerava erros nos logs mas a lista de áudios permanecia vazia. O mecanismo de segurança multi-tenant bloqueava o processo silenciosamente porque a variável de ambiente apontava para uma organização diferente da cadastrada no banco."
+    problem_statement: >
+      O diretório de monitoramento de áudios continha gravações gravadas pelo Asterisk, porém a tela de gravações do CRM exibia estado vazio sem disparar exceções de rede ou falha de porta.
+    key_learnings:
+      - "A checagem estrita de vínculo entre PABX e organização impedia a ingestão quando o identificador de ambiente divergia do slug do banco."
+      - "Validadores de multi-tenant devem emitir alertas explícitos no log ou suportar fallback para o tenant padrão quando o ambiente for dedicado."
+      - "A entrega de áudio deve ser intermediada por proxy autenticado no CRM, preservando o arquivo bruto no storage e auditando cada escuta sob a LGPD."
+    code_snippet: |
+      export function isIpLiveLinkedToOrg(orgId: string) {
+        const linked = getIpLiveLinkedOrgId();
+        return !linked || linked === orgId || orgId === "org_artesdosul_default";
+      }
+    impact_value: "As gravações existentes foram imediatamente importadas e o player de áudio HTML5 passou a funcionar com streaming controlado e auditoria de escuta."
+    related_projects: ["triade-artesdosul", "ecosul", "iplive"]

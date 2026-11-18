@@ -1,0 +1,88 @@
+# Volume novo do Diário de Desenvolvimento.
+# Cole entradas a partir de _data/templates/diario.entrada.modelo.yml
+# Roteiro: docs/roteiro-automacao-diario-dev.md
+
+metadata:
+  year: 2026
+  author: "Araguaci Carlos de Andrade"
+  ecosystem: "Artes do Sul & Araguaci Dev Hub"
+  volume: 25
+  total_entries: 3
+  generated_at: "2026-11-10"
+  status: "pronto"
+  source_note: "Conversas de 2026-11-09 no app Rota (ideia) e de 2026-11-10 no ranking do gosurf.site. A identificação de artigos sobre pacto federativo não entrou: foi cópia de arquivos, sem mecanismo novo. Sem URL publicada e sem chave Pix."
+
+entries:
+  - id: "DEV-2026-146"
+    date: "2026-11-09"
+    title: "A segunda visita não mostra a landing porque o passo já está gravado no navegador"
+    category: "frontend"
+    tags: [react, localstorage, landing, teste]
+    slug: "segunda-visita-pula-a-landing-gravada-no-navegador"
+    summary: "O teste da landing falhou na segunda abertura do mesmo navegador. O app grava o passo inteiro em localStorage, e a landing só existe enquanto o passo ainda é o de boas-vindas."
+    problem_statement: >
+      A página principal passou a explicar o projeto antes do fluxo. A primeira visita mostrava
+      a landing e o botão de começar. A abertura seguinte, no mesmo perfil, já estava adiantada
+      no fluxo, e a landing parecia ter sumido.
+    key_learnings:
+      - "A chave rota-mvp-v1 guarda o estado inteiro. load() faz o merge do JSON salvo sobre o estado inicial, e um useEffect grava de novo a cada mudança."
+      - "A landing só renderiza com state.step igual a welcome. Quem já confirmou o retrato volta em home, no mesmo navegador."
+      - "Um teste que abre a página duas vezes no mesmo perfil não está vendo a primeira visita. Para fotografar a landing de novo, o teste limpa o localStorage e recarrega."
+      - "Apagar os dados do site é o caminho da pessoa voltar a ver a landing. Recarregar a página não zera o passo."
+    code_snippet: |
+      const KEY = "rota-mvp-v1";
+      function load() {
+        const raw = localStorage.getItem(KEY);
+        if (!raw) return initial();
+        return { ...initial(), ...JSON.parse(raw) };
+      }
+    impact_value: "O teste da primeira visita passou a limpar o armazenamento local, e a volta ao fluxo deixou de ser lida como landing quebrada."
+    related_projects: ["ideia"]
+
+  - id: "DEV-2026-147"
+    date: "2026-11-09"
+    title: "O copia e cola do Pix é um payload EMV, e o app não fica sabendo se o valor caiu"
+    category: "backend"
+    tags: [pix, emv, crc16, frontend]
+    slug: "pix-copia-e-cola-e-payload-emv-sem-confirmacao"
+    summary: "A pré-venda entrega um código que o banco consegue ler, sem conta recebedora no app. O texto segue o arranjo EMV do Pix, e a divisão acima de trezentos reais é regra do próprio app."
+    problem_statement: >
+      O plano de pré-venda precisava de um código para colar no banco. Não havia confirmação
+      de pagamento nem webhook. Nome com acento ou longo demais faz o banco recusar o payload.
+    key_learnings:
+      - "buildPixPayload monta TLV: dois dígitos de id, dois de tamanho e o valor. O campo 26 leva o GUI br.gov.bcb.pix e a chave. Moeda 986, país BR, valor no campo 54 com duas casas."
+      - "pixText tira acento e o que não é letra, número ou espaço. O nome de quem recebe fica em 25 caracteres e a cidade em 15. Abaixo disso o banco não aceita o nome."
+      - "O CRC16-CCITT entra depois do marcador 6304, calculado sobre o corpo que já inclui esse marcador."
+      - "parcelasPix, a partir de 300, gera três payloads estáticos: na confirmação, em 30 dias e em 60 dias. Cada um é um copia e cola. O app não recebe o valor e não sabe se caiu."
+    code_snippet: |
+      function tlv(id, value) {
+        const text = String(value);
+        return id + String(text.length).padStart(2, "0") + text;
+      }
+      body += "6304";
+      return body + crc16(body);
+    impact_value: "A pré-venda publica um código que o banco lê, e o painel continua dependendo da venda que a pessoa anota."
+    related_projects: ["ideia"]
+
+  - id: "DEV-2026-148"
+    date: "2026-11-10"
+    title: "A descrição do dossiê saturava o ranking porque alcance e sinergia liam o mesmo texto"
+    category: "conteudo"
+    tags: [python, ranking, corpus, showcase]
+    slug: "descricao-do-dossie-saturava-alcance-e-sinergia"
+    summary: "O primeiro passe do ranking de showcase pôs quase todo dossiê longo acima de 85. A descrição repetia as mesmas palavras de alcance e de ecossistema, e a nota automática deixou de ler esse parágrafo."
+    problem_statement: >
+      rank_showcase_candidates.py aplica os pesos editoriais de 2026-10-08: prontidão 20%,
+      diferenciação 20%, alcance 25%, sinergia 20% e profundidade 15%.
+      No primeiro passe, o texto corrido do HTML entrava no alcance e na sinergia ao mesmo tempo.
+      O lead repete Brasil e global, então peça pronta e ensaio parecido recebiam a mesma força.
+    key_learnings:
+      - "score_alcance usa só o conjunto de tokens do slug, do título e das tags. A descrição fica de fora porque o lead saturava o eixo."
+      - "cluster_for escolhe o cluster com mais acertos de palavra. O slug pesa três, e título e tags pesam um. O corpo do HTML não vota."
+      - "ecosystem_hits, que alimenta a sinergia, lê o mesmo trio. Um dossiê longo deixa de parecer ligado a todos os nós só porque o parágrafo cita o ecossistema."
+      - "O que já está em portfolio.json ou em portfolio-todos.json sai da fila. A força automática é proxy de arquivo e fica abaixo da nota editorial, que leu o dossiê inteiro."
+    code_snippet: |
+      alcance_tokens = tokens(" ".join([item["slug"], title, *tag_text]))
+      cluster = cluster_for(item["slug"], title, tag_text)
+    impact_value: "O ranking volta a separar card novo de ensaio parecido, e a fila deixa de fora o que o showcase já publicou."
+    related_projects: ["gosurf.site"]

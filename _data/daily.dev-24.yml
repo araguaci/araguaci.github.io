@@ -1,0 +1,158 @@
+# Volume novo do Diário de Desenvolvimento.
+# Cole entradas a partir de _data/templates/diario.entrada.modelo.yml
+# Roteiro: docs/roteiro-automacao-diario-dev.md
+
+metadata:
+  year: 2026
+  author: "Araguaci Carlos de Andrade"
+  ecosystem: "Artes do Sul & Araguaci Dev Hub"
+  volume: 24
+  total_entries: 6
+  generated_at: "2026-11-10"
+  status: "pronto"
+  source_note: "Sessões de 2026-10-26 e 2026-10-29 no Supervisor, no CTI e no conversor php5-to-php8. A memória do monorepo até 2026-10-24 já estava no índice. Sem hostname, sem IP e sem nome de cliente."
+
+entries:
+  - id: "DEV-2026-140"
+    date: "2026-10-26"
+    title: "A página HTTPS monta o iframe em HTTP porque o PHP não vê o esquema do terminador"
+    category: "infraestrutura"
+    tags: [php, caddy, https, iframe, webphone]
+    slug: "iframe-https-montado-em-http-pelo-php"
+    summary: "O Operador Web abria em HTTPS e o navegador bloqueava os iframes do posto e do softphone. O Apache do container continua em HTTP, então a URL pública tem de sair do cabeçalho encaminhado e do nome configurado."
+    problem_statement: >
+      A página do operador chegava por HTTPS. Os iframes de atendimentos, perdas e softphone
+      eram montados com http://, inclusive na porta HTTP do container do webphone.
+      O PHP lia $_SERVER['HTTPS'] vazio, porque quem termina o TLS é a borda e o Apache segue em HTTP.
+    key_learnings:
+      - "cli_RequestIsHttps em cliente/cli_userfn.php aceita ew_IsHttps, $_SERVER['HTTPS'], X-Forwarded-Proto, X-Forwarded-Ssl, porta 443 e, por último, EW_SERVER_URL quando o host coincide e o esquema configurado é https."
+      - "A porta publicada do webphone só fala HTTP. Com a página em HTTPS, cli_GetWebphonePublicUrl aponta para o host público do softphone, e a configuração do operador fica no host HTTPS do Supervisor."
+      - "Acesso por IP no laboratório continua em http://host:porta. Nome público e endereço direto não usam a mesma regra."
+      - "O endpoint de configuração precisa aceitar a origem do softphone, senão o iframe HTTPS carrega e a sessão do Supervisor não vale nele."
+    code_snippet: |
+      $forwarded = strtolower(trim(explode(',', (string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? ''))[0]));
+      if ($forwarded === 'https') {
+          return true;
+      }
+    impact_value: "O posto em HTTPS passa a embutir softphone, atendimentos e perdas no mesmo esquema, e o laboratório por IP permanece em HTTP."
+    related_projects: ["supervisor", "lorentz-vps-stack", "lorentz-webphone"]
+
+  - id: "DEV-2026-141"
+    date: "2026-10-26"
+    title: "O webphone da mesa e o PWA do celular entram por hosts e logins diferentes"
+    category: "telefonia"
+    tags: [webphone, webrtc, cti, pwa, supervisor]
+    slug: "webphone-da-mesa-e-pwa-do-celular"
+    summary: "Os dois falam com o mesmo PABX e o mesmo CTI, e mesmo assim não são o mesmo posto. Um é o telefone da mesa embutido no Operador Web. O outro é o aplicativo do celular publicado dentro do PBX."
+    problem_statement: >
+      A pergunta era se o host público do softphone opera como o caminho /mobile/.
+      Os dois são WebRTC no navegador. O da mesa vive num container próprio e entra pela sessão do Operador Web.
+      O do celular é outro aplicativo, publicado dentro do PBX, com login próprio.
+    key_learnings:
+      - "O da mesa é o Lorentz Webphone (fork 008, SIP.js), container próprio, embutido no Operador Web. A voz sai pelo WebSocket descrito na configuração desse aplicativo."
+      - "O do celular é o Lorentz Mobile, PWA com JsSIP, arquivos em /mobile/ dentro do PBX. A voz sai por wss na porta 443, no caminho /mobile/ws."
+      - "No CTI os dois usam web_agent. O celular autentica com sub próprio. Tratar os dois como um atalho só mistura host, login e estado do ramal."
+      - "cli_GetWebphonePublicUrl, com a página em HTTPS e host no formato supervisor.<resto>, monta o softphone em https://phone.<resto>/. Isso não aponta para /mobile/."
+    impact_value: "Embed, suporte e login passam a tratar mesa e celular como postos distintos, cada um com o seu host."
+    related_projects: ["lorentz-webphone", "supervisor", "lorentz-vps-stack"]
+
+  - id: "DEV-2026-142"
+    date: "2026-10-29"
+    title: "O CTI só grava Atendida igual a S quando o atendimento cai num tronco"
+    category: "telefonia"
+    tags: [cti, asterisk, sqlserver, powerdialing, relatorio]
+    slug: "atendida-so-vira-s-quando-cai-num-tronco"
+    summary: "Chamadas de teste atendidas em ramal interno tinham duração e continuavam com Atendida igual a N. O relatório lia o flag certo. Quem só grava S é o ramo de tronco do CTI."
+    problem_statement: >
+      No ensaio do PowerDialing, as ligações ativas foram atendidas em ramais do próprio PABX.
+      O relatório de CTI_CHAMADA_ATIVA mostrou HoraIni e HoraFim preenchidos e Atendida igual a N.
+      A linha nasce com N. O update para S não rodou, porque aquelas pernas não eram tronco.
+    key_learnings:
+      - "AtualizaAtendidaChamadaAtiva em clsData.vb faz UPDATE Cti_Chamada_Ativa SET Atendida = 'S' para o NumChamada."
+      - "Em cls3cx.vb essa chamada só ocorre dentro de If Canal.Tronco, e só enquanto ChamadaAtivaAtendida ainda é falso."
+      - "Tempo de conversa e flag de atendida são escritos por caminhos diferentes. Duração preenchida não implica Atendida = S."
+      - "Teste de campanha com ramal interno completa a ligação e deixa o flag em N. Para ver S, o atendimento tem de cair num tronco."
+    code_snippet: |
+      If Canal.Tronco Then
+          If Canal.NumChamadaAtiva > 0 And Canal.ChamadaAtivaAtendida = False Then
+              objData.AtualizaAtendidaChamadaAtiva(Canal.NumChamadaAtiva)
+              Canal.ChamadaAtivaAtendida = True
+          End If
+      End If
+    impact_value: "O ensaio interno deixa de ser lido como chamada perdida, e o flag S fica reservado ao atendimento que passa por tronco."
+    related_projects: ["LorentzCTI", "supervisor"]
+
+  - id: "DEV-2026-143"
+    date: "2026-10-29"
+    title: "A grade de módulos lia a data num bloco de licença que a chave não traz"
+    category: "backend"
+    tags: [php, licenca, supervisor, php8]
+    slug: "grade-de-modulos-sem-bloco-na-licenca"
+    summary: "A página Sobre avisava no PHP 8 ao montar SAC e TMK. As linhas existem na empresa. O texto da licença em sessão não tem esses blocos, e a data passa a vir da tabela."
+    problem_statement: >
+      SAC_EMPRESA_MODULO tem os módulos, e a grade da página Sobre lia a validade no array
+      montado por get_Licenca. A chave do produto é a concatenação de sistema e módulo.
+      Sistema 3 com módulo 6 vira 36 (SAC / CRMWEB). Sistema 4 com módulo 8 vira 48 (TMK / TMKWEB).
+      Esses blocos não vinham no texto da licença, e o PHP 8 avisava ao ler o índice ausente.
+    key_learnings:
+      - "get_Licenca explode a chave por # e depois por ;. Cada bloco com ao menos cinco campos entra em $aLicenca na chave dadosModulo[0] . dadosModulo[1]."
+      - "A grade usa essa mesma concatenação, CdSistema . CdModulo, e só lê as posições 4 e 5 se o bloco existir e for array."
+      - "Sem o bloco, Validade e Expiracao ficam vazias e a data exibida é DtValidade já gravada em SAC_EMPRESA_MODULO."
+      - "Os quatro avisos eram dois produtos vezes duas posições de data. Módulo contratado na empresa e módulo presente no texto da licença são consultas diferentes."
+    code_snippet: |
+      $chaveModulo = $CdSistema . $CdModulo;
+      $blocoLicenca = (isset($aLicenca[$chaveModulo]) && is_array($aLicenca[$chaveModulo]))
+          ? $aLicenca[$chaveModulo] : array();
+      $Validade = isset($blocoLicenca[4]) ? $blocoLicenca[4] : '';
+    impact_value: "A página Sobre deixa de avisar no PHP 8 e mostra a validade gravada na empresa quando a chave não traz o bloco."
+    related_projects: ["supervisor"]
+
+  - id: "DEV-2026-144"
+    date: "2026-10-29"
+    title: "Tratar a chave da licença como Base64 faz o OpenSSL devolver texto vazio"
+    category: "seguranca"
+    tags: [php, openssl, licenca, aes, php8]
+    slug: "chave-licenca-em-base64-esvazia-openssl"
+    summary: "A página da licença voltava vazia. A chave e o IV são texto puro, e o código os decodificava como Base64 antes do AES. O OpenSSL recusava o material e a função devolvia string vazia."
+    problem_statement: >
+      O porte da licença para OpenSSL aplicava base64_decode na chave e no IV.
+      Os dois são texto puro, com tamanho ajustado na hora do uso.
+      openssl_encrypt devolvia false, e encrypt transformava esse false em string vazia.
+      Sem o texto cifrado, a leitura da licença não tinha o que mostrar.
+    key_learnings:
+      - "A chave e o IV da licença entram crus no OpenSSL. base64_decode neles troca o material e o AES-256-CBC falha."
+      - "licencaAesMaterial corta a chave em 32 bytes e o IV em 16. AES-256 pede chave desse tamanho, e o CBC pede IV de 16 bytes."
+      - "encrypt e decrypt devolvem string vazia quando o OpenSSL retorna false. A página fica em branco, sem exceção."
+      - "O Base64 continua só no texto cifrado, na ida e na volta. Isso é outro caminho do que o Rijndael de bloco 256 usado nas senhas de usuário."
+    code_snippet: |
+      function licencaAesMaterial($key, $iv) {
+          return array(substr((string) $key, 0, 32), substr((string) $iv, 0, 16));
+      }
+    impact_value: "A licença volta a cifrar e a abrir no PHP 8, com a chave usada como texto e o Base64 só no resultado."
+    related_projects: ["supervisor"]
+
+  - id: "DEV-2026-145"
+    date: "2026-10-29"
+    title: "O conversor de PHP 5.6 para 8 reescreve trechos que o PHP 8 recusa"
+    category: "backend"
+    tags: [php, php8, migracao, supervisor]
+    slug: "conversor-php8-each-implode-e-referencia"
+    summary: "O lote php5-to-php8.php aplica o que a leitura arquivo a arquivo deixava passar. Parte da reescrita quebra no PHP 8, e uma regra pelo nome each também pegaria JavaScript."
+    problem_statement: >
+      corrige_php8.php percorre o Supervisor legado para tirar construções do PHP 5.6.
+      each() saiu do PHP 8. implode com a lista no primeiro argumento vira TypeError.
+      count() em string ou null derruba a página. O operador ?? dentro do argumento
+      de ew_AddMessage cria um temporário, e o PHP 8 recusa temporário em parâmetro por referência.
+    key_learnings:
+      - "while (list($k, $v) = each($a)) vira foreach ($a as $k => $v). A troca não pode alcançar .each( de JavaScript. Outro each() fica marcado para revisão manual."
+      - "implode($lista, ',') é TypeError no PHP 8. A ordem passa a ser separador e depois lista. implode($sep, $lista) fica quieto, porque o segundo argumento não é texto fixo."
+      - "count() global vira acount() em userfn9.php. $obj->count() e o count() de dentro da própria acount() ficam de fora."
+      - "ew_AddMessage(($_SESSION[...] ?? null), $v) não compila no PHP 8. O conversor garante a chave com string vazia e passa a variável de sessão."
+      - "define($nome, $valor, TRUE) perde o terceiro argumento no PHP 8. O conversor grava define com dois argumentos."
+    code_snippet: |
+      if (!isset($_SESSION[$chave])) {
+          $_SESSION[$chave] = "";
+      }
+      ew_AddMessage($_SESSION[$chave], $v);
+    impact_value: "O lote deixa de gerar TypeError, aviso de referência e reescrita de JavaScript, e o que não cabe na regra fica para revisão manual."
+    related_projects: ["supervisor"]

@@ -1,0 +1,88 @@
+# Volume novo do Diário de Desenvolvimento.
+# Cole entradas a partir de _data/templates/diario.entrada.modelo.yml
+# Roteiro: docs/roteiro-automacao-diario-dev.md
+
+metadata:
+  year: 2026
+  author: "Araguaci Carlos de Andrade"
+  ecosystem: "Artes do Sul & Araguaci Dev Hub"
+  volume: 23
+  total_entries: 3
+  generated_at: "2026-11-08"
+  status: "pronto"
+  source_note: "Sessão de tropicalização e módulos financeiros do Aureus ERP"
+
+entries:
+  - id: "DEV-2026-137"
+    date: "2026-11-08"
+    title: "Rollover do Fator de Vencimento FEBRABAN pós-2025 e Linha Digitável de Boleto no PHP"
+    category: "backend"
+    tags: [php, boleto, febraban, erp, pagamentos]
+    slug: "rollover-fator-vencimento-febraban-2025-boleto-php"
+    summary: "O cálculo do Fator de Vencimento bancário da FEBRABAN ultrapassou o teto de 9999 dias em fevereiro de 2025. Implementamos o rollover para o novo ciclo de 1000 a 9999 garantindo código de barras e linha digitável válidos."
+    problem_statement: >
+      A data base original da FEBRABAN (07/10/1997) gerava 10.000 dias decorridos em 22/02/2025. Ao converter datas posteriores para o fator de vencimento de 4 dígitos sem o tratamento de rollover, a string resultante continha 5 dígitos, estourando o código de barras de 44 posições para 45 caracteres e corrompendo a validação por Módulo 11.
+    key_learnings:
+      - "O primeiro ciclo da FEBRABAN esgotou em 21/02/2025 (fator 9999); em 22/02/2025 reiniciou em 1000."
+      - "O cálculo deve usar a diferença em dias a partir da data de corte 2025-02-22 acrescido do offset 1000."
+      - "A linha digitável divide o código em três campos validados por Módulo 10, seguidos do dígito geral e fator/valor."
+      - "A geração de barras I25 e QR Code PIX deve ser feita em SVG vetorial offline para evitar latência de APIs externas."
+    code_snippet: |
+      if ($dueDate->gte(Carbon::parse('2025-02-22'))) {
+          $base2025 = Carbon::parse('2025-02-22');
+          $days = 1000 + $base2025->diffInDays($dueDate);
+          return str_pad((string) ($days % 10000), 4, '0', STR_PAD_LEFT);
+      }
+    impact_value: "Emissão de boletos bancários no ERP 100% aderente ao novo ciclo regulatório FEBRABAN sem quebra de código de barras."
+    related_projects: ["laravel-ERP"]
+
+  - id: "DEV-2026-138"
+    date: "2026-11-08"
+    title: "Migração de SQLite para MySQL 9.1 com InnoDB Forçado e Isolamento de Testes no Laravel 11"
+    category: "arquitetura"
+    tags: [laravel, mysql, sqlite, pest, devops]
+    slug: "migracao-sqlite-para-mysql-laravel-11-isolamento-testes"
+    summary: "A migração do ERP de SQLite para MySQL 9.1 exigiu parametrização de engine InnoDB estrita e revisão do ciclo de testes. Desativamos rotinas destrutivas de bootstrap preservando simulações no banco corporativo."
+    problem_statement: >
+      O driver padrão do MySQL criava tabelas sob collation e engines legadas quando omitidas, gerando falhas em chaves estrangeiras com cascades e deadlocks durante a instalação modular de 11 plugins. Simultaneamente, o helper de testes executava migrate:fresh a cada execução do Pest, apagando a base MySQL de desenvolvimento.
+    key_learnings:
+      - "Forçar 'engine' => 'InnoDB' na conexão mysql do config/database.php garante integridade relacional entre plugins."
+      - "TestBootstrapHelper não pode invocar migrate:fresh em ambientes locais com dados persistidos de simulação."
+      - "O uso da trait DatabaseTransactions no Pest isola cada teste revertendo commits sem truncar tabelas."
+      - "Comandos que acessam soquetes de rede locais no Windows exigem desvio de isolamento quando executados fora do servidor."
+    code_snippet: |
+      'mysql' => [
+          'driver' => 'mysql',
+          'engine' => 'InnoDB',
+          'charset' => 'utf8mb4',
+          'collation' => 'utf8mb4_unicode_ci',
+          'prefix' => '',
+          'strict' => true,
+      ],
+    impact_value: "Ambiente de desenvolvimento e testes rodando sobre MySQL real com isolamento de transações em 16 segundos."
+    related_projects: ["laravel-ERP"]
+
+  - id: "DEV-2026-139"
+    date: "2026-11-08"
+    title: "Modelagem de DRE Conforme Lei 6.404/76 e DFC em Filament 4 sem Rotas Virtuais Quebradas"
+    category: "backend"
+    tags: [laravel, filament, contabilidade, dre, financeiro]
+    slug: "modelagem-dre-lei-6404-e-dfc-filament-4-rotas-virtuais"
+    summary: "Estruturamos as demonstrações financeiras brasileiras (DRE e DFC) desacopladas em serviços com visão comparativa de 12 meses. Corrigimos a resolução de breadcrumbs virtuais em clusters do Filament 4."
+    problem_statement: >
+      Ao registrar páginas analíticas dentro de clusters no Filament 4, o componente de navegação buscava rotas de breadcrumb para clusters sem rota inicial associada, lançando RouteNotFoundException. Além disso, o ERP não dispunha de demonstrações no padrão contábil brasileiro exigido pelo CPC e Lei nº 6.404/76.
+    key_learnings:
+      - "A DRE brasileira exige segregação rígida: Receita Bruta, Deduções, Receita Líquida, CPV/CSP, Lucro Bruto, EBITDA e Lucro Líquido."
+      - "O Fluxo de Caixa Operacional (DFC) consolida títulos a vencer (previstos) com liquidações bancárias (realizadas)."
+      - "Sobrescrever getBreadcrumbs() na página Filament evita exceções quando o cluster atua apenas como agrupador de menu."
+      - "DomPDF exige layout em A4 Paisagem (landscape) com DejaVu Sans para renderizar tabelas financeiras de 13 colunas."
+    code_snippet: |
+      public function getBreadcrumbs(): array
+      {
+          return [
+              'Relatórios' => '#',
+              'DRE',
+          ];
+      }
+    impact_value: "Painel executivo com DRE anual de 12 meses, DFC projetado e exportação em PDF corporativo no padrão contábil nacional."
+    related_projects: ["laravel-ERP"]

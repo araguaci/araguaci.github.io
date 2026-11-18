@@ -1,0 +1,112 @@
+# Volume novo do Diário de Desenvolvimento.
+# Fatos das memórias de 2026-11-05 e 2026-11-07 que o índice ainda não tinha.
+# Sem IP, hostname, senha ou nome de instância pública.
+
+metadata:
+  year: 2026
+  author: "Araguaci Carlos de Andrade"
+  ecosystem: "Artes do Sul & Araguaci Dev Hub"
+  volume: 26
+  total_entries: 4
+  generated_at: "2026-11-10"
+  status: "pronto"
+  source_note: "Memórias de projeto ainda fora do índice: git archive com autocrlf e árvore suja no servidor (2026-11-05), APP_ENV demo liberando a base que apaga (2026-11-05), recriação do EcoSul sem as redes externas (2026-11-07). O restante das memórias já tinha entrada."
+
+entries:
+  - id: "DEV-2026-149"
+    date: "2026-11-05"
+    title: "O git archive com autocrlf ligado exporta o texto em CRLF"
+    category: "devops"
+    tags: [git, autocrlf, crlf, deploy]
+    slug: "git-archive-com-autocrlf-exporta-crlf"
+    summary: "O pacote enviado ao servidor chegou com fim de linha do Windows em 29 arquivos de texto. git archive obedece core.autocrlf, e só o que o .gitattributes fixa em LF escapa."
+    problem_statement: >
+      Em 2026-11-05 o envio para o servidor de deploy saiu da máquina em que
+      core.autocrlf está true. O checkout local parecia certo, e o que chegou
+      tinha CR.
+    key_learnings:
+      - "core.autocrlf=true faz o git archive converter o texto para CRLF na exportação. O arquivo no disco de trabalho não mostra esse CR."
+      - "O que o .gitattributes fixa em LF continua em LF. O resto do texto vai com o fim de linha do Windows."
+      - "A cópia que segue para o servidor passa por tr -d '\\r' antes do envio. O .gitattributes só protege o arquivo que ele marca."
+      - "A conferência é no arquivo que chegou, não no exit code do archive."
+    code_snippet: |
+      git config --get core.autocrlf
+      tr -d '\r' < arquivo.txt > arquivo-lf.txt
+    impact_value: "O envio passou a tirar o CR antes de chegar no servidor, e a conferência olha o arquivo recebido."
+    related_projects: ["lorentz-vps-stack"]
+
+  - id: "DEV-2026-150"
+    date: "2026-11-05"
+    title: "O git no servidor não representa o que está rodando"
+    category: "devops"
+    tags: [git, deploy, drift, backup]
+    slug: "git-no-servidor-nao-representa-o-que-roda"
+    summary: "A árvore no servidor estava em main com dezenas de arquivos alterados sem commit, inclusive o que atende. Sincronizar a pasta inteira apagaria ajuste que só existe lá."
+    problem_statement: >
+      Em 2026-11-05, lorentz-vps-stack no servidor apontava o HEAD para 33572d8
+      e o disco divergia desse commit. O git status de lá não era o inventário
+      do que estava no ar.
+    key_learnings:
+      - "HEAD em main não significa árvore limpa. Havia dezenas de arquivos modificados sem commit, e parte deles era o que estava em uso."
+      - "Antes de enviar, compare cada arquivo com a versão do lab e mande só o que precisa mudar."
+      - "O backup vem antes da sobrescrita, e só segue quem confirma que o backup existe."
+      - "A documentação entra na mesma comparação. Ajuste que está só no servidor se perde num envio completo."
+    code_snippet: |
+      git -C ~/omnichannel/lorentz-vps-stack status --short
+      git -C ~/omnichannel/lorentz-vps-stack rev-parse --short HEAD
+    impact_value: "O deploy deixou de tratar o git do servidor como cópia fiel e passou a comparar arquivo por arquivo."
+    related_projects: ["lorentz-vps-stack"]
+
+  - id: "DEV-2026-151"
+    date: "2026-11-05"
+    title: "Em demo, a base de demonstração deixa de recusar e apaga os dados"
+    category: "backend"
+    tags: [laravel, artisan, app-env, demo]
+    slug: "app-env-demo-libera-base-que-apaga-os-dados"
+    summary: "A instância de apresentação ficou em demo para aceitar a base fictícia. Nesse ambiente o comando que a produção recusa roda, e o do ATP recria o banco do zero."
+    problem_statement: >
+      ATP_APP_ENV e CIDADAO_APP_ENV no .env da stack definem o APP_ENV.
+      O padrão continua production, que recusa atp:base-demo e cidadao:base-demo.
+      Em demo essa recusa não dispara.
+    key_learnings:
+      - "atp:base-demo, em lorentz-atp/app/Console/Commands/BaseDemo.php, só retorna falha quando environment('production'). Fora isso chama migrate:fresh e db:seed. A opção --force pula a pergunta."
+      - "cidadao:base-demo recusa do mesmo jeito, só em production. Com --limpar executa TRUNCATE de request_events, notifications, requests e citizens."
+      - "scripts/render-laravel-apps.py é quem leva ATP_APP_ENV e CIDADAO_APP_ENV para o APP_ENV do container. Apagar as duas chaves e recriar os containers devolve o padrão production."
+      - "Enquanto a chave estiver em demo, dado real não entra nessa instância. Um base-demo apaga o que estiver no banco."
+    code_snippet: |
+      if ($this->laravel->environment('production')) {
+          $this->error('Recusado: APP_ENV=production. A base de demonstração apaga todos os dados.');
+          return self::FAILURE;
+      }
+      $this->call('migrate:fresh', ['--force' => true]);
+    impact_value: "Instância em demo ficou marcada como lugar sem dado real, e a volta ao padrão passa por apagar as duas chaves e recomeçar com base vazia."
+    related_projects: ["lorentz-atp", "lorentz-cidadao", "lorentz-vps-stack"]
+
+  - id: "DEV-2026-152"
+    date: "2026-11-07"
+    title: "Recriar o EcoSul sem as redes externas nasce sem Postgres e sem o painel"
+    category: "devops"
+    tags: [docker, compose, redes, ecosul]
+    slug: "recriar-ecosul-sem-redes-externas-no-compose"
+    summary: "Um docker compose up avulso recriou o EcoSul e ele passou a reiniciar. As redes do Postgres e do IPLive não estavam no arquivo, então o container nascia sem elas."
+    problem_statement: >
+      Em 2026-11-07, docker compose up -d --no-deps ecosul derrubou o serviço.
+      triade-ecosul-1 precisa de iplive_default e postgresql_default, redes de
+      outros projetos da mesma máquina. Sem elas o processo não alcança o banco
+      nem o iplive-mesa-1.
+    key_learnings:
+      - "docker-compose.triade.yml marca iplive_default e postgresql_default como external: true. O Compose não cria nem remove essas redes."
+      - "Até o deploy de 2026-11-07 o serviço ecosul não listava as duas redes. A ligação era um docker network connect depois. Qualquer up que recriava o container nascia sem elas."
+      - "restart: unless-stopped mantém o ciclo. O container sobe, não alcança Postgres nem painel, e o Docker liga de novo."
+      - "A partir desse deploy o serviço declara default, iplive_default e postgresql_default. docker inspect triade-ecosul-1 no campo NetworkSettings.Networks tem de listar as três."
+      - "Se a recriação vier de um arquivo antigo, na máquina do serviço: docker network connect postgresql_default triade-ecosul-1 e o mesmo para iplive_default."
+    code_snippet: |
+      networks:
+        - default
+        - iplive_default
+        - postgresql_default
+      # no rodapé, sem criar a rede:
+      # iplive_default:
+      #   external: true
+    impact_value: "Recriar o EcoSul passou a nascer ligado ao Postgres e ao painel, e a checagem das três redes entrou no roteiro de publicação."
+    related_projects: ["triade-artesdosul", "ecosul"]

@@ -554,7 +554,7 @@ entries:
       - "Declare o motor em config/database.php, com env('DB_ENGINE', 'InnoDB'). Transação de teste e chave estrangeira dependem dele, então o padrão do servidor não pode decidir."
       - "MyISAM aceita a declaração de chave estrangeira e não a aplica. A base de dev antiga continua sem essa proteção até ser recriada."
       - "Os eventos MigrationsStarted e MigrationsEnded desligam a checagem de chave estrangeira durante as migrations. É uma solução provisória, e o certo é corrigir a ordem."
-      - "Antes de atribuir uma falha à entrega, compare com a base: rodar o main numa worktree temporária deu as mesmas 64 falhas, teste a teste, nenhuma nova."
+      - "Antes de atribuir uma falha à entrega, compare com a base: rodar o main numa worktree temporária, com o vendor copiado, deu 74 falhas, entre elas as 64 do branch, e nenhuma nova."
       - "Suíte que nunca roda dá falsa segurança: as 64 falhas estavam ali, escondidas pelo erro de configuração."
     code_snippet: |
       Event::listen(MigrationsStarted::class, fn () => Schema::disableForeignKeyConstraints());

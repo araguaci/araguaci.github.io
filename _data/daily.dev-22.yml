@@ -1,0 +1,63 @@
+# Volume novo do Diário de Desenvolvimento.
+# Fatos de 2026-11-08: Desenvolvimento do ZapDisparador (Laravel 12, Sanctum, React 19).
+
+metadata:
+  year: 2026
+  author: "Araguaci Carlos de Andrade"
+  ecosystem: "Artes do Sul & Araguaci Dev Hub"
+  volume: 22
+  total_entries: 2
+  generated_at: "2026-11-08"
+  status: "pronto"
+  source_note: "Incidentes técnicos e decisões de arquitetura no ZapDisparador: correção do erro CSRF 419 no Sanctum e implementação de spin-syntax com opt-out LGPD. Anonimizado."
+
+entries:
+  - id: "DEV-2026-135"
+    date: "2026-11-08"
+    title: "Laravel Sanctum statefulApi força verificação de CSRF e quebra SPAs desacopladas com HTTP 419"
+    category: "backend"
+    tags: [laravel, sanctum, csrf, spa, react, autenticacao]
+    slug: "laravel-sanctum-stateful-api-csrf-419-spa"
+    summary: "Ao configurar o Laravel 11/12 para servir uma SPA React em localhost, requisições de login falhavam com HTTP 419 misterioso. Descobrimos que o método statefulApi ativa validação de CSRF para origens locais mesmo quando a SPA utiliza autenticação por Bearer Token."
+    problem_statement: >
+      O frontend Vite chamava POST /api/auth/login via proxy e recebia HTTP 419. Como a aplicação React armazena e envia Bearer Token via header Authorization e não mantém sessão por cookies, o middleware EnsureFrontendRequestsAreStateful exigia um token CSRF inexistente.
+    key_learnings:
+      - "O método statefulApi() no bootstrap/app.php injeta o middleware de verificação de CSRF em rotas de API para domínios listados em SANCTUM_STATEFUL_DOMAINS."
+      - "SPAs desacopladas que usam Personal Access Tokens (Bearer Token) não devem usar statefulApi(), pois não realizam o handshake com /sanctum/csrf-cookie."
+      - "A correção consiste em remover statefulApi(), configurar validateCsrfTokens(except: ['api/*']) e publicar o config/cors.php liberando origens do dev server."
+    code_snippet: |
+      // bootstrap/app.php
+      ->withMiddleware(function (Middleware $middleware): void {
+          $middleware->validateCsrfTokens(except: ['api/*']);
+          $middleware->api(prepend: [
+              \Illuminate\Http\Middleware\HandleCors::class,
+          ]);
+      })
+    impact_value: "Eliminação imediata do erro HTTP 419 e garantia de autenticação Bearer pura e sem atrito no ciclo de desenvolvimento local e produção."
+    related_projects:
+      - "00-ZapDisparador"
+
+  - id: "DEV-2026-136"
+    date: "2026-11-08"
+    title: "Spin-syntax em streaming e opt-out automático por webhook para conformidade LGPD e anti-ban"
+    category: "saas"
+    tags: [whatsapp, lgpd, anti-ban, spin-syntax, regex, webhooks]
+    slug: "spin-syntax-anti-ban-opt-out-automatico-lgpd"
+    summary: "Disparadores de WhatsApp enfrentam risco duplo de bloqueio por envio em massa de mensagens idênticas e multas regulatórias por contatar números que pediram descadastro. Resolvemos isso combinando avaliação de spin-syntax por contato no processamento da fila com captura de opt-out por webhook."
+    problem_statement: >
+      Envios repetidos da mesma mensagem ativam filtros heurísticos de spam do WhatsApp, enquanto a ausência de uma lista negra local expõe a operação a violações da LGPD caso contatos solicitem parada e continuem sendo importados em planilhas futuras.
+    key_learnings:
+      - "A sintaxe de spin {Olá|Oi|Bom dia} deve ser avaliada individualmente em tempo de execução para cada linha de contato, garantindo entropia máxima no payload enviado."
+      - "Webhooks de mensagens recebidas devem interceptar comandos como 'PARAR' ou 'CANCELAR' e persistir o número imediatamente em tabela de opt-outs."
+      - "O job de leitura de planilha deve cruzar os números com a tabela de opt-outs antes do enfileiramento, descartando contatos bloqueados com registro em trilha de auditoria."
+    code_snippet: |
+      public static function spinSyntax(string $text): string
+      {
+          return preg_replace_callback('/\{([^{}]+)\}/', function ($matches) {
+              $options = explode('|', $matches[1]);
+              return $options[random_int(0, count($options) - 1)];
+          }, $text) ?? $text;
+      }
+    impact_value: "Mitigação severa do risco de bloqueio de chips WhatsApp por repetição de hash e garantia técnica de respeito irrevogável à vontade do titular de dados."
+    related_projects:
+      - "00-ZapDisparador"

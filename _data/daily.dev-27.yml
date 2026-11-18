@@ -1,0 +1,175 @@
+# Volume 27 do Diário de Desenvolvimento.
+# Fatos da publicação do ProntOS (30-FieldFlow) em 2026-11-12:
+# FK auto-referenciada UUID no PostgreSQL 16, dessincronia entre Zustand persist e interceptor 401,
+# e sincronização de temas da Tríade entre subdomínios via cookie compartilhado.
+
+metadata:
+  year: 2026
+  author: "Araguaci Carlos de Andrade"
+  ecosystem: "Artes do Sul & Araguaci Dev Hub"
+  volume: 27
+  total_entries: 6
+  generated_at: "2026-11-13"
+  status: "pronto"
+  source_note: "Implantação do ProntOS (30-FieldFlow v1.0.0) em 2026-11-12/13: migrations PostgreSQL 16, sincronização de sessão authStore/api.ts, Design System Tríade via cookie triade_theme, contraste dark/light, e fallback resiliente de IA."
+
+entries:
+  - id: "DEV-2026-153"
+    date: "2026-11-12"
+    title: "Chave estrangeira auto-referenciada em tabela UUID no PostgreSQL 16 exige que a PK já exista"
+    category: "backend"
+    tags: [postgresql, laravel, migrations, uuid, sqlstate-42830]
+    slug: "fk-auto-referenciada-uuid-postgresql-16-exige-pk-criada-antes"
+    summary: "A migration de service_orders quebrava no PostgreSQL 16 ao declarar a chave estrangeira parent_order_id para a própria tabela dentro do Schema::create. Separar a constraint em um bloco Schema::table logo após a criação da tabela resolveu o erro SQLSTATE[42830]."
+    problem_statement: >
+      Em 2026-11-12, durante o php artisan migrate --force do 30-FieldFlow no
+      PostgreSQL 16, a migration 2026_03_27_144054_create_service_orders_table.php
+      falhou com SQLSTATE[42830]: there is no unique constraint matching given keys
+      for referenced table "service_orders". Além disso, assigned_to usava foreignUuid
+      apontando para users.id, que é BIGINT.
+    key_learnings:
+      - "Em database/migrations/2026_03_27_144054_create_service_orders_table.php, $table->uuid('id')->primary() e $table->foreignUuid('parent_order_id')->constrained('service_orders') no mesmo Schema::create geram o ALTER TABLE da FK antes de a constraint service_orders_pkey estar disponível para auto-referência no PostgreSQL 16."
+      - "Declarar apenas a coluna $table->uuid('parent_order_id')->nullable() no Schema::create e adicionar $table->foreign('parent_order_id')->references('id')->on('service_orders')->nullOnDelete() em um Schema::table('service_orders') subsequente garante que a chave primária já exista no catálogo."
+      - "Quando a tabela users usa $table->id() (BIGINT) e as tabelas de domínio usam UUID, referências a users.id precisam de foreignId('assigned_to') ou foreignId('user_id') em vez de foreignUuid, evitando SQLSTATE[42804] (incompatibilidade entre uuid e bigint)."
+      - "A ordem dos arquivos de migration precisa respeitar dependências: create_checklist_templates_table deve ter timestamp anterior a create_checklist_responses_table."
+    code_snippet: |
+      Schema::create('service_orders', function (Blueprint $table) {
+          $table->uuid('id')->primary();
+          $table->uuid('parent_order_id')->nullable();
+          $table->foreignId('assigned_to')->nullable()->constrained('users')->nullOnDelete();
+      });
+
+      Schema::table('service_orders', function (Blueprint $table) {
+          $table->foreign('parent_order_id')
+              ->references('id')
+              ->on('service_orders')
+              ->nullOnDelete();
+      });
+    impact_value: "Todas as 14 migrations do ProntOS passaram a rodar de forma idempotente no PostgreSQL 16 sem falha de chave primária ou tipo de coluna."
+    related_projects: ["30-FieldFlow"]
+
+  - id: "DEV-2026-154"
+    date: "2026-11-12"
+    title: "Interceptor 401 que apaga só o token deixa o Zustand autenticado e pula a Landing Page"
+    category: "frontend"
+    tags: [react, zustand, axios, auth, localstorage]
+    slug: "interceptor-401-apaga-token-deixa-zustand-autenticado"
+    summary: "Visitantes com sessão expirada iam direto para /login ao abrir a raiz do site em vez de verem a Landing Page pública. O interceptor Axios removia fieldflow_token do localStorage, mas deixava isAuthenticated como true no objeto fieldflow-auth persistido pelo Zustand."
+    problem_statement: >
+      Em 2026-11-12, abrir a raiz pública do ProntOS sem sessão válida redirecionava
+      imediatamente para /login. A rota / usava PublicHome, que lia isAuthenticated
+      do authStore (Zustand persist em fieldflow-auth). Quando uma sessão anterior
+      recebia HTTP 401, api.ts apagava apenas fieldflow_token.
+    key_learnings:
+      - "Em frontend/src/lib/api.ts, localStorage.removeItem('fieldflow_token') no interceptor de erro 401 não limpava a chave fieldflow-auth gravada pelo middleware persist do Zustand."
+      - "Na visita seguinte à raiz /, PublicHome lia isAuthenticated === true do fieldflow-auth, redirecionava para /dashboard via Navigate, disparava fetchUser() sem token e caía no redirect para /login."
+      - "No onRehydrateStorage de frontend/src/stores/authStore.ts, validar se localStorage.getItem('fieldflow_token') existe antes de aceitar state.isAuthenticated = true impede que um estado órfão finja sessão ativa."
+      - "No interceptor 401 de api.ts, remover tanto fieldflow_token quanto fieldflow-auth e redirecionar para /login apenas quando window.location.pathname não for /, /landing, /login ou /register preserva a vitrine pública."
+    code_snippet: |
+      onRehydrateStorage: () => (state) => {
+        if (state && !localStorage.getItem('fieldflow_token')) {
+          state.user = null;
+          state.token = null;
+          state.isAuthenticated = false;
+        }
+      }
+    impact_value: "Visitantes deslogados ou com token expirado passaram a ver a Landing Page na raiz / sem redirecionamento indevido para /login."
+    related_projects: ["30-FieldFlow"]
+
+  - id: "DEV-2026-155"
+    date: "2026-11-12"
+    title: "Cookie compartilhado no domínio pai sincroniza tema e modo escuro entre subdomínios da Tríade"
+    category: "arquitetura"
+    tags: [css-variables, tailwind, multi-app, design-system, cookies]
+    slug: "cookie-compartilhado-sincroniza-tema-entre-subdominios-triade"
+    summary: "O ProntOS e o Agenda rodam em repositórios e containers separados, mas passaram a compartilhar a mesma identidade visual e escolha de tema do usuário. O cookie triade_theme no domínio pai .artesdosul.com sincroniza seis paletas e o modo claro ou escuro entre subdomínios."
+    problem_statement: >
+      Em 2026-11-12, o ProntOS precisava incorporar o Design System e o seletor de
+      temas do agenda.artesdosul.com mantendo a preferência visual do usuário ao
+      navegar entre os aplicativos do ecossistema.
+    key_learnings:
+      - "Em frontend/src/lib/triadeTheme.ts, gravar o cookie triade_theme=<theme>:<mode> com Domain=.artesdosul.com; Path=/; SameSite=Lax permite que qualquer subdomínio leia a paleta escolhida na primeira renderização."
+      - "Aplicar data-triade-theme e data-triade-mode no document.documentElement junto com variáveis CSS (--tr-blue-50..950, --tr-gray-50..950 e --tr-sgray-50..950) mapeadas no tailwind.config.js troca toda a paleta e o modo escuro sem recarregar a página."
+      - "A sincronização em dois sentidos (cookie compartilhado para outros subdomínios e localStorage para ambiente local em localhost) garante o mesmo funcionamento em desenvolvimento e em produção."
+    code_snippet: |
+      document.cookie = `triade_theme=${encodeURIComponent(`${theme}:${mode}`)}; Max-Age=31536000; Path=/; SameSite=Lax; Domain=.artesdosul.com; Secure`;
+      document.documentElement.setAttribute('data-triade-theme', theme);
+      document.documentElement.setAttribute('data-triade-mode', mode);
+    impact_value: "Trocar o tema ou o modo escuro no ProntOS reflete automaticamente no Agenda e nos demais sistemas da Tríade sob o mesmo domínio."
+    related_projects: ["30-FieldFlow", "triade-artesdosul"]
+
+  - id: "DEV-2026-156"
+    date: "2026-11-12"
+    title: "Classe utilitária do Tailwind sobrescreve a variável de fundo e quebra o contraste no tema escuro"
+    category: "frontend"
+    tags: [css, tailwind, design-system, dark-mode, especificidade]
+    slug: "classe-utilitaria-tailwind-sobrescreve-variavel-fundo-tema-escuro"
+    summary: "O fundo da área de trabalho continuava branco claro nos temas Sunset Dourado, Oceano Profundo e Floresta Esmeralda enquanto os títulos recebiam cor clara, sumindo sobre o fundo. A classe utilitária gerada pelo Tailwind tinha a mesma especificidade da folha de temas e vencia pela ordem de importação."
+    problem_statement: >
+      Em 2026-11-12, ao ativar temas escuros no ProntOS, o cabeçalho e a barra
+      lateral escureciam, mas a área principal mantinha fundo branco #F8FAFC. Como
+      a regra do tema aplicava texto quase branco aos títulos de h1 e tabelas, o
+      conteúdo ficava invisível.
+    key_learnings:
+      - "Importar triade-theme.css antes do @tailwind utilities fazia a classe gerada .bg-[#F8FAFC] ter prioridade de cascata sobre body, .bg-[#F8FAFC] { background-color: var(--tr-page); }."
+      - "Inverter a ordem no main.tsx (importando triade-theme.css após index.css) garante que a definição dos temas seja avaliada por último."
+      - "Definir o fundo do container e do elemento main com style={{ backgroundColor: 'var(--tr-page)' }} e classe semântica remove a dependência de sobrescrever classes literais hexadecimais do Tailwind."
+      - "Botões de destaque com texto claro precisam de --tr-on-accent quando a paleta do tema no modo escuro clareia a cor primária (como o âmbar do Sunset Dourado e o ciano do Oceano Profundo)."
+    code_snippet: |
+      /* main.tsx */
+      import './index.css'
+      import './triade-theme.css'
+
+      /* MainLayout.tsx */
+      <main style={{ backgroundColor: 'var(--tr-page)', color: 'rgb(var(--tr-gray-900))' }}>
+    impact_value: "A área principal e as tabelas adotaram contraste perfeito e fundo imersivo em todos os temas escuros da Tríade."
+    related_projects: ["30-FieldFlow", "triade-artesdosul"]
+
+  - id: "DEV-2026-157"
+    date: "2026-11-12"
+    title: "Chamada de IA sem fallback devolve intent desconhecido e rota nova pede reinício do PHP-FPM"
+    category: "backend"
+    tags: [ia, laravel, php-fpm, opcache, webhooks]
+    slug: "chamada-ia-sem-fallback-devolve-unknown-e-php-fpm-segura-rotas"
+    summary: "O simulador de IA respondia sempre unknown e a rota de importação recém-adicionada dava 404. A API externa falhava por modelo não provisionado sem acionar o classificador heurístico, e os processos PHP-FPM retidos em memória serviam o catálogo antigo de rotas."
+    problem_statement: >
+      Em 2026-11-12, ao testar o webhook de IA em /integrations, o endpoint retornava
+      detected_intent: unknown. Simultaneamente, a rota POST /api/integrations/orcamento/import
+      respondia HTTP 404 no navegador mesmo constando na listagem do artisan route:list.
+    key_learnings:
+      - "Em app/Services/ClaudeService.php, quando o provedor externo responde erro (ex: not_found_error ou cota), retornar 'unknown' descarta a inteligência da aplicação. O fluxo precisa acionar imediatamente um classificador NLP semântico local em português."
+      - "No webhook de entrada, ler $request->input('data.message.conversation') ?? $request->input('message') ?? $request->getContent() garante suporte tanto ao formato nativo da Evolution API quanto a chamadas JSON do Axios ou payloads brutos."
+      - "Adicionar rotas no routes/api.php de um container PHP-FPM em produção não tem efeito imediato se houver routes-v7.php compilado ou OPcache ativo. php artisan route:clear seguido de docker restart recicla os workers e ativa os novos endpoints."
+    code_snippet: |
+      /* Fallback resiliente no ClaudeService */
+      if ($response->failed()) {
+          return $this->fallbackIntentDetection($message);
+      }
+      /* Reciclagem do FPM */
+      docker restart fieldflow_app
+    impact_value: "A detecção de intenções passou a responder instantaneamente com alta precisão e a rota de importação foi ativada em produção."
+    related_projects: ["30-FieldFlow"]
+
+  - id: "DEV-2026-158"
+    date: "2026-11-13"
+    title: "Sobrescrita de superfícies sem seletor claro faz título herdar a cor do fundo do card"
+    category: "frontend"
+    tags: [css, tailwind, design-system, contraste, light-mode]
+    slug: "sobrescrita-superficies-sem-seletor-claro-apaga-titulo-card"
+    summary: "Nos temas claros ProntOS e Central de Aventura, o texto de títulos h2 dentro de cards sumia por se igualar ao fundo branco ou washi. O seletor de tema claro não declarava a cor de texto contrastante e classes conflitantes de card misturavam fundos escuros e claros."
+    problem_statement: >
+      Em 2026-11-13, após a padronização do modo escuro, os títulos h2 dentro de cards
+      nos temas claros (ProntOS / AgendaSul e Central de Aventura) sumiram da tela por
+      estarem com a mesma tonalidade da superfície do card.
+    key_learnings:
+      - "Declarar regras de contraste para [data-triade-mode='dark'] sem o bloco espelho [data-triade-mode='light'] deixa os títulos dos temas claros vulneráveis a heranças indevidas."
+      - "O tema padrão agendasul precisa ter seletor explícito [data-triade-theme='agendasul'] no CSS para igualar a especificidade dos temas temáticos como central-de-aventura."
+      - "Banners e blocos que já possuem gradiente próprio ou fundo escuro explícito (.bg-slate-900, .bg-gradient-to-r) não devem herdar a classe .card, cujo @apply bg-white injeta cor de superfície conflitante."
+    code_snippet: |
+      /* Garantia de contraste nos temas claros */
+      [data-triade-mode="light"] :is(.card, main) :is(h1, h2, h3, h4, h5, h6):not([class*="text-white"]) {
+        color: rgb(var(--tr-gray-900)) !important;
+      }
+    impact_value: "Os títulos e cabeçalhos de todos os cards recuperaram legibilidade e contraste absoluto nos temas claros e escuros."
+    related_projects: ["30-FieldFlow", "triade-artesdosul"]
+

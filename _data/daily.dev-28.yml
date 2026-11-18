@@ -1,0 +1,54 @@
+# Volume novo do Diário de Desenvolvimento.
+# Cole entradas a partir de _data/templates/diario.entrada.modelo.yml
+# Roteiro: docs/roteiro-automacao-diario-dev.md
+
+metadata:
+  year: 2026
+  author: "Araguaci Carlos de Andrade"
+  ecosystem: "Artes do Sul & Araguaci Dev Hub"
+  volume: 28
+  total_entries: 1
+  generated_at: "2026-11-13"
+  status: "rascunho"
+  source_note: "Ajustes de infraestrutura e proxy reverso para Evolution API v2 e integração WhatsApp com ProntOS (30-FieldFlow)."
+
+entries:
+  - id: "DEV-2026-159"
+    date: "2026-11-13"
+    title: "Proxy reverso duplo para WebSocket exige repasse de Upgrade e Connection condicional em todas as camadas"
+    category: "devops"
+    tags: [nginx, websocket, socket-io, evolution-api, proxy-pass, docker]
+    slug: "proxy-reverso-duplo-websocket-repasse-upgrade-connection-condicional"
+    summary: "Conexões Socket.IO da Evolution API falhavam com 404 e erro de WebSocket ao atravessar o Nginx do host e o Nginx em container. Adicionar headers de Upgrade com mapeamento condicional de Connection em ambas as camadas garantiu o handshake bidirecional."
+    problem_statement: >
+      Em 2026-11-13, o frontend do Evolution Manager (evolution.artesdosul.com)
+      apresentava falhas contínuas de 'WebSocket connection failed' e erro 404 em
+      /socket.io/?EIO=4&transport=websocket. A requisição chegava pela porta 443 do
+      Nginx do host, passava por proxy_pass para o container orcamento_nginx (porta 8443)
+      e depois seguia para o container evolution_api:8080. Como o Nginx do host não
+      possuía proxy_set_header Upgrade $http_upgrade e Connection, o cabeçalho era
+      descartado na primeira camada, impedindo a negociação HTTP 101.
+    key_learnings:
+      - "Em arquiteturas com Nginx no host roteando para Nginx em container (reverse proxy encadeado), ambas as camadas devem declarar os cabeçalhos de Upgrade e Connection, caso contrário o handshake WebSocket é truncado na primeira borda."
+      - "Socket.IO alterna entre pooling HTTP e WebSocket. Forçar Connection 'upgrade' estático quebra requisições GET/POST normais; a diretiva correta é map $http_upgrade $connection_upgrade { default upgrade; '' close; }."
+      - "No Docker Compose, o comando docker restart não recarrega variáveis de ambiente de env_file: - .env. É mandatória a execução de docker compose up -d para recriar o container com os novos valores."
+      - "Vhosts órfãos no Nginx (como certificados de domínios desativados) bloqueiam o comando nginx -t e impedem qualquer reload seguro da malha de containers."
+    impact_value: >
+      O Evolution Manager e o backend do ProntOS passaram a operar com comunicação
+      bidirecional em tempo real e webhooks ativos (MESSAGES_UPSERT, MESSAGES_UPDATE,
+      CONNECTION_UPDATE), viabilizando triagem de intenções por IA via WhatsApp.
+    code_snippet: >
+      map $http_upgrade $connection_upgrade {
+          default upgrade;
+          ''      close;
+      }
+
+      location /socket.io/ {
+          proxy_pass http://evolution_api:8080;
+          proxy_http_version 1.1;
+          proxy_set_header Upgrade $http_upgrade;
+          proxy_set_header Connection $connection_upgrade;
+          proxy_read_timeout 86400s;
+          proxy_send_timeout 86400s;
+      }
+    related_projects: ["30-FieldFlow", "evolution-api", "05-orcamento"]

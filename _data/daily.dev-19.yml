@@ -1,0 +1,312 @@
+# Volume novo do Diário de Desenvolvimento.
+# Fatos de 2026-11-04, anonimizados: revisão de um sistema de atendimento em Laravel e Vue.
+
+metadata:
+  year: 2026
+  author: "Araguaci Carlos de Andrade"
+  ecosystem: "Artes do Sul & Araguaci Dev Hub"
+  volume: 19
+  total_entries: 12
+  generated_at: "2026-11-04"
+  status: "pronto"
+  source_note: "Revisão de telas, testes e merge de um sistema de atendimento, em 2026-11-04. Anonimizado: sem nome de produto, empresa, cliente, rota, servidor ou credencial."
+
+entries:
+  - id: "DEV-2026-112"
+    date: "2026-11-04"
+    title: "No Carbon 3, diffInSeconds tem sinal e casas decimais, e a duração negativa foi parar no banco"
+    category: "backend"
+    tags: [laravel, carbon, php, datas]
+    slug: "carbon-3-diff-tem-sinal-e-decimais"
+    summary: "Uma tela mostrava pausa de -34,10325 segundos, o que parecia erro de exibição. A causa era a mudança do Carbon 3, e o mesmo cálculo gravava duração negativa ao encerrar pausa, chamada e chat."
+    problem_statement: >
+      O código fazia now()->diffInSeconds($inicio), que no Carbon 2 devolvia um inteiro positivo.
+      No Carbon 3, que vem com o Laravel 12, o intervalo tem sinal e é decimal: do presente para o passado, o resultado é negativo.
+    key_learnings:
+      - "O sentido passou a importar. Escreva sempre do mais antigo para o mais novo: $inicio->diffInSeconds(now())."
+      - "O retorno é float. Se a coluna ou a tela espera inteiro, faça o cast com (int)."
+      - "Uma atualização de framework pode não dar erro nenhum e ainda assim gravar dado errado. Depois de atualizar, procure todos os diffIn no código, e não só o que apareceu na tela."
+      - "A busca achou o mesmo erro em cinco pontos, três deles gravando no banco. Corrigir o cálculo não conserta o que já foi gravado, e esses dados precisam de conferência à parte."
+    code_snippet: |
+      // Carbon 3: negativo e decimal
+      now()->diffInSeconds($pause->started_at);   // -34.10325
+
+      // Do passado para o presente, como inteiro
+      (int) $pause->started_at->diffInSeconds(now());   // 34
+    impact_value: "As durações passaram a ser positivas e inteiras, e os registros antigos ficaram marcados para conferência."
+    related_projects: ["sistema-de-atendimento"]
+
+  - id: "DEV-2026-113"
+    date: "2026-11-04"
+    title: "Modal em branco no Tailwind 4: o fundo ficou opaco e cobriu o painel, sem nenhum erro no console"
+    category: "frontend"
+    tags: [tailwind, vue, css, modal]
+    slug: "modal-em-branco-no-tailwind-4"
+    summary: "Clicar em um botão deixava a tela inteira de uma cor só, e o console não mostrava erro. Duas classes do Tailwind 3 tinham deixado de existir, e isso atingia todos os modais do sistema."
+    problem_statement: >
+      O modal usava bg-gray-500 bg-opacity-75 no fundo, e o painel dependia da classe transform para ficar na frente.
+      No Tailwind 4, bg-opacity-* não existe e o fundo ficou opaco. O fundo fixo também passou a ser desenhado sobre o painel, que não tinha posição.
+    key_learnings:
+      - "Classe removida não dá erro: o CSS simplesmente não é gerado. Página em branco sem erro de JavaScript pede para olhar qual elemento está na frente, com document.elementFromPoint."
+      - "A sintaxe nova é a cor com barra: bg-gray-500/75. O mesmo vale para ring-opacity-*, e flex-shrink-* virou shrink-*."
+      - "Elemento fixo fica acima de conteúdo sem posição. Dê position: relative ao painel, em vez de contar com um efeito colateral de transform."
+      - "O defeito estava em um componente compartilhado. Corrigir só a tela em que foi visto deixaria as outras quebradas, então a busca deve ser pela classe, em todo o projeto."
+    code_snippet: |
+      <!-- Antes -->
+      <div class="fixed inset-0 bg-gray-500 bg-opacity-75" />
+      <div class="inline-block transform">
+
+      <!-- Depois -->
+      <div class="fixed inset-0 bg-gray-500/75" @click="$emit('close')" />
+      <div class="relative inline-block">
+    impact_value: "Os modais voltaram a aparecer em todas as telas, e o fundo e o Esc passaram a fechá-los."
+    related_projects: ["sistema-de-atendimento"]
+
+  - id: "DEV-2026-114"
+    date: "2026-11-04"
+    title: "A ação de automação devolvia 'enviado' sem enviar: um TODO que retorna sucesso é pior que um erro"
+    category: "arquitetura"
+    tags: [laravel, automacao, workflows, confiabilidade]
+    slug: "todo-que-retorna-sucesso-e-pior-que-erro"
+    summary: "As automações ofereciam enviar e-mail, enviar WhatsApp e criar tarefa, e o registro dizia que tudo tinha dado certo. As três ações eram um TODO que devolvia uma frase de sucesso."
+    problem_statement: >
+      O método tinha só o comentário TODO e um return com 'E-mail enviado'.
+      A execução terminava como concluída e o formulário nem tinha campo para assunto ou texto. Falha real de webhook e ação desconhecida também terminavam como concluídas.
+    key_learnings:
+      - "Enquanto não existe, o código deve falhar ou nem ser oferecido. Registro falso de sucesso esconde o problema de quem depende dele."
+      - "A execução só conclui se todas as ações rodaram. Cada ação devolve se deu certo e o motivo, e o status final sai disso, e não de uma exceção que nunca é lançada."
+      - "A falta de campo no formulário era a pista: ninguém conseguiria ter configurado aquele envio. Confira se a tela permite usar o que ela oferece."
+      - "Tirar a opção da tela não basta. A validação do servidor também precisa recusá-la, e o que já está salvo com ela termina como falha."
+      - "Enviar de verdade a clientes depende de consentimento, textos e custo. Por isso a correção parou na honestidade, e o envio real ficou para quem decide o produto."
+    code_snippet: |
+      // Antes
+      protected function sendEmail(array $action, $entity): string
+      {
+          // TODO: Implementar envio de e-mail
+          return 'E-mail enviado';
+      }
+
+      // Depois
+      default => ['ok' => false, 'message' => "Ação {$type} não executada: não está disponível"],
+    impact_value: "O registro de execução passou a dizer o que aconteceu, e a tela só oferece o que o sistema faz."
+    related_projects: ["sistema-de-atendimento"]
+
+  - id: "DEV-2026-115"
+    date: "2026-11-04"
+    title: "Taxa de atendimento de 0% com mil chamadas: a métrica procurava um status que os dados não usam"
+    category: "backend"
+    tags: [metricas, laravel, sql, dashboard]
+    slug: "metrica-procurava-status-que-os-dados-nao-usam"
+    summary: "O painel mostrava 0% de atendimento e nenhuma chamada ativa, enquanto a lista exibia chamadas atendidas. Cada tela tinha a própria definição de atendida e de em andamento, e nenhuma foi conferida contra os dados."
+    problem_statement: >
+      O painel contava só o status completed, mas os dados tinham apenas answered e abandoned.
+      Outra tela procurava in_progress, que a validação nem aceita. E um indicador novo contava answered como em andamento sem olhar se a chamada já tinha terminado.
+    key_learnings:
+      - "Antes de escrever uma métrica, agrupe os dados reais por status. A consulta de um minuto teria mostrado o problema."
+      - "Regra de negócio repetida em cada consulta acaba divergindo. Definir atendida e em andamento em um só lugar, com scopes no model, faz as telas concordarem."
+      - "Em andamento depende de dois campos: o status e a data de encerramento vazia."
+      - "Confira o número novo contra outro independente. Atendidas de 73,54% e abandono de 26,18% somam cerca de 100%, o que dá mais confiança do que o teste passar."
+      - "O dado de demonstração revelou o erro, mas também pode confundir: uma pausa aberta há 8.504 horas é conta certa sobre um dado antigo, e não um defeito."
+    code_snippet: |
+      public function scopeAttended($query)
+      {
+          return $query->whereIn('status', ['answered', 'completed']);
+      }
+
+      public function scopeOngoing($query)
+      {
+          return $query->whereIn('status', ['ringing', 'answered'])->whereNull('ended_at');
+      }
+    impact_value: "Painel, monitoramento e tela inicial passaram a usar a mesma definição e a mostrar números que fecham entre si."
+    related_projects: ["sistema-de-atendimento"]
+
+  - id: "DEV-2026-116"
+    date: "2026-11-04"
+    title: "A verificação de limite existia e tinha teste, mas só o teste a chamava"
+    category: "arquitetura"
+    tags: [licenca, testes, laravel, revisao]
+    slug: "verificacao-de-limite-que-so-o-teste-chama"
+    summary: "Parecia haver um erro na conta do limite de uso contratado. Ao procurar quem usava aquela função, o problema era maior: nenhum código de produção a chamava."
+    problem_statement: >
+      Os métodos de limite de usuários, campanhas e uso simultâneo estavam prontos e cobertos por testes unitários.
+      Nenhum controller, middleware ou serviço os chamava, então nenhum limite era aplicado.
+    key_learnings:
+      - "Teste unitário prova que a função funciona, e não que ela é usada. A cobertura pode estar alta com a regra desligada."
+      - "Ao corrigir uma função, procure quem a chama. Se só os testes aparecem, a correção não muda nada para o usuário."
+      - "Teste de regra de negócio precisa partir da ação do usuário: tentar passar do limite e ver a recusa."
+      - "Ligar uma regra que nunca valeu é mudança de comportamento. Pode bloquear quem já passou do limite, então vale medir e avisar antes de bloquear."
+    code_snippet: |
+      # Quem chama, fora a própria definição?
+      grep -rn "checkUserLimit" app resources routes tests | grep -v "public function"
+    impact_value: "A aplicação dos limites virou uma decisão explícita de negócio, em vez de uma suposição de que já funcionava."
+    related_projects: ["sistema-de-atendimento"]
+
+  - id: "DEV-2026-117"
+    date: "2026-11-04"
+    title: "Corrigir um erro abriu uma falha de segurança que ele escondia"
+    category: "seguranca"
+    tags: [seguranca, laravel, multi-tenant, api]
+    slug: "corrigir-um-erro-abriu-falha-que-ele-escondia"
+    summary: "Uma rota usava o tipo enviado pelo cliente como nome de classe, sem conferir a empresa, mas outro erro a derrubava antes. Ao remover esse erro, a falha ficou alcançável, e isso só ficou claro ao testar o ataque contra o código original."
+    problem_statement: >
+      A linha $validated['entity_type']::findOrFail($id) aceitava qualquer classe e registros de qualquer empresa.
+      No branch principal a rota respondia 500 por outro motivo. O teste de ataque respondeu 200 na cópia de trabalho, depois de eu ter removido esse outro erro.
+    key_learnings:
+      - "Nunca use texto da requisição como nome de classe. Use uma lista fechada de apelidos e confira a empresa do registro."
+      - "Responda 404 também para o registro de outra empresa, para não revelar que ele existe."
+      - "Um erro pode estar protegendo por acidente. Antes de consertar um 500 em uma rota sensível, leia o que vem depois dele."
+      - "Avalie a gravidade na versão de referência, e não na cópia alterada. Eu tinha chamado de urgente uma falha que, no branch principal, ainda estava inalcançável."
+      - "Procure o padrão no projeto todo: a mesma linha estava em outro controller, parado pelo mesmo erro."
+      - "A ação de alterar campo também precisa de limite: mudar company_id moveria o registro para outra empresa."
+    code_snippet: |
+      public function resolve(array $types, string $type, int $id, int $companyId): Model
+      {
+          $class = $types[$type] ?? (in_array($type, $types, true) ? $type : null);
+          abort_if($class === null, 404);
+
+          $entity = $class::findOrFail($id);
+          abort_unless($this->companyOf($entity) === $companyId, 404);
+
+          return $entity;
+      }
+    impact_value: "O acesso entre empresas foi fechado com 15 testes que falham sem a correção, e a urgência passou a ser medida na versão de referência."
+    related_projects: ["sistema-de-atendimento"]
+
+  - id: "DEV-2026-118"
+    date: "2026-11-04"
+    title: "Worktree com vendor por junction testa o código da pasta original, e a comparação sai falsa"
+    category: "devops"
+    tags: [git, worktree, composer, php, windows, testes]
+    slug: "worktree-com-vendor-por-junction-testa-codigo-errado"
+    summary: "Para comparar testes antes e depois de uma correção, usei uma worktree com o vendor ligado por junction. Os testes da falha passaram mesmo com a correção removida, o que revelou que a cópia rodava o código de outra pasta."
+    problem_statement: >
+      A comparação mostrou 60 falhas antes e depois, e eu a chamei de válida.
+      O autoload do Composer resolve o caminho real do vendor, então as classes vinham da pasta original, com as correções, e só os testes vinham da worktree. O número real era 64.
+    key_learnings:
+      - "Copie o vendor de verdade ao criar a worktree. No Windows, robocopy com /MT é rápido."
+      - "Confira de onde a classe é carregada antes de confiar no resultado, com ReflectionClass e getFileName."
+      - "Um teste de controle tem que falhar: rode o teste novo sem a correção. Se ele passar, o método está errado, e não o código."
+      - "Duas coisas que eu não sabia explicar eram sintomas do mesmo erro. Quando um número não fecha, vale investigar antes de seguir."
+      - "O projeto antigo usava MyISAM nesta máquina. Ajustes só para o teste rodar devem ser revertidos antes do commit, e uma trava no script evita o descuido."
+    code_snippet: |
+      New-Item -ItemType Junction ...  # autoload aponta para a pasta original
+      robocopy .\vendor $wt\vendor /E /MT:16  # autoload aponta para a worktree
+
+      php -r "require 'vendor/autoload.php'; echo (new ReflectionClass('App\Models\X'))->getFileName();"
+    impact_value: "A comparação com a base passou a provar o que diz, e a medição anterior foi refeita e corrigida."
+    related_projects: ["sistema-de-atendimento"]
+
+  - id: "DEV-2026-119"
+    date: "2026-11-04"
+    title: "Merge na pasta que o servidor lê derruba a tela com marcadores de conflito"
+    category: "devops"
+    tags: [git, merge, php, desenvolvimento]
+    slug: "merge-na-pasta-do-servidor-derruba-a-tela"
+    summary: "Durante um merge, quem usava o sistema recebeu ParseError com unexpected token '<<'. O servidor de desenvolvimento lia os arquivos com os marcadores de conflito no disco."
+    problem_statement: >
+      O merge parou com conflito em um serviço PHP, e o php artisan serve lia essa mesma pasta.
+      Enquanto os testes rodavam, com o conflito já resolvido mas o merge ainda aberto, a pessoa já tinha visto o erro numa tela que não tinha relação com o assunto.
+    key_learnings:
+      - "PHP não tem etapa de build: o que está no disco é o que roda. Merge com conflito em pasta servida quebra o sistema na hora."
+      - "Faça merge com conflito esperado em uma worktree separada, e traga o resultado pronto."
+      - "git merge-tree --write-tree simula o merge sem tocar nos arquivos e lista os conflitos."
+      - "O merge limpo também merece leitura: o automático juntou duas regras para a mesma chave em um array PHP. Funcionou, porque a última vence, mas uma das linhas virou código morto."
+      - "Depois de um merge, confira marcadores, sintaxe, a suíte e as telas, nessa ordem."
+    code_snippet: |
+      # Simula, sem mexer na pasta de trabalho
+      git merge-tree --write-tree --name-only meu-branch main
+    impact_value: "Merge com conflito esperado passou a ser feito fora da pasta que o servidor usa."
+    related_projects: ["sistema-de-atendimento"]
+
+  - id: "DEV-2026-120"
+    date: "2026-11-04"
+    title: "Regra de validação em closure não roda com valor nulo, e o campo obrigatório nunca foi exigido"
+    category: "backend"
+    tags: [laravel, validacao, formularios]
+    slug: "regra-em-closure-nao-roda-com-valor-nulo"
+    summary: "O motivo da desqualificação devia ser obrigatório, e a regra estava escrita. Como ela era um closure sobre um campo nullable, nunca rodava justamente quando o campo vinha vazio."
+    problem_statement: >
+      A regra conferia se o motivo estava vazio, mas o Laravel não executa regra comum em valor nulo de campo nullable.
+      Além disso, o motivo era anexado às notas e, logo depois, as notas do formulário sobrescreviam o texto.
+    key_learnings:
+      - "Para campo obrigatório sob condição, use required_if. Essa regra roda com valor vazio."
+      - "Se precisar de closure para exigir valor, ela tem que ser uma regra implícita. Um teste com o campo vazio mostra a diferença na hora."
+      - "Duas gravações na mesma coluna na mesma requisição: a última vence. Altere os dados antes da gravação final, e não em uma gravação à parte."
+      - "Atributo required na tela não é validação. O servidor precisa recusar sozinho."
+    code_snippet: |
+      // Nunca executa quando o valor vem nulo
+      'reason' => ['nullable', 'string', function ($attribute, $value, $fail) { /* ... */ }],
+
+      // Roda também com o campo vazio
+      'reason' => 'nullable|required_if:status,not_qualified|string|max:500',
+    impact_value: "O motivo passou a ser exigido e a ficar guardado nas notas."
+    related_projects: ["sistema-de-atendimento"]
+
+  - id: "DEV-2026-121"
+    date: "2026-11-04"
+    title: "O teste do webhook passou pelo motivo errado: Http::fake não intercepta curl direto"
+    category: "backend"
+    tags: [laravel, testes, http, xdebug, curl]
+    slug: "http-fake-nao-intercepta-curl-direto"
+    summary: "O teste de webhook com erro passou, enquanto o de sucesso falhou. O model usava curl direto, então a simulação não valia e o teste tentava sair para a rede de verdade."
+    problem_statement: >
+      Http::fake só intercepta o cliente HTTP do Laravel, e o model chamava curl_init.
+      O teste de erro passava porque a conexão a um domínio inexistente falhava de verdade. Uma resposta HTTP 500 também gerava mensagem de erro vazia, porque curl_error só informa falha de conexão.
+    key_learnings:
+      - "Um teste de falha pode passar por qualquer falha. Confira também o motivo, por exemplo se a mensagem contém HTTP 500."
+      - "Trocar curl pelo cliente do Laravel torna o código testável sem rede e leva o motivo do erro para o registro."
+      - "O teste de sucesso é o controle: ele mostrou que a simulação não estava valendo."
+      - "Http::failedConnection e exceção lançada dentro de Http::fake derrubaram o PHP 8.3 com falha de segmentação com o Xdebug no modo develop. Para simular conexão recusada, uma porta local fechada funciona sem simulação."
+      - "Falha de segmentação não deixa relatório do teste: exit 139 e saída vazia. Rode os testes um a um para isolar o culpado."
+    code_snippet: |
+      try {
+          $response = Http::withHeaders($this->headers ?? [])
+              ->timeout($this->timeout)
+              ->send($this->method, $this->url, ['json' => $payload]);
+      } catch (ConnectionException $e) {
+          return ['success' => false, 'error' => $e->getMessage()];
+      }
+    impact_value: "Os testes de webhook passaram a provar o resultado sem depender da rede, e a falha grava o motivo."
+    related_projects: ["sistema-de-atendimento"]
+
+  - id: "DEV-2026-122"
+    date: "2026-11-04"
+    title: "No Laravel 12, $this->middleware() no construtor do controller não existe mais"
+    category: "backend"
+    tags: [laravel, controllers, atualizacao, api]
+    slug: "laravel-12-middleware-no-construtor-nao-existe"
+    summary: "Oito controllers de API chamavam $this->middleware() no construtor. O controller base mais novo não tem esse método, então essas rotas respondem 500 com Call to undefined method."
+    problem_statement: >
+      Desde o Laravel 11, a classe Controller do esqueleto é vazia e não herda o método middleware().
+      Os controllers antigos foram mantidos, e o erro só aparecia ao chamar a rota. Parte dos testes dessas APIs falhava por isso.
+    key_learnings:
+      - "O erro só aparece em tempo de execução. O php -l passa, e só um teste que chama a rota mostra."
+      - "Antes de remover a linha, confira se a rota já exige login pelo grupo: php artisan route:list --path=api/x --json mostra o middleware aplicado."
+      - "A linha pedia auth:sanctum, e o grupo usa auth. Remover mantém o login, mas não necessariamente o mesmo mecanismo pensado na época."
+      - "Remover pode ligar uma rota que estava morta. Leia o que ela faz antes, porque ela pode nunca ter sido exercitada com essa versão."
+      - "A alternativa para middleware por controller é declarar no grupo de rotas ou implementar a interface HasMiddleware."
+    code_snippet: |
+      # Quantos ainda têm o problema?
+      grep -rln '$this->middleware(' app/Http/Controllers
+    impact_value: "Os controllers com o erro ficaram listados, e os que tratam de dado sensível só voltam depois de revisados."
+    related_projects: ["sistema-de-atendimento"]
+
+  - id: "DEV-2026-123"
+    date: "2026-11-04"
+    title: "O status escrito no README não é o que o sistema faz: confira no código antes de apresentar"
+    category: "conteudo"
+    tags: [documentacao, apresentacao, produto, revisao]
+    slug: "status-do-readme-nao-e-o-que-o-sistema-faz"
+    summary: "O README marcava canais como implementados, e uma apresentação feita a partir dele prometeria o que não existe. Conferir o código mudou o slide de situação e um relatório de decisões."
+    problem_statement: >
+      O documento listava telefonia, WhatsApp, chat e e-mail com sinal de pronto.
+      No código, a chamada era só registrada, o WhatsApp comercial só gravava a mensagem, o e-mail não enviava e iniciar campanha só mudava o status.
+    key_learnings:
+      - "Pronto precisa dizer pronto para quê. Separar tela e regra de tráfego real muda a conversa com quem compra."
+      - "Para cada frase de capacidade, procure no código a chamada que faz acontecer: o cliente HTTP, o envio, a discagem."
+      - "Ao revisar o texto final, procure o que afirma mais do que foi conferido. Eu escrevi que uma falha impedia acessos, e o certo era que podia estar impedindo, porque a confirmação ainda faltava."
+      - "Escolha prints que mostrem a tela como ela é, com aviso de dados de demonstração. Tela com número errado fica de fora e entra na lista de defeitos."
+      - "Notas do apresentador ficam no código da página. Em site público, qualquer um as lê."
+      - "Errar e corrigir por escrito vale mais do que ajustar em silêncio: quem decide precisa saber qual afirmação mudou."
+    impact_value: "O material passou a separar o que está pronto do que vem, e cada afirmação tem de onde veio."
+    related_projects: ["sistema-de-atendimento"]
