@@ -1,0 +1,144 @@
+# Volume 33 do Diário de Desenvolvimento.
+# Roteiro: docs/roteiro-automacao-diario-dev.md
+
+metadata:
+  year: 2026
+  author: "Araguaci Carlos de Andrade"
+  ecosystem: "Artes do Sul & Araguaci Dev Hub"
+  volume: 33
+  total_entries: 6
+  generated_at: "2026-11-25"
+  status: "pronto"
+  source_note: "Monitor (monitoramento-app), commits 0df3cfa e bdad9f6 e a árvore de 25/11/2026: Appearance, theme.js, theme-rules.css, GlobalSearch, layouts/print.blade.php, MonitorController::collectedReport, a migration da comissão e o commit que versionou .history/.env_*. Um tema por entrada. Sem valor de ambiente, sem hostname e sem nome de instalação."
+
+entries:
+  - id: "DEV-2026-173"
+    date: "2026-11-24"
+    title: "O tema da empresa não pode ficar no aparelho, e o script antigo continua escolhendo sozinho"
+    category: "frontend"
+    tags: [laravel, css, tema, cache, localstorage]
+    slug: "tema-da-empresa-nao-fica-no-aparelho"
+    summary: "Cada pessoa guardava a cor no próprio navegador, e um script em cache mantinha a escolha velha depois da publicação. A cor passou a ser a da empresa, e o endereço do script leva a versão para o navegador buscar o arquivo novo."
+    problem_statement: >
+      A tela logada precisa da mesma aparência para quem entra naquela empresa. localStorage
+      cumpre isso num aparelho só. O arquivo theme.js ia sem versão na URL, então o navegador
+      seguia com a cópia antiga. Gráfico já desenhado também não troca de paleta sozinho.
+    key_learnings:
+      - "A coluna é companies.theme, string de 40, na migration 2026_11_24_000800_add_theme_to_companies.php. Appearance::forUser lê a empresa do usuário e, se o valor não está em Appearance::THEMES, devolve atp."
+      - "O layout logado marca html com data-theme-source=company. Em theme.js, boot() volta nesse caso e não lê a chave app_theme. set() também não grava localStorage quando a origem é a empresa. A entrada usa data-theme-source=device e continua no aparelho."
+      - "O script entra no head, sem defer, como /js/theme.js?v= e config('app.version'). O mesmo vale para reading.js, sidebar.js e theme.css. Sem a consulta, a publicação nova continua rodando o arquivo que o navegador já tinha."
+      - "A troca chama PUT /settings/appearance, atrás do middleware supervisor, e devolve JSON com o tema gravado. Se Chart.instances tem gráfico, theme.js recarrega a página: a instância não se repinta com o dataset novo."
+      - "Appearance::FEATURED deixa três temas à vista (atp, lorentz-dark, auto). O restante fica em Mais opções. O monitor recebe 403 nessa rota."
+    code_snippet: |
+      if (root.dataset.themeSource === 'company') return root.dataset.themeChoice || 'atp';
+    impact_value: "Quem entra na empresa vê a cor gravada nela, e a publicação nova não fica presa no script antigo."
+    related_projects: ["monitoramento-app"]
+
+  - id: "DEV-2026-174"
+    date: "2026-11-25"
+    title: "A barra lateral abre rolagem horizontal quando o item flex não encolhe"
+    category: "frontend"
+    tags: [css, flexbox, sidebar, tipografia]
+    slug: "barra-lateral-flex-sem-rolagem-horizontal"
+    summary: "A lista do menu passava da largura da barra e a página ganhava rolagem para o lado. A barra ficou com altura da janela, a lista é o único trecho que rola, e só na vertical."
+    problem_statement: >
+      No computador a barra é uma coluna flex. O corpo do offcanvas pedia min-height 100% e o
+      item flex, por padrão, não encolhe abaixo do conteúdo. Letra grande alarga a barra para
+      280px e a máxima para 320px. Contraída, ela tem 72px e o texto longo continuava empurrando
+      a largura.
+    key_learnings:
+      - "A partir de 768px, em scripts/theme-rules.css, .sidebar é sticky, height e max-height 100vh, flex column. .offcanvas-body fica flex 1 1 auto, min-height 0 com !important e overflow hidden."
+      - ".nav fica flex 1 1 auto, min-width 0, min-height 0, overflow-x hidden e overflow-y auto. .nav-link e .nav-texto também têm min-width 0. Sem isso o mínimo do flex é o tamanho do texto e a barra abre rolagem horizontal."
+      - "Usuário, tamanho da letra, botão de contrair e versão têm flex-shrink 0, para a lista ceder o espaço e esses blocos permanecerem no fim."
+      - "html[data-text=grande] alarga a barra para 280px e maxima para 320px. O estado contraido força 72px mesmo com essas letras. O texto some com o recorte de 1px, e o link ganha title com o nome."
+      - "reading.js grava a escolha em app_text neste aparelho, antes de pintar: menor 16px, grande 20px, maxima 24px, padrão grande, em documentElement.style.fontSize. Os três botões usam grid com minmax(0, 1fr)."
+    code_snippet: |
+      .sidebar .nav { min-width: 0; min-height: 0; overflow-x: hidden; overflow-y: auto; }
+    impact_value: "A página não rola mais para o lado por causa do menu. Só a lista de itens desce."
+    related_projects: ["monitoramento-app"]
+
+  - id: "DEV-2026-175"
+    date: "2026-11-25"
+    title: "Na pesquisa, número curto, telefone, valor e dia de vencimento não são a mesma busca"
+    category: "backend"
+    tags: [laravel, sql, busca, telefone]
+    slug: "pesquisa-separa-numero-telefone-valor-e-dia"
+    summary: "Um campo só precisava achar rua, casa, nome, telefone, contrato, código, vencimento e valor. Tratar tudo como LIKE juntava o dia do mês com telefone e com dinheiro."
+    problem_statement: >
+      O termo 10 pode ser casa, código ou dia de vencimento. 80,00 é mensalidade. Um telefone
+      com máscara não é igual aos dígitos digitados. Uma letra só, ou um número de um ou dois
+      dígitos passado em LIKE, devolve gente demais. A rota também não pode entregar o cadastro
+      a quem está em campo.
+    key_learnings:
+      - "GlobalSearch::clients trata termo só de dígitos com menos de 3 caracteres como id, legacy_id ou number do imóvel. A partir de 3, entra o LIKE em nome, endereço, rua, bairro e telefone. Uma letra não busca: longEnough pede dois caracteres quando não é número puro."
+      - "O telefone compara os dígitos com REPLACE aninhado em espaço, hífen, parênteses e ponto, e só se há pelo menos 3 dígitos. O valor vira decimal com ponto: vírgula troca o separador e o ponto de milhar sai. Se o termo tem ponto ou vírgula e o valor fechou, esses dígitos não vão para o telefone. Mais de 8 dígitos não é valor."
+      - "O dia usa a expressão dia ou vencimento, opcional, mais um ou dois dígitos de 1 a 31. O SQL é DAY(COALESCE(billing_date, start_date)). O contrato também compara contract_number, id e legacy_id."
+      - "Client usa BelongsToCompany, e CompanyScope filtra company_id de quem está logado. Sem empresa, a consulta vira whereRaw 1 = 0. RestrictMonitorAccess não lista search.index, então o perfil de campo recebe 403."
+      - "A rota /busca tem throttle de 60 por minuto. A página pede 30 linhas, o JSON pede 8 e a saída csv, ficha ou checklist pede 200. O CSV grava BOM EF BB BF e separa com ponto e vírgula."
+    code_snippet: |
+      $phoneDigits = ($amount !== null && preg_match('/[.,]/', $term)) ? '' : $digits;
+    impact_value: "O mesmo campo acha a casa, o telefone mascarado, o valor e o dia, sem misturar um no outro."
+    related_projects: ["monitoramento-app"]
+
+  - id: "DEV-2026-176"
+    date: "2026-11-25"
+    title: "A folha impressa fica preta no branco porque o tema da tela não entra no papel"
+    category: "frontend"
+    tags: [css, impressao, a4, privacidade]
+    slug: "folha-impressa-nao-herda-o-tema"
+    summary: "Ficha, checklist e pagamentos iam para o papel com a cor da tela, inclusive tema escuro. A folha passou a ter estilo próprio, sempre preto no branco, em A4."
+    problem_statement: >
+      O layout da aplicação pinta fundo, texto e barra com o tema da empresa. Na impressão isso
+      gasta tinta, some em tema escuro e ainda manda o botão Imprimir para o papel. A folha também
+      carrega dado de cliente e não pode ser indexada.
+    key_learnings:
+      - "resources/views/layouts/print.blade.php não usa theme.css. O corpo é branco, o texto é preto, a fonte é 10pt Arial. @page declara size A4 portrait e margin 12mm 10mm."
+      - "No @media print, .print-actions some e .sheet fica com overflow visible. Fora da impressão a tabela pode rolar; no papel ela não pode ser cortada por uma barra."
+      - "thead usa display table-header-group, para o cabeçalho repetir na página seguinte. tr usa break-inside avoid. .section + .section usa break-before page."
+      - "A página manda meta robots noindex. O rodapé avisa que a folha tem dado pessoal. O botão Imprimir chama window.print() e não entra no papel."
+    code_snippet: |
+      @page { size: A4 portrait; margin: 12mm 10mm; }
+    impact_value: "A folha sai legível em qualquer tema da tela, e o botão de imprimir não vai para o papel."
+    related_projects: ["monitoramento-app"]
+
+  - id: "DEV-2026-177"
+    date: "2026-11-25"
+    title: "A comissão do legado é um inteiro no funcionário, e zero não é zero por cento"
+    category: "backend"
+    tags: [laravel, mysql, comissao, fuso]
+    slug: "comissao-inteira-do-legado-e-janela-em-utc"
+    summary: "A comissão já existia no cadastro antigo como inteiro, e zero significava que não havia comissão. A consulta do monitor passou a somar o valor confirmado no período local, com o fim do dia exclusivo."
+    problem_statement: >
+      Somar a mensalidade, ou o mês civil em UTC, erra o total de quem trabalha em São Paulo.
+      Um percentual 0 gravado como número ainda aparece como comissão. Pagamento de outro monitor,
+      ou de fora do intervalo, não pode entrar na soma.
+    key_learnings:
+      - "No Access o campo é Funcionario.Comissao, inteiro. LegacyImporter grava commission_percent só de 1 a 100; fora disso fica null. A migration 2026_11_25_000900_add_monitor_commission_percent.php copia o mesmo recorte do JSON em legacy_records, source_table Funcionario, com CAST e BETWEEN 1 AND 100."
+      - "No formulário, 0 vira null antes da validação. A regra é nullable, integer, min 1, max 100. Sem isso o zero não passa no mínimo e a tela trata ausência como erro."
+      - "collectedReport lê de e ate. Se o fim é anterior ao início, troca os dois. O padrão é o dia 1 do mês até hoje, no fuso config('app.display_timezone'), que cai em America/Sao_Paulo. O início é startOfDay convertido para UTC. O fim é o dia seguinte, também startOfDay em UTC, e a comparação de confirmed_at é maior ou igual e menor."
+      - "O total é a soma de confirmed_amount, arredondada em duas casas. A comissão é essa soma vezes o percentual, dividida por 100, também arredondada. Percentual vazio não gera valor. A consulta filtra monitor_id, então o recebimento de outro monitor fica de fora."
+    code_snippet: |
+      $start = Carbon::createFromFormat('Y-m-d', $de, $timezone)->startOfDay()->utc();
+      $end = Carbon::createFromFormat('Y-m-d', $ate, $timezone)->addDay()->startOfDay()->utc();
+    impact_value: "O percentual vem do cadastro antigo, zero continua sem comissão, e o período fecha na meia-noite local."
+    related_projects: ["monitoramento-app"]
+
+  - id: "DEV-2026-178"
+    date: "2026-11-25"
+    title: "O histórico do editor versionou o ambiente porque o ignore só cobria o nome .env"
+    category: "seguranca"
+    tags: [git, gitignore, ambiente, editor]
+    slug: "historico-do-editor-versionou-o-ambiente"
+    summary: "O commit da versão 0.12.9 levou cópias do arquivo de ambiente feitas pelo histórico local do editor. A regra que ignora .env não alcança um nome com carimbo na frente da extensão, dentro de outra pasta."
+    problem_statement: >
+      .gitignore lista .env, .env.backup e .env.production. O editor gravou cópias em .history
+      com o nome .env seguido de um carimbo numérico. Esse caminho não é o arquivo .env, então
+      o git add incluiu as três cópias no commit bdad9f6.
+    key_learnings:
+      - "Um padrão sem barra, como .env, casa com esse nome de arquivo em qualquer pasta. Não casa com .env_ e um carimbo. .env.backup também não cobre esse sufixo."
+      - "A pasta .history não estava no ignore. Três caminhos .history/.env_ mais carimbo passaram a ser rastreados. O conteúdo não entra neste registro."
+      - "A regra que fecha o buraco é ignorar a pasta .history/. Apagar só a cópia de trabalho não tira o arquivo do commit em que ele já entrou."
+    code_snippet: |
+      .history/
+    impact_value: "As três cópias continuam no commit até saírem do índice do git. Ignorar .env não as alcança."
+    related_projects: ["monitoramento-app"]

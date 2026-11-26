@@ -1,0 +1,175 @@
+# Volume 30 do Diário de Desenvolvimento.
+# Roteiro: docs/roteiro-automacao-diario-dev.md
+
+metadata:
+  year: 2026
+  author: "Araguaci Carlos de Andrade"
+  ecosystem: "Artes do Sul & Araguaci Dev Hub"
+  volume: 30
+  total_entries: 6
+  generated_at: "2026-11-20"
+  status: "pronto"
+  source_note: "Aprendizados técnicos do wslpanel 0.1.0/0.2.0 em Zig 0.17 + GTK 3 no WSL (D:/labs/wslpanel/docs/diario-dev.md) e engenharia WebGL/Mobile-First no laboratório geometria.artesdosul.com."
+
+entries:
+  - id: "DEV-2026-161"
+    date: "2026-11-18"
+    title: "Arquivos em /proc informam tamanho zero e exigem readPositional em buffer fixo no Zig 0.17"
+    category: "backend"
+    tags: [zig, linux, wsl, procfs, cgroup, telemetry]
+    slug: "leitura-proc-tamanho-zero-readpositional-zig-017"
+    summary: "Medidores de CPU e processos lidos via readFileAlloc em /proc retornavam vazio e travavam a interface em 0% no wslpanel. Trocar para openFile com readPositional em buffer fixo e calcular deltas entre amostras de um segundo estabilizou toda a telemetria em Zig 0.17."
+    problem_statement: >
+      Durante o desenvolvimento do wslpanel (0.1.0 e 0.2.0) em Zig 0.17 rodando em WSL2,
+      tentativas de ler arquivos virtuais do procfs com readFileAlloc devolviam conteúdo
+      vazio porque o kernel reporta tamanho 0 no stat de /proc. Além disso, a primeira
+      amostra de CPU sempre resulta em 0% sem um delta anterior, a função std.posix.getpid
+      não existe no Zig 0.17 e o parâmetro --nanoui-wait executa antes de --nanoui-script,
+      fazendo um clique posterior à espera ainda cair na primeira amostra.
+    key_learnings:
+      - "Arquivos virtuais em /proc informam tamanho 0; readFileAlloc falha silenciosamente devolvendo vazio, exigindo openFile seguido de readPositional em um buffer de tamanho fixo."
+      - "O percentual de CPU em /proc/stat é o delta entre duas leituras (cerca de 1 segundo) usando total menos idle e iowait; em containers, cpu.stat fornece usage_usec (microssegundos de um núcleo) e a página precisa chamar frameIn(1) enquanto aberta."
+      - "No Zig 0.17, o PID do próprio processo vem de std.os.linux.getpid (std.posix.getpid não existe), enquanto std.posix.kill está disponível normalmente."
+      - "Em testes automatizados com nanoui, --nanoui-wait roda antes de --nanoui-script, portanto qualquer aba aberta por clique no script ainda receberá a primeira amostra (0%) antes do segundo delta."
+    code_snippet: |
+      const file = try std.fs.openFileAbsolute("/proc/stat", .{});
+      defer file.close();
+      var buf: [4096]u8 = undefined;
+      const n = try file.readPositional(&buf, 0);
+      const pid = std.os.linux.getpid();
+    impact_value: "Os medidores de CPU por núcleo, processos e cgroup do wslpanel passaram a atualizar com precisão a cada segundo sem leituras vazias no Linux e no WSL2."
+    related_projects: ["wslpanel"]
+
+  - id: "DEV-2026-162"
+    date: "2026-11-18"
+    title: "Ponteiros de stack passados para ui.text no nanoui geram blocos pretos na fase de layout"
+    category: "frontend"
+    tags: [zig, nanoui, gtk3, memoria, layout, testes]
+    slug: "ponteiros-stack-uitext-nanoui-blocos-pretos-layout"
+    summary: "Copiar uma struct com buffer interno na pilha e passar sua fatia para ui.text no nanoui corrompia o desenho de texto em blocos pretos no wslpanel. Manter o ponteiro apontando para o item na lista ou arena e reservar grow para a célula do nome resolveu a renderização e o truncamento."
+    problem_statement: >
+      Na construção da aba Processos do wslpanel com nanoui, o método ui.text retém o
+      ponteiro da string até a etapa de layout, depois que a função de view já retornou.
+      Ao copiar um item Proc contendo um array [16]u8 para a pilha local, o ponteiro ficava
+      inválido e renderizava um bloco preto por caractere. Também ocorreram regressões de
+      layout quando um espaçador com grow vinha após o nome (reduzindo o texto a ellipsis)
+      e falhas em testes automatizados por causa de hasText (comparação de nó inteiro) e
+      clickText (primeiro nó correspondente).
+    key_learnings:
+      - "ui.text guarda apenas o ponteiro do texto até o layout; strings oriundas de arrays em structs devem apontar para o elemento estável na lista ou arena de estado, nunca para uma cópia local na pilha."
+      - "Em linhas tabulares, o atributo grow deve ficar na célula do nome enquanto PID, CPU, RSS e estado usam largura fixa; adicionar um espaçador com grow depois do nome comprime a célula e força ellipsis (...)."
+      - "Em testes com nanoui, hasText compara o conteúdo inteiro do nó (rodapés compostos exigem containsText) e clickText aciona o primeiro nó igual, exigindo que um botão '200' nasça antes de uma linha de log com o mesmo texto."
+      - "Listas virtuais constroem apenas as linhas visíveis na janela, logo os testes devem consultar o primeiro item ordenado efetivamente renderizado na tela."
+    impact_value: "A renderização das abas Processos, Programas e Logs ficou estável sem artefatos de memória e a suíte de testes headless do wslpanel parou de falhar por seletores ambíguos."
+    related_projects: ["wslpanel"]
+
+  - id: "DEV-2026-163"
+    date: "2026-11-18"
+    title: "Trocar docker stats por docker ps com cgroup corta latência de 2,6s e evita zerar o delta"
+    category: "devops"
+    tags: [docker, cgroup, linux, performance, logs, wsl]
+    slug: "docker-ps-cgroup-substitui-docker-stats-e-tail-logs"
+    summary: "Consultar containers via docker stats --no-stream travava a interface do wslpanel por cerca de 2,6 segundos por ciclo. Ler nome e estado com docker ps (dezenas de milissegundos) e extrair CPU, memória e PIDs direto do cgroup — controlando dupla leitura com flag fresh — eliminou o bloqueio."
+    problem_statement: >
+      Ao implementar a aba Docker no wslpanel, o comando docker stats --no-stream levava
+      aproximadamente 2,6 segundos para responder, congelando o ciclo de 1 segundo do painel.
+      Na migração para leitura direta do cgroup (system.slice/docker-<id>.scope e fallback
+      /sys/fs/cgroup/docker/<id>), varrer as duas árvores na mesma amostra fazia a segunda
+      leitura ver o contador recém-gravado pela primeira, zerando o delta de CPU. Na aba
+      Logs, era preciso evitar carregar arquivos enormes, linhas iniciais cortadas ou logs
+      binários e compactados.
+    key_learnings:
+      - "docker ps responde em dezenas de milissegundos enquanto docker stats --no-stream bloqueia ~2,6s; o ID curto do docker ps serve de prefixo para localizar o escopo de 64 caracteres hexadecimais no cgroup."
+      - "Ao suportar duas árvores de cgroup (system.slice/docker-<id>.scope e /sys/fs/cgroup/docker/<id>), uma flag fresh por linha impede ler ambas na mesma amostra e zerar o delta; containers recém-descobertos (seen falso) exibem 0% na primeira leitura."
+      - "A aba Docker deve aparecer pela presença do binário no disco, exibindo 'não respondeu' quando o daemon está caído sem remover a aba no meio de um teste."
+      - "Na leitura de /var/log, limitar o tail aos últimos 256 KB, descartar a primeira linha quando o offset é maior que 0 e excluir .gz, .xz, .bz2, .zst, wtmp, btmp, lastlog e faillog mantém a interface rápida e legível."
+    code_snippet: |
+      # Caminho primário e fallback de métricas cgroup v2 no Linux
+      /sys/fs/cgroup/system.slice/docker-<id64>.scope/cpu.stat
+      /sys/fs/cgroup/docker/<id64>/cpu.stat
+    impact_value: "A aba Docker passou a atualizar no ritmo de 1 segundo sem travar a UI e o leitor de /var/log abre arquivos grandes instantaneamente com segurança."
+    related_projects: ["wslpanel"]
+
+  - id: "DEV-2026-164"
+    date: "2026-11-18"
+    title: "Compilar Zig em /mnt (9p) falha no .zig-cache e GtkGLArea sem GPU exige NANOUI_RENDERER=cpu"
+    category: "devops"
+    tags: [zig, wsl, 9p, gtk3, opengl, build]
+    slug: "zig-cache-mnt-9p-accessdenied-e-nanoui-renderer-cpu"
+    summary: "Compilar projetos Zig sob /mnt no WSL2 falhava com AccessDenied ao renomear .zig-cache, e abrir o wslpanel em máquina sem GPU fechava a janela no GtkGLArea. Mover ZIG_LOCAL_CACHE_DIR para o filesystem Linux e usar NANOUI_RENDERER=cpu resolveu compilação e execução em ambientes headless ou sem EGL."
+    problem_statement: >
+      Durante os testes de compilação e instalação do wslpanel no WSL2 e no servidor labmini
+      (2026-11-18), o sistema de arquivos 9p montado em /mnt recusava a operação de rename
+      dentro de .zig-cache com AccessDenied. Na instalação manual do Zig 0.17.0 como root,
+      tar -C "$HOME/.local" falhava quando /root/.local ainda não existia. Ao executar o
+      binário em máquina sem GPU, GtkGLArea exigia OpenGL 3.0+, emitia libEGL com fd -1 e
+      ZINK: failed to choose pdev e fechava sem fallback automático. Além disso, zig fetch
+      --save gravava .path em vez de .url + hash no build.zig.zon.
+    key_learnings:
+      - "Em diretórios montados sob /mnt (9p do Windows), exportar ZIG_LOCAL_CACHE_DIR=\"$HOME/.cache/wslpanel-zig\" evita erro AccessDenied no rename do cache enquanto o binário em zig-out grava normalmente."
+      - "Executar mkdir -p \"$HOME/.local\" antes de tar -C garante a extração do Zig mesmo sob conta root onde /root/.local não existe."
+      - "Quando não há GPU/EGL disponível (erros libEGL fd -1 e ZINK: failed to choose pdev), GtkGLArea não faz fallback silencioso: é necessário executar com NANOUI_RENDERER=cpu e DISPLAY definido."
+      - "No Zig 0.17, zig fetch --save pode registrar .path no build.zig.zon em vez de .url + hash; além disso, c.print exige formato conhecido em comptime (frases traduzidas saem de std.fmt.allocPrint) e _ = param gera erro se o parâmetro também for usado."
+    code_snippet: |
+      export ZIG_LOCAL_CACHE_DIR="$HOME/.cache/wslpanel-zig"
+      mkdir -p "$HOME/.local"
+      zig build -Doptimize=ReleaseSafe
+      NANOUI_RENDERER=cpu ./zig-out/bin/wslpanel
+    impact_value: "Compilação e execução do wslpanel passaram a funcionar de forma reproduzível tanto em WSL2 sob /mnt quanto em máquinas Linux sem aceleração GPU."
+    related_projects: ["wslpanel"]
+
+  - id: "DEV-2026-165"
+    date: "2026-11-19"
+    title: "Cores neon de baixa luminância perdem o brilho no UnrealBloomPass sem compensação HDR linear"
+    category: "frontend"
+    tags: [threejs, webgl, glsl, bloom, color-management]
+    slug: "cores-neon-baixa-luminancia-unrealbloompass-hdr-linear"
+    summary: "No palco 3D dos 5 Sólidos Platônicos com UnrealBloomPass (threshold 0.85), tons como violeta (#b5179e) e coral (#ff2a6d) ficavam apagados após conversão sRGB para linear no Three.js r170. Calibrar o multiplicador HDR pela luminância linear de cada cor e adicionar OutputPass garantiu glow uniforme em todos os sólidos."
+    problem_statement: >
+      Ao construir o palco 3D dos 5 Sólidos Platônicos em Three.js r170 com
+      ACESFilmicToneMapping e UnrealBloomPass configurado em threshold 0.85, strength 1.2 e
+      radius 0.6, um multiplicador fixo (2.5x) ativava fortemente o brilho em ciano (#00f5d4)
+      e verde (#05ffa1), mas deixava o Icosaedro violeta (#b5179e) abaixo do limiar de bloom
+      porque sua luminância linear (0.299*R + 0.587*G + 0.114*B) é de apenas ~0.182.
+      Sem OutputPass ao final do EffectComposer, a conversão sRGB e o tone mapping também
+      ficavam desalinhados com o render padrão.
+    key_learnings:
+      - "No Three.js r170 com gerenciamento de cores ativo, THREE.Color converte hex sRGB para espaço linear; matizes saturados de baixa luminância (violeta, coral) exigem multiplicador HDR proporcional a targetLuma / max(luma, 0.12) com toneMapped: false para ultrapassar threshold 0.85."
+      - "Usar THREE.EdgesGeometry(geometry, 1) com detail = 0 remove diagonais internas nas faces quadradas do Hexaedro e pentagonais do Dodecaedro, preservando arestas limpas para o bloom."
+      - "Adicionar OutputPass após UnrealBloomPass no EffectComposer assegura a aplicação correta de ACESFilmicToneMapping e saída SRGBColorSpace."
+      - "Reutilizar um THREE.Vector3 pré-alocado fora do loop requestAnimationFrame evita dezenas de alocações por frame em interpolações de escala (group.scale.lerp)."
+    code_snippet: |
+      function createEmissiveHDRColor(colorInt, targetLuma = 2.4) {
+        const c = new THREE.Color(colorInt);
+        const luma = 0.299 * c.r + 0.587 * c.g + 0.114 * c.b;
+        return c.multiplyScalar(Math.max(2.2, targetLuma / Math.max(luma, 0.12)));
+      }
+    impact_value: "Todos os 5 Sólidos Platônicos em geometria.artesdosul.com/platonicos.html exibem brilho neon equilibrado sem estourar o fundo nem perder nitidez."
+    related_projects: ["geometria.artesdosul.com", "artesdosul"]
+
+  - id: "DEV-2026-166"
+    date: "2026-11-19"
+    title: "Remodelar cenas Three.js para Mobile-First exige 100dvh, drawer colapsável e câmera adaptativa"
+    category: "frontend"
+    tags: [mobile-first, pwa, threejs, css, web-audio, ux]
+    slug: "remodelacao-mobile-first-pwa-cenas-threejs-100dvh"
+    summary: "A versão desktop da Coluna dos 7 Chakras empilhava seletores de áudio, jornada e HUD lateral sobre o canvas WebGL em telas pequenas, obstruindo a cena e disparando cliques acidentais no raycaster. Aplicar CSS Mobile-First com 100dvh, drawer colapsável, bottom sheet e enquadramento de câmera responsivo tornou o app utilizável como PWA em qualquer tela."
+    problem_statement: >
+      No artefato original de 7 Chakras com sintetizador Solfeggio e ondas binaurais
+      (geometria.artesdosul.com), a barra superior quebrava em múltiplas linhas no celular,
+      o card HUD lateral colidia com o guia de respiração e o uso de 100vh sofria recorte
+      pela barra dinâmica de endereço em navegadores móveis. Além disso, tocar nos controles
+      disparava o raycaster do Three.js e a distância fixa da câmera (z = 16.5 com offset
+      horizontal x = 0.38) cortava os chakras extremos em telas retrato.
+    key_learnings:
+      - "Usar 100dvh com viewport-fit=cover, env(safe-area-inset-*) e touch-action: none no container WebGL evita cortes da barra de endereço móvel e conflitos de scroll/pull-to-refresh durante a órbita 3D."
+      - "Agrupar controles avançados (onda binaural, timbre, volume, link e botão de instalação PWA) num drawer colapsável no mobile que vira barra inline em min-width: 1024px preserva todos os IDs do DOM sem duplicar estado JS."
+      - "No raycaster (pointerup), filtrar cliques vindos de header e #controls-drawer via e.target.closest impede selecionar um objeto 3D por trás dos botões."
+      - "Em telas retrato (< 768px), recuar DEFAULT_CAM_POS no eixo Z (19.6 vs 16.5) e zerar o deslocamento horizontal do foco quando o HUD vira bottom sheet mantém o objeto 3D centralizado e visível."
+    code_snippet: |
+      function getDefaultCamPos() {
+        const isCompact = window.innerWidth < 768;
+        return new THREE.Vector3(0, isCompact ? 5.9 : 6.2, isCompact ? 19.6 : 16.5);
+      }
+    impact_value: "O portal geometria.artesdosul.com passou a operar como PWA instalável Mobile-First com alvos táteis >= 44px, suporte offline e câmera 3D adaptada para retrato e paisagem."
+    related_projects: ["geometria.artesdosul.com", "artesdosul"]

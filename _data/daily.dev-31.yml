@@ -1,0 +1,58 @@
+# Volume 31 do Diário de Desenvolvimento.
+# Roteiro: docs/roteiro-automacao-diario-dev.md
+
+metadata:
+  year: 2026
+  author: "Araguaci Carlos de Andrade"
+  ecosystem: "Artes do Sul & Araguaci Dev Hub"
+  volume: 31
+  total_entries: 2
+  generated_at: "2026-11-23"
+  status: "pronto"
+  source_note: "Correção de temas do sio-ecosystem em 22-23/11/2026: gerador do catálogo, tokens do ui-cockpit e publicação nos cockpits. Um tema por entrada."
+
+entries:
+  - id: "DEV-2026-167"
+    date: "2026-11-23"
+    title: "Catálogo de tema copiava a cor crua e o cockpit pintava status com o destaque"
+    category: "frontend"
+    tags: [css, contraste, temas, wcag]
+    slug: "catalogo-tema-contraste-status-separado-do-destaque"
+    summary: "O gerador do catálogo gravava as cores do JSON sem piso, e o cockpit usava a cor de destaque para sucesso, erro e texto de apoio. O piso passou a valer nos dois fundos, e o texto apagado passou a sair do texto principal."
+    problem_statement: >
+      Em tools/scripts/build-theme-catalog.py o catálogo copiava o JSON do tema como estava.
+      No ui-cockpit, apply.ts punha foreground.secondary em --straw e foreground.muted em
+      --sio-muted e --fog. Num tema escuro de mar, o secundário é o verde de sucesso, então
+      o rótulo saía verde. theme.css mandava text-emerald, text-rose e text-amber para
+      --sio-accent, e o hover misturava o destaque com --sio-fg. A mistura de 78% do texto
+      com o fundo da página deixava o texto apagado do tema de faroeste em 4,27:1 sobre o
+      cartão, que usa background.secondary.
+    key_learnings:
+      - "O piso é medido em background.primary e em background.secondary. Texto, aviso e destaque ficam em 4,5:1. Sucesso, erro e perigo ficam em 5:1. O gerador recusa o catalog.json se algum par ficar abaixo."
+      - "Texto de apoio não usa a cor semântica. --sio-muted e --fog saem de color-mix com 80% de --sio-fg sobre --sio-bg. Com 78% um cartão ficava em 4,27:1. Com 80% os 22 temas passaram de 4,5:1 na página e no cartão."
+      - "Sucesso, erro e aviso têm token próprio. Se o piso cola o sucesso no destaque, o gerador empurra o matiz e mede de novo. O hover do botão mistura o destaque com preto ou branco conforme a luminância da tinta, não com a cor do texto da página."
+    code_snippet: |
+      const muted = "color-mix(in srgb, var(--sio-fg) 80%, var(--sio-bg))";
+    impact_value: "Erro, ok e destaque deixam de sair na mesma cor, e o texto de apoio deixa de herdar o verde do tema."
+    related_projects: ["sio-ecosystem"]
+
+  - id: "DEV-2026-168"
+    date: "2026-11-23"
+    title: "Tema corrigido no laptop não chega ao cockpit enquanto a imagem web não é reconstruída"
+    category: "devops"
+    tags: [docker, frontend, deploy]
+    slug: "tema-no-ar-so-muda-quando-a-imagem-web-e-reconstruida"
+    summary: "Os cockpits no ar continuaram com o tema antigo depois da correção no repositório local. A imagem web copia o ui-cockpit na hora do build, então o bundle só muda quando esse serviço é reconstruído."
+    problem_statement: >
+      Os cinco cockpits publicados seguiam com o catálogo antigo. O clone que o Compose usa
+      no build estava num commit anterior, e a correção ainda não estava nesse clone. O
+      Dockerfile do frontend faz COPY --from=uicockpit do pacote @ainativo/ui-cockpit. O
+      arquivo novo no laptop não entra na imagem que já está servida.
+    key_learnings:
+      - "O frontend publicado é a imagem, não o working tree. Sem reconstruir o serviço web, o bundle continua com o catálogo que foi copiado no build anterior."
+      - "O comando é docker compose up -d --no-deps --build web, no diretório do produto. Não se faz source do .env e não se usa compose down -v."
+      - "A prova é o JavaScript servido. Depois do rebuild, o bundle passou a conter o nome autoral novo do tema. O navegador só larga o arquivo antigo com atualização forçada."
+    code_snippet: |
+      docker compose up -d --no-deps --build web
+    impact_value: "Os cinco cockpits passaram a entregar o catálogo corrigido, conferido pelo nome novo dentro do bundle."
+    related_projects: ["sio-ecosystem"]

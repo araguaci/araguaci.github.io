@@ -1,0 +1,184 @@
+# Volume 34 do Diário de Desenvolvimento.
+# Roteiro: docs/roteiro-automacao-diario-dev.md
+
+metadata:
+  year: 2026
+  author: "Araguaci Carlos de Andrade"
+  ecosystem: "Artes do Sul & Araguaci Dev Hub"
+  volume: 34
+  total_entries: 7
+  generated_at: "2026-11-26"
+  status: "pronto"
+  source_note: "Montagem do laboratório de relatórios da URA em 25-26/11/2026: VM Ubuntu no Hyper-V, stack Docker com Issabel 4, SQL Server, CTI e URA Impacta, e a chamada de prova. Fatos de laboratorio-relatorios-ura.sh, deploy-issabel.sh, issabel-extensions-batch.php, configure-issabel-ami-docker.sh e PjsuaUra.cpp. Um tema por entrada. Sem senha, sem endereço e sem nome de instalação."
+
+entries:
+  - id: "DEV-2026-179"
+    date: "2026-11-26"
+    title: "URA muda porque o 180 Ringing tirava a chamada do estado que emitia o atendimento"
+    category: "infraestrutura"
+    tags: [pjsip, sip, asterisk, ura, telefonia]
+    slug: "ura-muda-180-ringing-estado-early-pjsua"
+    summary: "A URA em Linux atendia, carregava a árvore e recebia dígitos, mas nunca tocava o menu. O evento de atendimento só saía no estado INCOMING, e o 180 enviado antes do 200 levava o INVITE para EARLY."
+    problem_statement: >
+      A porta Linux da URA (PJSIP) responde 180 Ringing no on_incoming_call e só depois
+      atende com 200. O on_call_media_state emitia o Event_answer apenas quando o estado era
+      PJSIP_INV_STATE_INCOMING. A versão Windows atende direto com 200, e nela o estado ainda
+      é INCOMING quando a mídia fica ativa. Na versão Linux o estado já é EARLY. As árvores
+      começam num nó "Atendimento" que espera esse evento, então a URA ficava parada no
+      primeiro nó, em silêncio. Os áudios estavam no lugar, e o código nem chegava a chamar o
+      player.
+    key_learnings:
+      - "Depois de um 18x sem SDP o INVITE fica em EARLY, não em INCOMING. Um teste de estado escrito para quem atende direto com 200 deixa de valer quando alguém acrescenta o 180."
+      - "O log mostrou o caminho: eventos 2 (chegou), 4096 (confirmado), 32 (dígito) e 8 (desligou), sem o 4 (atendeu) e sem nenhuma linha de reprodução. A ausência do evento apontou o código antes de qualquer suspeita de formato de áudio."
+      - "Numa porta entre plataformas, cada diferença de protocolo (180 antes do 200) tem de ser comparada com a versão antiga linha a linha. A correção aceitou INCOMING ou EARLY, com o motivo comentado."
+    code_snippet: |
+      if (call_info.state == PJSIP_INV_STATE_INCOMING ||
+          call_info.state == PJSIP_INV_STATE_EARLY)
+          Evento(call_info.acc_id, call_id, Event_answer, ev_vazio, ...);
+    impact_value: "As árvores que começam em Atendimento voltaram a tocar o menu e a pesquisa na URA em container."
+    related_projects: ["lorentz-ura-impacta", "lorentz-vps-stack"]
+
+  - id: "DEV-2026-180"
+    date: "2026-11-26"
+    title: "docker cp para o /tmp de um container com systemd grava por baixo do tmpfs"
+    category: "devops"
+    tags: [docker, systemd, tmpfs, issabel]
+    slug: "docker-cp-tmp-tmpfs-container-systemd"
+    summary: "O script copiava um PHP para /tmp do container do PABX e o PHP dizia que o arquivo não existia. O /tmp do container é tmpfs montado pelo systemd, e o docker cp escreve na camada de baixo."
+    problem_statement: >
+      O deploy do laboratório criava ramais de teste copiando issabel-extensions-batch.php com
+      docker cp para /tmp do container do Issabel e rodando php nele. Resultado: "Could not open
+      input file". O container roda systemd, que monta um tmpfs em /tmp depois do boot. O docker cp
+      grava no sistema de arquivos do container, por baixo da montagem, onde o processo de dentro
+      não enxerga.
+    key_learnings:
+      - "Em container com init completo (systemd), /tmp, /run e /dev/shm costumam ser tmpfs. Copiar para lá com docker cp não chega ao processo."
+      - "mount | grep ' /tmp ' dentro do container confirma em um comando. Os outros scripts da stack já usavam /root, e a correção seguiu o mesmo destino."
+      - "Arquivo de troca entre host e container vai para um diretório persistente do próprio container ou para um volume, nunca para /tmp."
+    code_snippet: |
+      docker exec issabel-prod sh -c "mount | grep ' /tmp '"
+      # tmpfs on /tmp type tmpfs (...)
+      docker cp script.php issabel-prod:/root/script.php
+    impact_value: "A criação dos ramais de teste passou a funcionar na primeira rodada do deploy."
+    related_projects: ["lorentz-vps-stack"]
+
+  - id: "DEV-2026-181"
+    date: "2026-11-26"
+    title: "COMPOSE_PROJECT_NAME exportado de outro .env troca o nome dos volumes externos"
+    category: "devops"
+    tags: [docker-compose, volumes, bash]
+    slug: "compose-project-name-herdado-volume-externo"
+    summary: "O deploy do PABX criava volumes com prefixo fixo, e o compose montava o nome com COMPOSE_PROJECT_NAME. Rodado de um script que exportava o .env da stack, o compose procurou volumes que não existiam."
+    problem_statement: >
+      deploy-issabel.sh criava os volumes como issabel_*. O compose do Issabel declara o nome
+      como ${COMPOSE_PROJECT_NAME:-issabel}_issabel-spool. O script do laboratório carregava o
+      .env da stack com set -a, que define COMPOSE_PROJECT_NAME=lorentz, e chamava o deploy do
+      Issabel. A variável exportada venceu o padrão, e o compose parou em "external volume
+      lorentz_issabel-spool not found", depois de montar uma imagem de 4,7 GB com o nome errado.
+    key_learnings:
+      - "set -a seguido de source .env exporta tudo para os processos filhos, inclusive variáveis que o compose de outro projeto lê, como COMPOSE_PROJECT_NAME."
+      - "Quem cria volume com nome fixo e depois chama um compose que monta o nome com variável precisa fixar a variável na chamada."
+      - "Na VPS o problema não aparecia porque o deploy do PABX rodava sem o .env da stack exportado. Só a combinação dos dois scripts mostrou."
+    code_snippet: |
+      # os volumes são issabel_*: o projeto do compose tem de bater
+      COMPOSE_PROJECT_NAME=issabel bash ./scripts/deploy-production.sh
+    impact_value: "O PABX passou a subir com o .env da stack carregado, e a imagem órfã deixou de ocupar disco."
+    related_projects: ["lorentz-vps-stack", "issabel4-docker"]
+
+  - id: "DEV-2026-182"
+    date: "2026-11-26"
+    title: "Uma seção [admin] no manager_custom.conf derruba o AMI do próprio IssabelPBX"
+    category: "infraestrutura"
+    tags: [asterisk, ami, issabel, cti]
+    slug: "manager-custom-admin-derruba-ami-issabelpbx"
+    summary: "Para o CTI entrar no AMI, um script acrescentava [admin] com outra senha no manager_custom.conf. O IssabelPBX usa esse mesmo usuário, e o retrieve_conf passou a falhar."
+    problem_statement: >
+      O CTI precisa do AMI do Asterisk a partir da rede do Docker. O script da stack gravava no
+      manager_custom.conf uma seção com o usuário do CTI, a senha do .env e o permit da rede.
+      Com o usuário padrão admin e uma senha gerada para o laboratório, a seção nova tomou o lugar
+      da senha que o IssabelPBX lê do amportal.conf. O CTI conectou, mas o retrieve_conf e o botão
+      Aplicar do painel passaram a dar "Cannot connect to Asterisk Manager". Na VPS o script usava
+      a senha padrão, por isso nunca quebrou.
+    key_learnings:
+      - "O usuário admin do AMI pertence ao IssabelPBX. Integração externa ganha usuário próprio, com permit restrito à rede dela."
+      - "No Asterisk, uma seção repetida em arquivo incluído depois vale sobre a anterior. Acrescentar não é inofensivo."
+      - "O script passou a recusar admin com senha diferente da AMPMGRPASS do Issabel, e o deploy do laboratório recusa o .env com o CTI no admin."
+    code_snippet: |
+      LORENTZ_CTI_AMI_USER=lorentzcti
+      # manager show connected: lorentzcti vindo da rede do Docker,
+      # e o retrieve_conf do Issabel volta a funcionar
+    impact_value: "CTI e IssabelPBX usam o AMI ao mesmo tempo, sem um derrubar o outro."
+    related_projects: ["lorentz-vps-stack", "lorentz-cti"]
+
+  - id: "DEV-2026-183"
+    date: "2026-11-26"
+    title: "PHP 5.4 recusa expressão em parâmetro por referência do IssabelPBX"
+    category: "infraestrutura"
+    tags: [php, issabel, legado]
+    slug: "php54-parametro-por-referencia-issabelpbx-q"
+    summary: "O script de ramais funcionava ao criar e quebrava ao atualizar um ramal existente. A função q() do IssabelPBX recebe o valor por referência, e o caminho de atualização passava uma concatenação."
+    problem_statement: >
+      issabel-extensions-batch.php cria ou atualiza ramais chan_sip. Na segunda rodada, com os
+      ramais já criados, deu "Cannot pass parameter 1 by reference". A primeira suspeita foi a
+      função sql(), e a mudança nela não resolveu. A causa era q(&$value), que escapa valores
+      para o SQL, chamada com q('SIP/' . $ext) no UPDATE de devices. O mesmo script é usado pelos
+      sincronizadores de ramais da VPS, que também quebravam ao atualizar.
+    key_learnings:
+      - "Função que declara &$param exige variável. Literal ou concatenação passa no php -l e só falha quando a linha roda."
+      - "Testar só a criação deixa o caminho de atualização sem prova. A segunda rodada do deploy foi o teste que faltava."
+      - "Antes de mudar a função suspeita, ler a assinatura das que estão na mesma linha. Aqui a suspeita errada custou uma rodada."
+    code_snippet: |
+      $dial = 'SIP/' . $ext;  // q() é function q(&$value)
+      sql("UPDATE devices SET dial = " . q($dial) . " WHERE id = " . q($ext));
+    impact_value: "Atualizar um ramal existente voltou a funcionar no laboratório e nos sincronizadores da VPS."
+    related_projects: ["lorentz-vps-stack"]
+
+  - id: "DEV-2026-184"
+    date: "2026-11-26"
+    title: "Pesquisa de satisfação pela URA exige transferência cega"
+    category: "arquitetura"
+    tags: [ura, dtmf, asterisk, call-center]
+    slug: "pesquisa-satisfacao-ura-transferencia-cega"
+    summary: "Na chamada de prova, a terceira pergunta da pesquisa não aceitava resposta. O agente tinha feito transferência assistida, e as duas primeiras perguntas tocaram para ele."
+    problem_statement: >
+      O fluxo é: cliente liga para a URA de entrada, escolhe a fila, o agente atende e transfere
+      para a URA de satisfação. A pergunta 3 travava. O log de DTMF do Asterisk mostrou que, depois
+      da transferência, nenhum dígito vinha do cliente. A chamada direta do cliente para a URA de
+      satisfação passava inteira. O agente tinha consultado a URA antes de completar a transferência:
+      as perguntas 1 e 2 tocaram no telefone dele, e só a 3 chegou ao cliente.
+    key_learnings:
+      - "As perguntas 1 e 2 tinham espera de 5 s e avançavam sem dígito. A pergunta 3 não tinha prazo e ficava parada para sempre. Uma árvore sem timeout em todos os nós de dígito pode prender a chamada."
+      - "Separar o problema com duas chamadas (direta e transferida) e um canal de log só de DTMF no Asterisk mostrou em minutos de que lado o dígito sumia."
+      - "Para pesquisa pela URA, o agente usa transferência cega. A assistida coloca o próprio agente na URA."
+    code_snippet: |
+      asterisk -rx "logger add channel dtmf-lab.log dtmf,notice,warning"
+      # DTMF begin '5' received on SIP/410-...  (chamada direta)
+      # nenhum dígito do cliente depois da transferência assistida
+    impact_value: "A pesquisa fechou as três respostas, e o procedimento do agente entrou no roteiro do laboratório."
+    related_projects: ["lorentz-ura-impacta", "lorentz-vps-stack"]
+
+  - id: "DEV-2026-185"
+    date: "2026-11-26"
+    title: "VM Ubuntu no Hyper-V: DVD que não existe, Secure Boot e memória dinâmica"
+    category: "infraestrutura"
+    tags: [hyper-v, ubuntu, powershell, homelab]
+    slug: "hyper-v-geracao-2-ubuntu-dvd-secure-boot-memoria"
+    summary: "A primeira VM de laboratório não deu boot e depois enxergava só 1,8 GB. Geração 2 nasce sem unidade de DVD, o Ubuntu precisa de outro modelo de Secure Boot, e memória dinâmica engana o SQL Server em container."
+    problem_statement: >
+      O script de criação usava Set-VMDvdDrive, que só configura uma unidade existente. A VM de
+      Geração 2 não tem DVD por padrão, e o boot caiu em "No operating system was loaded" com só
+      rede e disco na lista. Corrigido o boot, o Ubuntu viu 1,8 GB de memória, porque a memória
+      dinâmica começa pequena, e o SQL Server em container recusa subir abaixo de 2 GB. O
+      instalador do Ubuntu ainda deixou metade do disco fora do LVM, e o console do Hyper-V usa
+      teclado americano.
+    key_learnings:
+      - "Geração 2: Add-VMDvdDrive com a ISO e Set-VMFirmware com o DVD como primeiro boot. Para Linux, Secure Boot com o modelo MicrosoftUEFICertificateAuthority."
+      - "Para serviço que confere a memória ao subir, memória fixa. No host de 15,4 GB, a VM foi de 8 para 6 GB fixos e o host saiu de 1,4 para 3,4 GB livres."
+      - "O Ubuntu Server usa metade do disco no LVM: lvextend -r -l +100%FREE. No console americano, o / de um teclado ABNT2 sai na tecla ;."
+    code_snippet: |
+      Add-VMDvdDrive -VMName Lab -Path C:\iso\ubuntu-22.04.5-live-server-amd64.iso
+      Set-VMFirmware -VMName Lab -SecureBootTemplate MicrosoftUEFICertificateAuthority `
+        -FirstBootDevice (Get-VMDvdDrive -VMName Lab)
+      Set-VMMemory -VMName Lab -DynamicMemoryEnabled $false -StartupBytes 6GB
+    impact_value: "O roteiro de criação da VM passou a funcionar sem ajuste manual e ficou registrado para o suporte repetir em campo."
+    related_projects: ["lorentz-vps-stack"]

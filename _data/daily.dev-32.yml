@@ -1,0 +1,103 @@
+# Volume 32 do Diário de Desenvolvimento.
+# Roteiro: docs/roteiro-automacao-diario-dev.md
+
+metadata:
+  year: 2026
+  author: "Araguaci Carlos de Andrade"
+  ecosystem: "Artes do Sul & Araguaci Dev Hub"
+  volume: 32
+  total_entries: 4
+  generated_at: "2026-11-23"
+  status: "pronto"
+  source_note: "Supervisor legado elevado em 23/11/2026. Fatos de supervisor-elevar-legado (elevar/boot.php, elevar_monitor.php, att_phoenix.php, att_monitor.php, userfn9.php, api/.htaccess) e de lorentz-atp Indicadores::termal. Um tema por entrada. Sem volume de chamada, sem hostname e sem nome de instalação."
+
+entries:
+  - id: "DEV-2026-169"
+    date: "2026-11-23"
+    title: "O quadro térmico do legado conta sete dias corridos, não a média do dia da semana"
+    category: "telefonia"
+    tags: [sql, php, cti, termico]
+    slug: "quadro-termico-sete-dias-corridos"
+    summary: "O monitor do atendimento presencial média o mesmo dia da semana ao longo de várias semanas. No Supervisor legado o quadro passou a contar as chamadas de cada hora dos últimos sete dias corridos, com escala própria para receptivas e para ativas."
+    problem_statement: >
+      Copiar Indicadores::termal() juntaria as segundas-feiras de semanas diferentes numa célula só.
+      A leitura pedida é o que aconteceu de fato, do dia mais antigo até hoje, somando todos os agentes
+      e podendo separar um. Receptivas e ativas não têm o mesmo teto: uma escala única deixa a série
+      menor quase sem cor. Duas grades lado a lado, dentro de uma página de 1200px, não cabem um dia
+      cheio de horas.
+    key_learnings:
+      - "A janela é DATEADD(DAY, -6, CONVERT(date, GETDATE())) até a meia-noite seguinte, exclusive. O dia sai com CONVERT(char(10), hora, 120), que o SQL Server antigo já devolve como aaaa-mm-dd. A hora é DATEPART(hour, ...)."
+      - "Receptivas leem CTI_CHAMADA.HoraEntrada. Com um agente, um EXISTS em CTI_ATENDIMENTO exige o mesmo NumChamada, o CodAgente e Atendida = 'S', então a chamada entra uma vez. Ativas leem CTI_CHAMADA_ATIVA.HoraIni e, no filtro, o CodAgente. A lista é a união de quem atendeu ou discou na janela."
+      - "As duas grades usam o menor e o maior horário com volume em qualquer uma, para as colunas coincidirem. Cada grade divide a quantidade pelo próprio máximo e pinta com rgba(11, 92, 173, alpha). Abaixo de 0,12 o alpha sobe para 0,12. A partir de 0,55 o número fica branco."
+      - "Meia página de 1200px fica em torno de 568px. Dezesseis colunas de 32px mais 72px de rótulo passam disso e abrem barra interna. A grade ficou numa coluna. Num viewport de 1281px ela mediu 1118px dentro de um cartão de 1150px, sem rolagem horizontal."
+      - "Código de agente que não está na lista volta para a soma geral só se a consulta da lista não falhou. Se a lista falha, o filtro pedido permanece. O id entra com intval. A página é PHP 5.6: array(), sem o operador de coalescência."
+    code_snippet: |
+      WHERE c.HoraEntrada >= DATEADD(DAY, -6, CONVERT(date, GETDATE()))
+        AND c.HoraEntrada < DATEADD(DAY, 1, CONVERT(date, GETDATE()))
+    impact_value: "O monitoramento mostra a semana que passou, e o quadro do turno continua sendo o agora."
+    related_projects: ["supervisor-elevar-legado", "lorentz-atp"]
+
+  - id: "DEV-2026-170"
+    date: "2026-11-23"
+    title: "FoneOcupado guarda o apelido de quem ocupa o ramal"
+    category: "telefonia"
+    tags: [sql, cti, php]
+    slug: "foneocupado-guarda-o-apelido-do-ramal"
+    summary: "O quadro do turno precisa distinguir livre, pausa e ligação. A coluna que parece um sinal de sim ou não recebe o apelido de outra pessoa, gravado quando o ramal dela está em IdTelefone."
+    problem_statement: >
+      Ler FoneOcupado como S ou 1 deixa a posição sempre livre ou sempre ocupada, conforme o texto
+      que estiver gravado. O inteiro da posição é IdEstadoRamal. FoneOcupado é o apelido copiado
+      de quem está no telefone.
+    key_learnings:
+      - "att_phoenix.php atualiza SAC_FUNCIONARIO A com o Apelido de B quando A.IdTelefone = B.RamalFunc e A.IdTelefone não é vazio. Quando o ramal libera, o mesmo fluxo zera FoneOcupado e grava IdEstadoRamal = 0."
+      - "elevar_situacao olha o motivo da pausa antes. Se o motivo não é vazio, login, logout nem pausa desligada, a posição é pausa. Só então um FoneOcupado não vazio vira ligação. Vazio, com a pausa desligada, fica livre."
+      - "A tabela de estado é CTI_ESTADO_AGENTE. Se EW_PHOENIX_3CX está definido e verdadeiro, elevar_tabela_estado() troca para CTI_ESTADO_AGENTE_LOGADO. O quadro fica no login de hoje ainda sem DataFim."
+    code_snippet: |
+      Update A Set A.FoneOcupado = B.Apelido
+        From SAC_FUNCIONARIO A, SAC_FUNCIONARIO B
+       Where A.IdTelefone = B.RamalFunc
+         And A.IdTelefone <> ''
+    impact_value: "Pausa não vira ligação por causa de um texto no ramal, e ligação não depende de um S na coluna errada."
+    related_projects: ["supervisor-elevar-legado"]
+
+  - id: "DEV-2026-171"
+    date: "2026-11-23"
+    title: "O monitor de ramais no diálogo abre sem o comando que zera a sessão"
+    category: "frontend"
+    tags: [iframe, php, sessao, cti]
+    slug: "monitor-de-ramais-no-dialogo-sem-zerar-sessao"
+    summary: "A mesma tela de ramais precisava abrir por cima do térmico e também como página inteira. O atalho que reinicia variáveis apaga o monitor da sessão, então o diálogo carrega att_monitor.php limpo e só na hora de abrir."
+    problem_statement: >
+      att_monitor.php?cmd=reiniciarvariaveis tira da sessão as escolhas do monitor, inclusive o
+      agente logado, e redireciona para a própria página. Colocar esse endereço no iframe zeraria
+      o contexto. A página puxa YUI, Phoenix e a sessão. O cabeçalho que nega frame está só em
+      api/.htaccess, não na raiz.
+    key_learnings:
+      - "O link Diálogo impede o clique e, na primeira abertura, define o src do iframe como att_monitor.php, sem query. Fechar ou Esc devolve o foco a esse link. O link Normal é outra âncora para o mesmo arquivo e não entra nesse listener."
+      - "Sem JavaScript os dois href seguem para a página. X-Frame-Options DENY vale para /api/. att_monitor.php, na mesma origem, entra no iframe. Na prova o documento veio com título Monitoramento e readyState complete."
+      - "O comando de reinício remove, entre outras, EW_SESSION_MONITOR_SERVICO, EW_SESSION_MONITOR_AGENTE, EW_SESSION_MONITOR_GRUPO e EW_SESSION_AgenteLogado. O diálogo não usa esse cmd."
+    code_snippet: |
+      if (!quadro.getAttribute("src")) quadro.src = "att_monitor.php";
+    impact_value: "Os ramais abrem por cima do térmico sem zerar a sessão do monitor, e a página antiga continua a um clique."
+    related_projects: ["supervisor-elevar-legado"]
+
+  - id: "DEV-2026-172"
+    date: "2026-11-23"
+    title: "O PHP 8 recusa o acesso a caractere com chaves em userfn9.php"
+    category: "backend"
+    tags: [php, legado]
+    slug: "php8-recusa-caractere-com-chaves-em-userfn9"
+    summary: "Este checkout do Supervisor ainda é interpretado. A partir do PHP 8.0 a leitura de caractere com chaves deixou de existir, e userfn9.php ainda usa essa forma numa função de depuração."
+    problem_statement: >
+      print_r_tree testa se a string começa com { para então decodificar JSON. A condição
+      usa $var{0}. O PHP 8.0 removeu esse acesso. O conversor já registrado trata each, implode
+      e referência; esta linha não entrou naquele artigo. O interpretador que valida e serve
+      este checkout é o PHP 5.6.40.
+    key_learnings:
+      - "A linha está em userfn9.php, dentro de print_r_tree, por volta da 2107: is_string($var) && $var{0}=='{'. Não é uma tela de negócio. Qualquer include que passe por userfn9 chega nela."
+      - "No PHP 8 a forma aceita é $var[0]. Enquanto o arquivo não for reescrito, o vhost deste checkout permanece no PHP 5.6.40."
+      - "Não misturar com o artigo do conversor. Aquele reescreve each, implode e passagem por referência. Este é um offset de string que ficou de fora."
+    code_snippet: |
+      if (is_string($var) && $var{0}=='{' && !is_null($var2 = json_decode($var, true))) {
+    impact_value: "O checkout elevado continua no PHP 5.6.40, e a página deixa de morrer na função de depuração."
+    related_projects: ["supervisor-elevar-legado"]
