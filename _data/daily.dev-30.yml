@@ -7,10 +7,10 @@ metadata:
   author: "Araguaci Carlos de Andrade"
   ecosystem: "Artes do Sul & Araguaci Dev Hub"
   volume: 30
-  total_entries: 5
+  total_entries: 8
   generated_at: "2026-11-26"
   status: "pronto"
-  source_note: "Labmini: painel Tauri para controlar processos, serviços, WSL, Docker e Hyper-V e desligar recursos padrão do Windows 11 25H2 com backup reversível (araguaci/labmini)."
+  source_note: "Labmini: painel Tauri para controlar processos, serviços, WSL, Docker e Hyper-V e desligar recursos padrão do Windows 11 25H2 com backup reversível; release 0.1.1, assinatura de código e queda de acesso remoto (araguaci/labmini)."
 
 entries:
   - id: "DEV-2026-161"
@@ -137,4 +137,81 @@ entries:
       - "Dependência usada pelo script de teste vai no devDependencies com versão exata. Aqui foi playwright 1.63.0, igual à versão do navegador já instalado, para não quebrar o ambiente local."
       - "Com vitest 5, a configuração test: {...} saiu do tipo do defineConfig do Vite. Remova a chave ou use vitest.config.ts."
     impact_value: "O CI roda no Windows real o teste de ida e volta e gera o instalador como artefato a cada push, verde nos dois sistemas."
+    related_projects: ["labmini"]
+
+  - id: "DEV-2026-166"
+    date: "2026-11-26"
+    title: "Sessão do AnyDesk caiu ao aplicar ajustes, e só o cruzamento de logs por horário mostrou o momento"
+    category: "windows"
+    tags: [anydesk, acesso-remoto, diagnostico, logs, windows-11]
+    slug: "queda-anydesk-ao-aplicar-ajustes-cruzar-logs-por-horario"
+    summary: "Aplicar 41 ajustes recomendados do Labmini por AnyDesk derrubou a sessão remota por cerca de um minuto, sem que nenhum item do catálogo tocasse rede. O diário passou a gravar hora e duração de cada operação, e o plano passou a avisar que sessões remotas podem cair."
+    problem_statement: >
+      Às 14:41:29 o Labmini 0.1.0 gravou o backup e começou o lote, com ponto de restauração.
+      Às 14:41:33 o serviço do AnyDesk perdeu a conexão com o relay. O lote terminou às 14:41:57 com
+      todos os itens ok, a sessão expirou às 14:42:15 e o acesso voltou sozinho às 14:42:34. O
+      serviço do AnyDesk continuou rodando e com início automático. O diário do Labmini tinha uma
+      linha por lote, então não dava para saber qual operação rodava na hora da queda. Os
+      suspeitos são Checkpoint-Computer (VSS) e Remove-AppxPackage dos apps Xbox.
+    key_learnings:
+      - "Os logs do AnyDesk ficam em UTC: ad_svc.trace em %ProgramData%\\AnyDesk e ad.trace em %APPDATA%\\AnyDesk. Converta o fuso antes de cruzar com logs em horário local."
+      - "Uma linha por lote não serve para diagnóstico. exec.ps1 passou a devolver startedAt (ISO 8601 com fuso) e durationMs por operação, como campos opcionais para os backups antigos continuarem abrindo."
+      - "Procurar um item culpado no catálogo não resolveu. O que mostrou o momento da queda foi cruzar, por horário, o diário do Labmini com o trace do AnyDesk."
+      - "Ponto de restauração e remoção de pacotes Appx bastam para derrubar uma sessão remota por alguns segundos, mesmo sem nenhum ajuste de rede. O plano agora avisa isso antes de aplicar."
+      - "Com o Git Credential Manager falhando no wincredman e o token do gh vencido, gh auth login seguido de gh auth setup-git fez o Git usar o gh como helper para o github.com."
+    code_snippet: |
+      git -c credential.helper= -c 'credential.helper=!gh auth git-credential' push
+    impact_value: "Na próxima queda, o Diário do Labmini mostra o passo que rodava naquele segundo, e quem aplica por acesso remoto é avisado antes."
+    related_projects: ["labmini"]
+
+  - id: "DEV-2026-167"
+    date: "2026-11-26"
+    title: "Subir a versão nos três manifestos antes do build, senão o MSI não atualiza a instalação existente"
+    category: "devops"
+    tags: [tauri, release, msi, versionamento, github-releases]
+    slug: "subir-versao-antes-do-build-msi-tauri"
+    summary: "O Labmini 0.1.0 foi distribuído sem tag, e gerar um instalador novo com a mesma versão faz o MSI não ser tratado como atualização. A 0.1.1 saiu com versão atualizada em Cargo.toml, package.json e tauri.conf.json, tag anotada e release no GitHub com os dois instaladores."
+    problem_statement: >
+      Um app Tauri carrega a versão em três lugares: [workspace.package] do Cargo.toml,
+      package.json e src-tauri/tauri.conf.json. O build gera Labmini_<versão>_x64-setup.exe (NSIS)
+      e Labmini_<versão>_x64_en-US.msi (WiX). A 0.1.0 nunca foi marcada com tag, e um MSI
+      reconstruído com a mesma versão não substitui a instalação de quem já tem o app.
+    key_learnings:
+      - "Atualize a versão nos três manifestos antes do build de distribuição. O MSI decide se é atualização pela versão do produto."
+      - "cargo update -w atualiza o Cargo.lock só para os crates do workspace, sem puxar versões novas das dependências. npm install --package-lock-only --ignore-scripts faz o mesmo no package-lock.json."
+      - "Toda versão publicada ganha uma tag anotada vX.Y.Z (git tag -a) e um gh release create com o .exe e o .msi anexados."
+      - "Instaladores sem assinatura fazem o SmartScreen alertar no download e na instalação. Isso ficou como pendência registrada já no release."
+    code_snippet: |
+      cargo update -w
+      npm install --package-lock-only --ignore-scripts
+      npm run tauri build
+      git tag -a v0.1.1 -m "Labmini 0.1.1"
+      git push origin main v0.1.1
+      gh release create v0.1.1 target/release/bundle/nsis/*.exe target/release/bundle/msi/*.msi
+    impact_value: "A 0.1.1 é o primeiro release público e com tag, e quem instala o MSI novo recebe uma atualização em vez de uma instalação paralela."
+    related_projects: ["labmini"]
+
+  - id: "DEV-2026-168"
+    date: "2026-11-26"
+    title: "Assinatura de código no Tauri com chave em nuvem e signCommand opcional por variável de ambiente"
+    category: "seguranca"
+    tags: [code-signing, tauri, signtool, smartscreen, powershell]
+    slug: "assinatura-de-codigo-tauri-signcommand-opcional"
+    summary: "Desde 2023 a chave de assinatura de código precisa ficar em hardware, então não existe mais o caminho de um .pfx num secret do CI. O Labmini passou a assinar pelo bundle.windows.signCommand do Tauri com um script que só assina quando há um thumbprint configurado, e o fluxo foi validado com um certificado descartável."
+    problem_statement: >
+      Os instaladores da 0.1.1 saíam sem assinatura e o SmartScreen alertava. A escolha foi o
+      Certum Open Source Code Signing com a chave no cofre SimplySign. O Azure Artifact Signing tem
+      restrições para pessoa física, OV e EV de outras autoridades custam mais (EV não dá mais
+      reputação imediata) e um certificado autoassinado não remove o alerta. O build precisava
+      continuar funcionando no CI e em máquinas sem certificado.
+    key_learnings:
+      - "bundle.windows.signCommand em tauri.conf.json chama 'powershell -File ../scripts/sign.ps1 %1'. O caminho é relativo a src-tauri/, que é onde o Tauri executa o comando."
+      - "Sem LABMINI_SIGN_THUMBPRINT o script sai com 0 e não assina. Com ela, confere o certificado em Cert:\\CurrentUser\\My, acha o signtool e assina em SHA-256 com carimbo RFC 3161. O thumbprint nunca entra no repositório."
+      - "O Tauri chama o signCommand para o labmini.exe, para as DLLs de plugin do NSIS e para os dois instaladores. Com SimplySign, a sessão precisa ficar ativa durante todo o build."
+      - "O labmini.exe solto em target/release fica sem assinatura, provavelmente porque o Tauri grava o tipo de pacote no executável depois de assinar. Confira pela cópia dentro do instalador, por exemplo com msiexec /a numa pasta temporária."
+      - "PowerShell 5.1 lê .ps1 sem BOM como ANSI. Script com acentos precisa ser gravado em UTF-8 com BOM."
+      - "Teste o fluxo inteiro com um certificado autoassinado de 1 dia. Get-AuthenticodeSignature mostra UnknownError, que é o esperado sem raiz confiável. Depois apague o certificado e refaça o build sem assinatura."
+    code_snippet: |
+      "bundle": { "windows": { "signCommand": "powershell -File ../scripts/sign.ps1 %1" } }
+    impact_value: "O mesmo repositório gera instaladores assinados na máquina com certificado e sem assinatura no CI, sem nenhum segredo versionado."
     related_projects: ["labmini"]
