@@ -1,0 +1,140 @@
+# Volume novo do Diário de Desenvolvimento.
+# Cole entradas a partir de _data/templates/diario.entrada.modelo.yml
+# Roteiro: docs/roteiro-automacao-diario-dev.md
+
+metadata:
+  year: 2026
+  author: "Araguaci Carlos de Andrade"
+  ecosystem: "Artes do Sul & Araguaci Dev Hub"
+  volume: 30
+  total_entries: 5
+  generated_at: "2026-11-26"
+  status: "pronto"
+  source_note: "Labmini: painel Tauri para controlar processos, serviços, WSL, Docker e Hyper-V e desligar recursos padrão do Windows 11 25H2 com backup reversível (araguaci/labmini)."
+
+entries:
+  - id: "DEV-2026-161"
+    date: "2026-11-26"
+    title: "Ler WSL e Hyper-V sem depender do idioma do Windows"
+    category: "windows"
+    tags: [wsl, hyper-v, powershell, utf-16, i18n]
+    slug: "ler-wsl-e-hyper-v-sem-depender-do-idioma-do-windows"
+    summary: "Um painel que interpretava a saída de wsl --list --verbose e o JSON do Get-VM quebrava num Windows em pt-BR. A lista de distros passou a vir do registro Lxss mais wsl --list --running --quiet, e o estado da VM passou a vir de .ToString() do enum."
+    problem_statement: >
+      Numa máquina Windows 11 25H2 em pt-BR, o cabeçalho e os estados de wsl --list --verbose
+      vêm traduzidos ("NOME", "Em execução", "Parado"), e a saída do wsl.exe sai em UTF-16LE,
+      às vezes sem BOM e com NULs soltos. No Hyper-V, Get-VM | ConvertTo-Json grava State como
+      número (2, 3, 6), e ConvertTo-Json devolve objeto solto quando há um único item e nada
+      quando não há itens. Quando não há distro rodando, wsl --list --running sai com código
+      diferente de zero.
+    key_learnings:
+      - "A lista de distros, a versão (1 ou 2) e a distro padrão estão em HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Lxss (DistributionName, Version, DefaultDistribution), que não é traduzido."
+      - "wsl.exe --list --running --quiet devolve só nomes. Decodifique como UTF-16LE detectando BOM ou bytes nulos nas posições ímpares, e trate código diferente de zero com o WSL instalado como 'nenhuma em execução'."
+      - "No PowerShell, $_.State.ToString() devolve o nome invariável do enum (Running, Off, Saved). ConvertTo-Json sozinho grava o número."
+      - "ConvertTo-Json -InputObject @($lista) garante array mesmo com zero ou um item. Sem isso, o parser recebe objeto, null ou vazio."
+      - "O WSL instalado pela Store usa só o serviço WSLService. LxssManager não existe no 25H2, então o detector precisa aceitar a ausência dele."
+    code_snippet: |
+      $root = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Lxss'
+      $items = Get-ChildItem $root | ForEach-Object {
+        $p = Get-ItemProperty $_.PSPath
+        [pscustomobject]@{ name = $p.DistributionName; version = [int]$p.Version }
+      }
+      ConvertTo-Json -InputObject @($items) -Compress
+      Get-VM | ForEach-Object { [pscustomobject]@{ name = $_.Name; state = $_.State.ToString() } }
+    impact_value: "O mesmo código lê WSL e Hyper-V em qualquer idioma do Windows e passou nos testes ao vivo numa máquina pt-BR com 5 distros."
+    related_projects: ["labmini"]
+
+  - id: "DEV-2026-162"
+    date: "2026-11-26"
+    title: "Desligar recursos do Windows com volta garantida exige gravar o estado anterior antes de mudar"
+    category: "arquitetura"
+    tags: [windows, registro, servicos, backup, rust]
+    slug: "desligar-recursos-do-windows-com-volta-garantida"
+    summary: "Scripts de debloat costumam gravar valores fixos e não sabem voltar ao estado de antes. No Labmini, cada ajuste passou a ser sondado, planejado com as operações de reversão calculadas a partir do valor real e gravado em backup antes da primeira alteração."
+    problem_statement: >
+      Desativar Xbox, widgets, telemetria e apps pré-instalados mexe em quatro tipos de alvo:
+      serviço, valor de registro, tarefa agendada e pacote Appx. Uma reversão genérica do tipo
+      "volta para Automático" ou "apaga a chave" erra quando o serviço era Automático com atraso,
+      quando o valor era ExpandString ou quando o valor nem existia antes. Também não dá para
+      confiar num plano montado minutos antes pela interface, porque o estado pode ter mudado.
+    key_learnings:
+      - "Serviço: guarde StartMode e DelayedAutoStart do Win32_Service e se estava rodando. Reverter é sc.exe config NOME start= auto, delayed-auto ou demand, e Start-Service só se estava rodando."
+      - "Registro: guarde se o valor existia, o tipo (GetValueKind) e o valor lido com 'DoNotExpandEnvironmentNames'. Se não existia, reverter é apagar o valor, não gravar zero. Tipos que você não sabe regravar (Binary, MultiString) ficam fora do plano."
+      - "O backup vai para o disco antes da primeira operação, com escrita atômica (arquivo temporário e rename). Assim, mesmo se o PowerShell cair no meio, existe como voltar."
+      - "O backend recebe só os ids e sonda de novo na hora de aplicar. Um plano velho vindo da interface nunca é executado."
+      - "Cada operação roda em try/catch próprio e devolve um resultado. A falha de um item não derruba os outros e fica registrada no backup."
+      - "A primeira sondagem grava um baseline.json que nunca é sobrescrito, com o retrato de como o Windows veio."
+    impact_value: "41 ajustes aplicados de uma vez no PC real podem ser revertidos tudo ou item a item, e o teste de ida e volta confirmou estado final idêntico ao inicial, inclusive tipo ExpandString."
+    related_projects: ["labmini"]
+
+  - id: "DEV-2026-163"
+    date: "2026-11-26"
+    title: "IDs da Microsoft Store mudam e só valem depois de conferidos com winget na máquina real"
+    category: "windows"
+    tags: [winget, msstore, appx, windows-11, debloat]
+    slug: "ids-da-microsoft-store-conferidos-com-winget"
+    summary: "O catálogo de limpeza usava IDs da Store para reinstalar apps removidos, e três deles não existiam mais. A verificação com winget show --source msstore no Windows 25H2 real passou a ser um teste do projeto, e apps sem ID válido deixaram de ser recomendados para remoção."
+    problem_statement: >
+      Remove-AppxPackage tira o app do usuário, e a volta depende de o pacote ainda estar em disco
+      (Add-AppxPackage -Register no AppxManifest.xml) ou de reinstalar pela Store. Dos 18 IDs
+      escritos de memória, os de Paciência (Solitaire), Dicas e Mapas não foram encontrados pelo
+      winget no msstore. Remover a Paciência sem ID válido tornaria a ação sem volta garantida.
+    key_learnings:
+      - "winget show --id ID --source msstore --accept-source-agreements responde se o ID existe hoje. Rode isso para cada ID antes de prometer reversão."
+      - "A reversão de um Appx tenta primeiro re-registrar pelo manifesto em InstallLocation, que sobrevive enquanto outro usuário ainda tiver o pacote, e só depois usa winget install."
+      - "Um app instalado cujo ID da Store não existe sai da lista de recomendados e ganha aviso explícito na tela de plano."
+      - "No 25H2 apareceram pacotes que o catálogo não previa (Microsoft.XboxGameCallableUI, Microsoft.WidgetsPlatformRuntime). Widgets se desliga melhor pela política AllowNewsAndInterests=0 em HKLM\\SOFTWARE\\Policies\\Microsoft\\Dsh do que removendo pacote."
+    code_snippet: |
+      foreach ($id in '9MV0B5HZVK9Z','9NZKPSTSNW4P','9WZDNCRFHWD2') {
+        winget show --id $id --source msstore --accept-source-agreements *> $null
+        "{0}: {1}" -f $id, ($(if ($LASTEXITCODE -eq 0) {'ok'} else {'NÃO ENCONTRADO'}))
+      }
+    impact_value: "Os 15 IDs que ficaram no catálogo foram confirmados na máquina real, e nenhum app recomendado para remoção fica sem caminho de volta."
+    related_projects: ["labmini"]
+
+  - id: "DEV-2026-164"
+    date: "2026-11-26"
+    title: "Compilar app Tauri para Windows a partir do Linux pede windres, gcc mingw e o WebView2Loader.dll ao lado do exe"
+    category: "devops"
+    tags: [tauri, rust, cross-compile, mingw, webview2]
+    slug: "compilar-tauri-para-windows-a-partir-do-linux"
+    summary: "O cargo check do app Tauri para x86_64-pc-windows-gnu falhava no build script com NotAttempted(x86_64-w64-mingw32-windres). Com binutils e gcc mingw instalados, o build cruzado gerou um exe funcional, mas que depende de WebView2Loader.dll na mesma pasta."
+    problem_statement: >
+      O tauri-build embute ícone e manifesto com tauri-winres, que chama x86_64-w64-mingw32-windres.
+      Sem o binário, o build script entra em pânico. Com só o binutils instalado, o windres falha
+      com "preprocessing failed", porque usa o gcc do mingw como pré-processador. O exe gerado
+      pelo alvo gnu importa WebView2Loader.dll dinamicamente, ao contrário do build MSVC, que o
+      liga estaticamente.
+    key_learnings:
+      - "Para o alvo windows-gnu no Ubuntu: rustup target add x86_64-pc-windows-gnu e apt install binutils-mingw-w64-x86-64 gcc-mingw-w64-x86-64. Os dois pacotes são necessários."
+      - "x86_64-w64-mingw32-objdump -p labmini.exe | grep 'DLL Name' mostra a dependência de WebView2Loader.dll. A DLL fica em target/x86_64-pc-windows-gnu/release/ e tem que ir junto no zip."
+      - "O build cruzado serve para validar compilação e entregar uma prévia rápida. O instalador definitivo (NSIS e MSI) sai de npm run tauri build com MSVC, no Windows ou no runner windows-latest do GitHub Actions."
+      - "O núcleo em Rust separado do app Tauri, com um trait Runner único para executar comandos, permite rodar 58 testes no Linux com saídas reais gravadas como fixtures."
+    code_snippet: |
+      rustup target add x86_64-pc-windows-gnu
+      apt-get install -y binutils-mingw-w64-x86-64 gcc-mingw-w64-x86-64
+      cargo build --release --target x86_64-pc-windows-gnu -p labmini
+      x86_64-w64-mingw32-objdump -p target/x86_64-pc-windows-gnu/release/labmini.exe | grep 'DLL Name'
+    impact_value: "O app passou a compilar e ser verificado para Windows num container Linux, antes de existir qualquer toolchain na máquina de destino."
+    related_projects: ["labmini"]
+
+  - id: "DEV-2026-165"
+    date: "2026-11-26"
+    title: "CI com clippy -D warnings e toolchain stable quebra quando o Rust ganha lint novo"
+    category: "devops"
+    tags: [rust, clippy, github-actions, vitest, playwright]
+    slug: "ci-clippy-d-warnings-quebra-com-lint-novo"
+    summary: "O primeiro push do Labmini falhou no CI porque o Rust 1.100 trouxe o lint chunks_exact_to_as_chunks e o runner usava stable mais recente que o ambiente local. Corrigir o código, atualizar a toolchain local e fixar as dependências de teste deixou Linux e Windows verdes."
+    problem_statement: >
+      Localmente o clippy passava limpo. No GitHub Actions, dtolnay/rust-toolchain@stable instalou
+      a versão do dia, e -D warnings transformou o lint novo em erro nos dois jobs. Na mesma rodada,
+      o e2e falhou com MODULE_NOT_FOUND porque o script fazia require('playwright') de uma instalação
+      global que só existia no container de desenvolvimento. Atualizar o vitest para 5.x, para zerar
+      o npm audit, removeu a chave test do defineConfig do Vite.
+    key_learnings:
+      - "Rode rustup update stable antes de confiar num clippy local quando o CI usa @stable. Para .chunks_exact(2) com tamanho constante, o lint pede .as_chunks::<2>().0.iter()."
+      - "Campo em [workspace.package] que nenhum crate herda gera o aviso unused_workspace_package_fields. Herde com repository.workspace = true."
+      - "Dependência usada pelo script de teste vai no devDependencies com versão exata. Aqui foi playwright 1.63.0, igual à versão do navegador já instalado, para não quebrar o ambiente local."
+      - "Com vitest 5, a configuração test: {...} saiu do tipo do defineConfig do Vite. Remova a chave ou use vitest.config.ts."
+    impact_value: "O CI roda no Windows real o teste de ida e volta e gera o instalador como artefato a cada push, verde nos dois sistemas."
+    related_projects: ["labmini"]
